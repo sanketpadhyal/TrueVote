@@ -23,13 +23,17 @@ export const Navbar: React.FC = () => {
     <>
       <header className={`navbar-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="navbar-inner">
-          {/* Logo */}
+          {/* Logo with User's Brand Logo */}
           <a href="/" className="navbar-brand">
-            <div className="navbar-star-icon">✦</div>
-            <span>TrueVote</span>
+            <img 
+              src="/images/logo.png" 
+              alt="TrueVote Logo" 
+              className="navbar-logo-img" 
+            />
+            <span className="navbar-brand-name">TrueVote</span>
           </a>
 
-          {/* Links matching Screenshot 3 */}
+          {/* Center Nav Links */}
           <ul className="navbar-menu">
             <li><a href="#features" className="navbar-link">Features</a></li>
             <li><a href="#benefits" className="navbar-link">Benefits</a></li>
@@ -58,6 +62,10 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
+        <div className="mobile-drawer-brand">
+          <img src="/images/logo.png" alt="TrueVote" className="navbar-logo-img" style={{ width: 28, height: 28 }} />
+          <span className="navbar-brand-name">TrueVote</span>
+        </div>
         <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
         <a href="#benefits" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Benefits</a>
         <a href="#integrations" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Integrations</a>
