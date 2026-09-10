@@ -51,6 +51,10 @@
   letter-spacing: -0.03em;
 }
 
+.navbar-brand-name .brand-accent {
+  color: #1d6bf3;
+}
+
 /* Center Nav Menu */
 .navbar-menu {
   display: flex;
