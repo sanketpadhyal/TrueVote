@@ -59,7 +59,14 @@ export const HomePage: React.FC = () => {
     const elements = document.querySelectorAll('.blur-animate');
     elements.forEach((el) => observer.observe(el));
 
+    // Smooth entrance on mount for hero elements
+    const heroTimer = setTimeout(() => {
+      const topElements = document.querySelectorAll('.hero-container .blur-animate');
+      topElements.forEach((el) => el.classList.add('visible'));
+    }, 50);
+
     return () => {
+      clearTimeout(heroTimer);
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('scroll', handleScroll);
       lenis?.destroy();
@@ -71,7 +78,7 @@ export const HomePage: React.FC = () => {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 4500);
+    }, 3500);
   };
 
   // 3D transformation values (bypassed on mobile)
@@ -82,6 +89,14 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="landing-wrapper">
+      {/* Ambient Flashing / Floating Glassmorphic Orbs behind Navbar & Hero */}
+      <div className="ambient-glass-lights" aria-hidden="true">
+        <div className="glass-orb orb-primary" />
+        <div className="glass-orb orb-secondary" />
+        <div className="glass-orb orb-cyan" />
+        <div className="glass-orb orb-accent" />
+      </div>
+
       {/* Persistent Glass Navbar */}
       <Navbar />
 
