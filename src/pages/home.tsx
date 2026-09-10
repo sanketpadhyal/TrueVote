@@ -37,7 +37,6 @@ export const HomePage: React.FC = () => {
     const handleScroll = () => {
       if (window.innerWidth <= 768) return;
       const scrollY = window.scrollY;
-      // Map scroll from 0 to 350px to a progress value from 0 to 1
       const progress = Math.min(Math.max(scrollY / 350, 0), 1);
       setScrollProgress(progress);
     };
@@ -96,9 +95,25 @@ export const HomePage: React.FC = () => {
           <div className="float-symbol sym-orange">☤</div>
         </div>
 
-        {/* Hackathon Badge Pill */}
+        {/* Top Hackathon Badge matching Screenshot 2 */}
         <div className="trusted-pill blur-animate">
-          <span className="hackathon-icon">🏆</span>
+          <div className="avatar-group">
+            <img 
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" 
+              alt="Voter 1" 
+              className="avatar-img" 
+            />
+            <img 
+              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" 
+              alt="Voter 2" 
+              className="avatar-img" 
+            />
+            <img 
+              src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" 
+              alt="Voter 3" 
+              className="avatar-img" 
+            />
+          </div>
           <span className="trusted-text">This is a Hackathon Project</span>
         </div>
 
@@ -126,7 +141,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* 3D PERSPECTIVE DASHBOARD SHOWCASE (Direct on mobile, 3D on desktop) */}
+        {/* 3D PERSPECTIVE DASHBOARD SHOWCASE */}
         <div className="dashboard-perspective-wrapper blur-animate delay-4">
           <div 
             className="dashboard-shell-wrapper"

@@ -13,15 +13,15 @@
   
   --brand-blue: #1d6bf3;
   --brand-blue-hover: #1557d4;
-  --brand-blue-light: #eff6ff;
-  --brand-blue-border: #bfdbfe;
+  --brand-blue-light: #eaf2fe;
+  --brand-blue-border: #1d6bf3;
   
   --border-subtle: #f1f5f9;
   --border-card: #e8edf4;
   
   --shadow-glow: 0 25px 90px -15px rgba(29, 107, 243, 0.2);
   --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
-  --shadow-button: 0 10px 22px -5px rgba(29, 107, 243, 0.4);
+  --shadow-button: 0 8px 20px -4px rgba(29, 107, 243, 0.35);
 }
 
 * {
@@ -84,7 +84,7 @@ html, body {
   background-color: var(--bg-page);
 }
 
-/* Hero Section with Generous Top Gap and Refined De-Zoomed Scale */
+/* Hero Section */
 .hero-container {
   width: 100%;
   max-width: 1200px;
@@ -96,35 +96,46 @@ html, body {
   position: relative;
 }
 
-/* Top Hackathon Badge */
+/* Top Hackathon Badge matching Screenshot 2 */
 .trusted-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   background-color: var(--brand-blue-light);
   border: 1.5px solid var(--brand-blue-border);
-  padding: 0.35rem 1.15rem;
+  padding: 0.3rem 1.15rem 0.3rem 0.35rem;
   border-radius: 9999px;
   margin-bottom: 1.4rem;
   box-shadow: 0 2px 8px rgba(29, 107, 243, 0.08);
 }
 
-.hackathon-icon {
-  font-size: 0.95rem;
-  line-height: 1;
+.avatar-group {
   display: flex;
   align-items: center;
 }
 
+.avatar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px; /* rounded square like Screenshot 2 */
+  border: 1.5px solid #ffffff;
+  margin-left: -5px;
+  object-fit: cover;
+}
+
+.avatar-img:first-child {
+  margin-left: 0;
+}
+
 .trusted-text {
   font-family: var(--font-main);
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--brand-blue);
   letter-spacing: -0.01em;
 }
 
-/* Hero Headline - De-zoomed & Balanced */
+/* Hero Headline */
 .main-title {
   font-size: 3.5rem;
   line-height: 1.1;
@@ -144,7 +155,7 @@ html, body {
   margin-bottom: 1.75rem;
 }
 
-/* CTA Buttons */
+/* CTA Buttons - NO HOVER JUMPS OR TRANSFORMS */
 .hero-action-group {
   display: flex;
   flex-direction: column;
@@ -163,16 +174,14 @@ html, body {
   border: none;
   cursor: pointer;
   box-shadow: var(--shadow-button);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
-  position: relative;
-  overflow: hidden;
+  transition: background-color 0.15s ease;
+  /* Completely static: NO translateY, NO scale, NO jumpy shadows */
 }
 
 .btn-primary-blue:hover {
   background-color: var(--brand-blue-hover);
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 14px 30px -5px rgba(29, 107, 243, 0.5);
+  /* Pure color change only */
 }
 
 .credit-caption {
@@ -184,7 +193,7 @@ html, body {
   color: #64748b;
 }
 
-/* Floating 3D Icon Cards - Compact Scale */
+/* Floating 3D Icon Cards - NO HOVER ROTATE OR LIFT */
 .floating-icon-card {
   position: absolute;
   width: 58px;
@@ -196,12 +205,7 @@ html, body {
   justify-content: center;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border-card);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 10;
-}
-
-.floating-icon-card:hover {
-  transform: translateY(-6px) rotate(4deg);
 }
 
 .float-top-left {
@@ -231,7 +235,7 @@ html, body {
 .sym-orange { background: #ffedd5; color: #ea580c; }
 
 /* ==========================================================================
-   3D PERSPECTIVE DASHBOARD SHOWCASE (Balanced Scale)
+   3D PERSPECTIVE DASHBOARD SHOWCASE
    ========================================================================== */
 .dashboard-perspective-wrapper {
   perspective: 1200px;
@@ -276,7 +280,7 @@ html, body {
 }
 
 /* ==========================================================================
-   BENEFITS SECTION (Refined Scale matching Screenshot 3)
+   BENEFITS SECTION - NO HOVER LIFTS OR SCALE
    ========================================================================== */
 .benefits-section {
   width: 100%;
@@ -289,8 +293,8 @@ html, body {
 }
 
 .benefits-pill-badge {
-  background-color: var(--brand-blue-light);
-  border: 1.5px solid var(--brand-blue-border);
+  background-color: #eaf2fe;
+  border: 1.5px solid #1d6bf3;
   color: var(--brand-blue);
   font-size: 0.825rem;
   font-weight: 700;
@@ -336,21 +340,15 @@ html, body {
   align-items: flex-start;
   text-align: left;
   box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
-}
-
-.benefit-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 35px -8px rgba(29, 107, 243, 0.12);
-  border-color: #bfdbfe;
+  /* Static: NO translateY, NO shadow jumps */
 }
 
 .benefit-icon-wrapper {
   width: 44px;
   height: 44px;
-  background: var(--brand-blue-light);
+  background: #eaf2fe;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -358,11 +356,7 @@ html, body {
   margin-bottom: 1.5rem;
   color: var(--brand-blue);
   font-size: 1.25rem;
-  transition: transform 0.3s ease;
-}
-
-.benefit-card:hover .benefit-icon-wrapper {
-  transform: scale(1.08);
+  /* Static: NO scale on hover */
 }
 
 .benefit-card-title {
