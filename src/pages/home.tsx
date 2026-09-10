@@ -15,6 +15,7 @@ export const HomePage: React.FC = () => {
       setIsMobile(window.innerWidth <= 768);
     };
     checkMobile();
+
     window.addEventListener('resize', checkMobile);
 
     // Initialize Lenis Smooth Scroll on desktop
@@ -98,13 +99,10 @@ export const HomePage: React.FC = () => {
         {/* Top Hackathon Badge with Icon */}
         <div className="trusted-pill blur-animate">
           <div className="hackathon-icon-box">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-              <path d="M4 22h16" />
-              <path d="M10 14.66V17c0 .55-.45 1-1 1H7" />
-              <path d="M14 14.66V17c0 .55.45 1 1 1h2" />
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m9 12 2 2 4-4" />
+              <path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" />
+              <path d="M9 3h6" />
             </svg>
           </div>
           <span className="trusted-text">This is a Hackathon Project</span>
@@ -129,7 +127,10 @@ export const HomePage: React.FC = () => {
             Get Started For Free
           </button>
           <div className="credit-caption">
-            <span>💳</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="20" height="14" x="2" y="5" rx="2" />
+              <line x1="2" x2="22" y1="10" y2="10" />
+            </svg>
             <span>No crypto wallet or gas fees required</span>
           </div>
         </div>
