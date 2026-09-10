@@ -96,14 +96,10 @@ export const HomePage: React.FC = () => {
           <div className="float-symbol sym-orange">☤</div>
         </div>
 
-        {/* Top Trusted Pill Badge */}
+        {/* Hackathon Badge Pill */}
         <div className="trusted-pill blur-animate">
-          <div className="avatar-group">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar 1" className="avatar-img" />
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Avatar 2" className="avatar-img" />
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Avatar 3" className="avatar-img" />
-          </div>
-          <span className="trusted-text">Trusted by 1M+ voters</span>
+          <span className="hackathon-icon">🏆</span>
+          <span className="trusted-text">This is a Hackathon Project</span>
         </div>
 
         {/* Main Title with Serif Accent */}
