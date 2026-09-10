@@ -137,7 +137,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* 3D PERSPECTIVE DASHBOARD SHOWCASE */}
-        <div className="dashboard-perspective-wrapper blur-animate delay-4">
+        <div className="dashboard-perspective-wrapper blur-animate delay-4" id="features">
           <div 
             className="dashboard-shell-wrapper"
             style={{
