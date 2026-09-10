@@ -1,8 +1,48 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
+import Navbar from '../components/navbar';
+import '../styles/animations.css';
 import './home.css';
 
+interface VoterRecord {
+  id: string;
+  name: string;
+  org: string;
+  avatar: string;
+  status: string;
+}
+
 export const HomePage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('Dashboard');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedVoter, setSelectedVoter] = useState<string>('Maggie Johnson');
+  const [hasVoted, setHasVoted] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [voters] = useState<VoterRecord[]>([
+    {
+      id: '1',
+      name: 'Chris Friedkly',
+      org: 'Supermarket Villanova',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80',
+      status: 'Verified',
+    },
+    {
+      id: '2',
+      name: 'Maggie Johnson',
+      org: 'Oasis Organic Inc.',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80',
+      status: 'Verified',
+    },
+    {
+      id: '3',
+      name: 'Gael Harry',
+      org: 'New York Finest Fruits',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80',
+      status: 'Verified',
+    },
+  ]);
+
   useEffect(() => {
     // Initialize Lenis Smooth Scroll
     const lenis = new Lenis({
@@ -39,33 +79,34 @@ export const HomePage: React.FC = () => {
     };
   }, []);
 
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4500);
+  };
+
+  const handleVoteDemo = (candidateName: string) => {
+    if (hasVoted) {
+      triggerToast('⚠️ Device Token Consumed: You have already voted in this session.');
+      return;
+    }
+    setHasVoted(true);
+    triggerToast(`✅ Vote recorded for ${candidateName}! Relayer submitted hash to EVM.`);
+  };
+
+  const filteredVoters = voters.filter(v => 
+    v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.org.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="landing-wrapper">
-      {/* Header Navigation matching Screenshot 1 */}
-      <header className="header-nav blur-animate">
-        <a href="/" className="brand-logo">
-          <div className="logo-star-icon">✦</div>
-          <span>TrueVote</span>
-        </a>
+      {/* Persistent Glass Navbar Component */}
+      <Navbar />
 
-        <ul className="nav-menu">
-          <li><a href="#features" className="nav-item">Features</a></li>
-          <li><a href="#benefits" className="nav-item">Benefits</a></li>
-          <li><a href="#integrations" className="nav-item">Integrations</a></li>
-          <li><a href="#pricing" className="nav-item">Pricing</a></li>
-          <li><a href="#faq" className="nav-item">FAQ</a></li>
-          <li><a href="#blogs" className="nav-item">Blogs</a></li>
-        </ul>
-
-        <button className="btn-header-cta">
-          Get Started
-        </button>
-
-        <button className="mobile-menu-btn">☰</button>
-      </header>
-
-      {/* Hero Section matching Screenshot 1 */}
-      <section className="hero-container">
+      {/* Hero Section */}
+      <section className="hero-container" style={{ paddingTop: '8.5rem' }}>
         {/* Floating 3D Icon Badges */}
         <div className="floating-icon-card float-top-left blur-animate delay-1">
           <div className="float-symbol sym-blue">⚡</div>
@@ -86,14 +127,14 @@ export const HomePage: React.FC = () => {
         {/* Trusted Pill Badge */}
         <div className="trusted-pill blur-animate">
           <div className="avatar-group">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Voter Avatar 1" className="avatar-img" />
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Voter Avatar 2" className="avatar-img" />
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Voter Avatar 3" className="avatar-img" />
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Voter 1" className="avatar-img" />
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Voter 2" className="avatar-img" />
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Voter 3" className="avatar-img" />
           </div>
           <span className="trusted-text">Trusted by 100K+ voters</span>
         </div>
 
-        {/* Hero Title & Subtitle */}
+        {/* Main Title */}
         <h1 className="main-title blur-animate delay-1">
           Turn Web3 Voting <br />
           Into Instant Decisions
@@ -104,9 +145,12 @@ export const HomePage: React.FC = () => {
           relayer state and voter behavior—without the chaos.
         </p>
 
-        {/* Action Button & Subtext */}
+        {/* Action Button & Caption */}
         <div className="hero-action-group blur-animate delay-3">
-          <button className="btn-primary-blue">
+          <button 
+            className="btn-hyper-blue"
+            onClick={() => handleVoteDemo('Candidate Alpha')}
+          >
             Get Started For Free
           </button>
           <div className="credit-caption">
@@ -115,39 +159,73 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dashboard Shell Showcase matching Screenshot 2 */}
+        {/* Dashboard Shell Showcase */}
         <div className="dashboard-shell-wrapper blur-animate delay-4">
           <div className="dashboard-outer-glow">
-            <div className="dashboard-app-frame">
+            <div className="dashboard-app-frame glass-panel">
               {/* Left Sidebar */}
               <aside className="app-sidebar">
                 <div className="sidebar-brand">
-                  <div className="logo-star-icon" style={{ width: 24, height: 24, fontSize: '0.8rem' }}>✦</div>
+                  <div className="navbar-star-icon" style={{ width: 24, height: 24, fontSize: '0.8rem' }}>✦</div>
                   <span>TrueVote</span>
                 </div>
 
                 <div className="search-box">
                   <span>🔍</span>
-                  <input type="text" placeholder="Search" readOnly />
+                  <input 
+                    type="text" 
+                    placeholder="Search voter..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
 
                 <ul className="sidebar-nav">
-                  <li className="sidebar-item active">📊 Dashboard</li>
-                  <li className="sidebar-item">👥 Voters</li>
-                  <li className="sidebar-item">📑 All reports</li>
-                  <li className="sidebar-item">🌐 Geography</li>
-                  <li className="sidebar-item">💬 Conversations</li>
-                  <li className="sidebar-item">🤝 Deals</li>
+                  <li 
+                    className={`sidebar-item ${activeTab === 'Dashboard' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('Dashboard')}
+                  >
+                    📊 Dashboard
+                  </li>
+                  <li 
+                    className={`sidebar-item ${activeTab === 'Voters' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('Voters')}
+                  >
+                    👥 Voters
+                  </li>
+                  <li 
+                    className={`sidebar-item ${activeTab === 'Reports' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('Reports')}
+                  >
+                    📑 All reports
+                  </li>
+                  <li 
+                    className={`sidebar-item ${activeTab === 'Geography' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('Geography')}
+                  >
+                    🌐 Geography
+                  </li>
+                  <li 
+                    className={`sidebar-item ${activeTab === 'Relayer' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('Relayer')}
+                  >
+                    💬 Conversations
+                  </li>
+                  <li 
+                    className={`sidebar-item ${activeTab === 'Deals' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('Deals')}
+                  >
+                    🤝 Deals
+                  </li>
                   <li className="sidebar-item">📥 Export</li>
                 </ul>
               </aside>
 
-              {/* Main Dashboard Panel */}
+              {/* Main Panel */}
               <main className="app-main-panel">
                 {/* Top Metrics Grid */}
                 <div className="metrics-top-grid">
-                  {/* Revenue / Votes Metric Card */}
-                  <div className="metric-card">
+                  <div className="metric-card glass-panel">
                     <div className="metric-card-header">Total Votes</div>
                     <div>
                       <div className="metric-value-row">
@@ -159,8 +237,7 @@ export const HomePage: React.FC = () => {
                     <a href="#reports" className="metric-link">Votes report →</a>
                   </div>
 
-                  {/* On-Chain Finality Card */}
-                  <div className="metric-card">
+                  <div className="metric-card glass-panel">
                     <div className="metric-card-header">Lost deals</div>
                     <div>
                       <div className="metric-value-row">
@@ -171,12 +248,10 @@ export const HomePage: React.FC = () => {
                     <a href="#deals" className="metric-link">All deals →</a>
                   </div>
 
-                  {/* Semi-Circle Gauge Arc Card */}
-                  <div className="metric-card">
+                  <div className="metric-card glass-panel">
                     <div className="metric-card-header">Quarter goal</div>
                     <div className="gauge-wrapper">
                       <svg className="gauge-svg" viewBox="0 0 100 50">
-                        {/* Background Track Arc */}
                         <path
                           d="M 10,50 A 40,40 0 0,1 90,50"
                           fill="none"
@@ -184,7 +259,6 @@ export const HomePage: React.FC = () => {
                           strokeWidth="10"
                           strokeLinecap="round"
                         />
-                        {/* Progress Arc (84%) */}
                         <path
                           d="M 10,50 A 40,40 0 0,1 82,24"
                           fill="none"
@@ -201,8 +275,8 @@ export const HomePage: React.FC = () => {
 
                 {/* Bottom Metrics Grid */}
                 <div className="metrics-bottom-grid">
-                  {/* Customers / Voters List Card */}
-                  <div className="content-box">
+                  {/* Voters List */}
+                  <div className="content-box glass-panel">
                     <div className="box-header">
                       <span className="box-title">Customers</span>
                       <select className="sort-select">
@@ -211,46 +285,36 @@ export const HomePage: React.FC = () => {
                     </div>
 
                     <div className="voters-list">
-                      <div className="voter-row">
-                        <div className="voter-profile">
-                          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" alt="Chris" className="voter-avatar" />
-                          <div className="voter-details">
-                            <span className="voter-name">Chris Friedkly</span>
-                            <span className="voter-org">Supermarket Villanova</span>
+                      {filteredVoters.map((v) => (
+                        <div 
+                          key={v.id} 
+                          className={`voter-row ${selectedVoter === v.name ? 'active-row' : ''}`}
+                          onClick={() => setSelectedVoter(v.name)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className="voter-profile">
+                            <img src={v.avatar} alt={v.name} className="voter-avatar" />
+                            <div className="voter-details">
+                              <span className="voter-name">{v.name}</span>
+                              <span className="voter-org">{v.org}</span>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div className="voter-row active-row">
-                        <div className="voter-profile">
-                          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Maggie" className="voter-avatar" />
-                          <div className="voter-details">
-                            <span className="voter-name">Maggie Johnson</span>
-                            <span className="voter-org">Oasis Organic Inc.</span>
-                          </div>
+                          {selectedVoter === v.name && (
+                            <div className="row-actions">
+                              <span>💬</span>
+                              <span>⭐</span>
+                              <span>✏️</span>
+                              <span>⋮</span>
+                            </div>
+                          )}
                         </div>
-                        <div className="row-actions">
-                          <span>💬</span>
-                          <span>⭐</span>
-                          <span>✏️</span>
-                          <span>⋮</span>
-                        </div>
-                      </div>
-
-                      <div className="voter-row">
-                        <div className="voter-profile">
-                          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80" alt="Gael" className="voter-avatar" />
-                          <div className="voter-details">
-                            <span className="voter-name">Gael Harry</span>
-                            <span className="voter-org">New York Finest Fruits</span>
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Growth Line Chart Card */}
-                  <div className="content-box">
+                  {/* Growth Line Chart */}
+                  <div className="content-box glass-panel">
                     <div className="box-header">
                       <span className="box-title">Growth</span>
                       <select className="sort-select">
@@ -262,19 +326,15 @@ export const HomePage: React.FC = () => {
                       <svg className="chart-svg" viewBox="0 0 500 150" preserveAspectRatio="none">
                         <defs>
                           <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#1d6bf3" stopOpacity="0.35" />
+                            <stop offset="0%" stopColor="#1d6bf3" stopOpacity="0.4" />
                             <stop offset="100%" stopColor="#1d6bf3" stopOpacity="0.0" />
                           </linearGradient>
                         </defs>
-                        {/* Grid lines */}
                         <line x1="0" y1="30" x2="500" y2="30" stroke="#f1f5f9" strokeDasharray="4 4" />
                         <line x1="0" y1="70" x2="500" y2="70" stroke="#f1f5f9" strokeDasharray="4 4" />
                         <line x1="0" y1="110" x2="500" y2="110" stroke="#f1f5f9" strokeDasharray="4 4" />
 
-                        {/* Area Fill */}
                         <polygon points="0,120 70,110 140,90 210,50 280,105 350,75 420,30 500,150 0,150" fill="url(#chartGradient)" />
-                        
-                        {/* Main Line */}
                         <path d="M 0,120 Q 70,110 140,90 T 280,105 T 420,30 L 500,15" fill="none" stroke="#1d6bf3" strokeWidth="3" />
                       </svg>
                     </div>
@@ -285,6 +345,13 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Toast Feedback Notification */}
+      {toastMessage && (
+        <div className="vote-toast glass-panel-dark">
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 };

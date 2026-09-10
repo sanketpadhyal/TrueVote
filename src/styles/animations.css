@@ -1,0 +1,162 @@
+/* ==========================================================================
+   Hyper-Premium Glassy UI, Universal Animations & Button Styles
+   ========================================================================== */
+
+/* Universal Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.05),
+              0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
+}
+
+.glass-nav-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(248, 250, 252, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-nav-container.scrolled {
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+  border-bottom-color: rgba(203, 213, 225, 0.8);
+}
+
+/* Hyper Premium Buttons */
+.btn-hyper-blue {
+  position: relative;
+  background: linear-gradient(135deg, #1d6bf3 0%, #1557d4 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(29, 107, 243, 0.4),
+              0 2px 4px rgba(29, 107, 243, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.btn-hyper-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.65s ease;
+}
+
+.btn-hyper-blue:hover::before {
+  left: 140%;
+}
+
+.btn-hyper-blue:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 36px -6px rgba(29, 107, 243, 0.55),
+              0 4px 12px rgba(29, 107, 243, 0.3);
+}
+
+.btn-hyper-blue:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.btn-hyper-dark {
+  position: relative;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.btn-hyper-dark:hover {
+  background: #1e293b;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 18px 36px -6px rgba(15, 23, 42, 0.45);
+}
+
+.btn-hyper-outline {
+  background: rgba(255, 255, 255, 0.5);
+  color: #0f172a;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  border: 1.5px solid #0f172a;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.btn-hyper-outline:hover {
+  background: #0f172a;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px -5px rgba(15, 23, 42, 0.25);
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(29, 107, 243, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(29, 107, 243, 0.6);
+  }
+}
+
+.glow-animation {
+  animation: pulseGlow 4s infinite ease-in-out;
+}
