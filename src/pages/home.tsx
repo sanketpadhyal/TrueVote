@@ -95,24 +95,17 @@ export const HomePage: React.FC = () => {
           <div className="float-symbol sym-orange">☤</div>
         </div>
 
-        {/* Top Hackathon Badge matching Screenshot 2 */}
+        {/* Top Hackathon Badge with Icon */}
         <div className="trusted-pill blur-animate">
-          <div className="avatar-group">
-            <img 
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" 
-              alt="Voter 1" 
-              className="avatar-img" 
-            />
-            <img 
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" 
-              alt="Voter 2" 
-              className="avatar-img" 
-            />
-            <img 
-              src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" 
-              alt="Voter 3" 
-              className="avatar-img" 
-            />
+          <div className="hackathon-icon-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+              <path d="M4 22h16" />
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H7" />
+              <path d="M14 14.66V17c0 .55.45 1 1 1h2" />
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+            </svg>
           </div>
           <span className="trusted-text">This is a Hackathon Project</span>
         </div>

@@ -109,22 +109,16 @@ html, body {
   box-shadow: 0 2px 8px rgba(29, 107, 243, 0.08);
 }
 
-.avatar-group {
+.hackathon-icon-box {
+  width: 26px;
+  height: 26px;
+  background: var(--brand-blue);
+  color: #ffffff;
+  border-radius: 7px;
   display: flex;
   align-items: center;
-}
-
-.avatar-img {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px; /* rounded square like Screenshot 2 */
-  border: 1.5px solid #ffffff;
-  margin-left: -5px;
-  object-fit: cover;
-}
-
-.avatar-img:first-child {
-  margin-left: 0;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(29, 107, 243, 0.3);
 }
 
 .trusted-text {
