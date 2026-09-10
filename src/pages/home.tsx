@@ -89,14 +89,6 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="landing-wrapper">
-      {/* Ambient Flashing / Floating Glassmorphic Orbs behind Navbar & Hero */}
-      <div className="ambient-glass-lights" aria-hidden="true">
-        <div className="glass-orb orb-primary" />
-        <div className="glass-orb orb-secondary" />
-        <div className="glass-orb orb-cyan" />
-        <div className="glass-orb orb-accent" />
-      </div>
-
       {/* Persistent Glass Navbar */}
       <Navbar />
 
