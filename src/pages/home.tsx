@@ -137,16 +137,8 @@ export const HomePage: React.FC = () => {
           <div className="float-symbol sym-blue">⚡</div>
         </div>
 
-        <div className="floating-icon-card float-bottom-left blur-animate delay-2">
-          <div className="float-symbol sym-dark">N</div>
-        </div>
-
         <div className="floating-icon-card float-top-right blur-animate delay-1">
           <div className="float-symbol sym-orange">☤</div>
-        </div>
-
-        <div className="floating-icon-card float-bottom-right blur-animate delay-2">
-          <div className="float-symbol sym-purple">⬢</div>
         </div>
 
         {/* Top Trusted Pill Badge */}
