@@ -99,10 +99,11 @@ export const HomePage: React.FC = () => {
         {/* Top Hackathon Badge with Icon */}
         <div className="trusted-pill blur-animate">
           <div className="hackathon-icon-box">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m9 12 2 2 4-4" />
-              <path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" />
-              <path d="M9 3h6" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6" />
+              <path d="M3 13h18" />
+              <path d="m9 7.5 2 2 4-4" />
+              <path d="M7 10V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v6" />
             </svg>
           </div>
           <span className="trusted-text">This is a Hackathon Project</span>
