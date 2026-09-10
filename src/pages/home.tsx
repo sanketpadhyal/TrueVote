@@ -1,233 +1,290 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import Lenis from 'lenis';
 import './home.css';
 
-interface Candidate {
-  id: string;
-  number: string;
-  name: string;
-  party: string;
-  votes: number;
-}
-
 export const HomePage: React.FC = () => {
-  const [hasVoted, setHasVoted] = useState<boolean>(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  
-  const [candidates, setCandidates] = useState<Candidate[]>([
-    {
-      id: '01',
-      number: '01',
-      name: 'John Davis',
-      party: 'Progressive Party',
-      votes: 1420,
-    },
-    {
-      id: '02',
-      number: '02',
-      name: 'Sarah Chen',
-      party: 'Community Alliance',
-      votes: 1890,
-    },
-    {
-      id: '03',
-      number: '03',
-      name: 'Michael Brown',
-      party: 'Innovation Coalition',
-      votes: 1150,
-    },
-  ]);
+  useEffect(() => {
+    // Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
 
-  const totalVotes = candidates.reduce((acc, curr) => acc + curr.votes, 0);
-
-  const handleVote = (candidateId: string, candidateName: string) => {
-    if (hasVoted) {
-      showToast(`⚠️ Device Token Consumed: You have already cast your vote in this election.`);
-      return;
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
     }
 
-    setCandidates(prev =>
-      prev.map(c => (c.id === candidateId ? { ...c, votes: c.votes + 1 } : c))
-    );
-    setHasVoted(true);
-    setSelectedCandidate(candidateName);
-    showToast(`✅ Vote cast successfully for ${candidateName}! Relayer processing block on-chain.`);
-  };
+    requestAnimationFrame(raf);
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4500);
-  };
+    // Blur-to-Normal Scroll Observer
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const elements = document.querySelectorAll('.blur-animate');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      lenis.destroy();
+      observer.disconnect();
+    };
+  }, []);
 
   return (
-    <div className="home-container">
-      {/* Top Navbar */}
-      <header className="navbar">
-        <a href="/" className="logo-group">
-          <div className="logo-badge">V</div>
+    <div className="landing-wrapper">
+      {/* Header Navigation matching Screenshot 1 */}
+      <header className="header-nav blur-animate">
+        <a href="/" className="brand-logo">
+          <div className="logo-star-icon">✦</div>
           <span>TrueVote</span>
         </a>
-        
-        <ul className="nav-links">
-          <li><a href="#overview" className="nav-link active">Profile</a></li>
-          <li><a href="#updates" className="nav-link">Updates</a></li>
-          <li><a href="#candidates" className="nav-link">Candidates</a></li>
+
+        <ul className="nav-menu">
+          <li><a href="#features" className="nav-item">Features</a></li>
+          <li><a href="#benefits" className="nav-item">Benefits</a></li>
+          <li><a href="#integrations" className="nav-item">Integrations</a></li>
+          <li><a href="#pricing" className="nav-item">Pricing</a></li>
+          <li><a href="#faq" className="nav-item">FAQ</a></li>
+          <li><a href="#blogs" className="nav-item">Blogs</a></li>
         </ul>
 
-        <div className="nav-actions">
-          <button className="btn-pill-dark">
-            <span>Sign up</span>
-          </button>
-          <div className="hamburger-icon">☰</div>
-        </div>
+        <button className="btn-header-cta">
+          Get Started
+        </button>
+
+        <button className="mobile-menu-btn">☰</button>
       </header>
 
-      {/* Hero Section */}
-      <section className="hero-section" id="overview">
-        <div className="hero-content">
-          <div className="online-vote-badge">Online Vote</div>
-          
-          <h1 className="hero-headline">
-            Political <span className="highlight-muted">Voting</span>
-          </h1>
+      {/* Hero Section matching Screenshot 1 */}
+      <section className="hero-container">
+        {/* Floating 3D Icon Badges */}
+        <div className="floating-icon-card float-top-left blur-animate delay-1">
+          <div className="float-symbol sym-blue">⚡</div>
+        </div>
 
-          <p className="hero-subtext">
-            TrueVote is a decentralized Web3 voting platform for secure and anonymous elections.
-            Users can vote without creating an account or connecting a wallet.
-          </p>
+        <div className="floating-icon-card float-bottom-left blur-animate delay-2">
+          <div className="float-symbol sym-dark">N</div>
+        </div>
 
-          <div className="cta-group">
-            <button 
-              className="btn-pill-dark"
-              onClick={() => {
-                const el = document.getElementById('candidates');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              <span className="hand-pointer">👉</span>
-              <span>let's vote...</span>
-            </button>
+        <div className="floating-icon-card float-top-right blur-animate delay-1">
+          <div className="float-symbol sym-orange">☤</div>
+        </div>
 
-            <button 
-              className="btn-pill-outline"
-              onClick={() => {
-                const el = document.getElementById('candidates');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              Vote now
-            </button>
+        <div className="floating-icon-card float-bottom-right blur-animate delay-2">
+          <div className="float-symbol sym-purple">⬢</div>
+        </div>
+
+        {/* Trusted Pill Badge */}
+        <div className="trusted-pill blur-animate">
+          <div className="avatar-group">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Voter Avatar 1" className="avatar-img" />
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Voter Avatar 2" className="avatar-img" />
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Voter Avatar 3" className="avatar-img" />
+          </div>
+          <span className="trusted-text">Trusted by 100K+ voters</span>
+        </div>
+
+        {/* Hero Title & Subtitle */}
+        <h1 className="main-title blur-animate delay-1">
+          Turn Web3 Voting <br />
+          Into Instant Decisions
+        </h1>
+
+        <p className="main-sub blur-animate delay-2">
+          One simple dashboard to track your election integrity, vote tallies,
+          relayer state and voter behavior—without the chaos.
+        </p>
+
+        {/* Action Button & Subtext */}
+        <div className="hero-action-group blur-animate delay-3">
+          <button className="btn-primary-blue">
+            Get Started For Free
+          </button>
+          <div className="credit-caption">
+            <span>💳</span>
+            <span>No credit card required</span>
           </div>
         </div>
 
-        <div className="hero-visual">
-          <div className="floating-election-banner">Election Day</div>
-          <div className="main-illustration-wrapper">
-            <img 
-              src="/images/voting_illustration.webp" 
-              alt="Online Political Voting Illustration" 
-              className="hero-img"
-            />
-          </div>
-        </div>
-
-        <div className="page-indicator">09/10</div>
-      </section>
-
-      {/* Candidates Interactive Section */}
-      <section className="candidates-demo-section" id="candidates">
-        <div className="section-header">
-          <span className="section-tag">Decentralized Ballot</span>
-          <h2 className="section-title">
-            Select Your <span className="highlight-muted">Candidate</span>
-          </h2>
-        </div>
-
-        <div className="candidate-cards-grid">
-          {candidates.map((c) => {
-            const percentage = Math.round((c.votes / totalVotes) * 100);
-            return (
-              <div key={c.id} className="candidate-card">
-                <span className="card-number">{c.number}</span>
-                <div className="candidate-avatar-badge">
-                  {c.name.split(' ').map(n => n[0]).join('')}
-                </div>
-                
-                <div className="candidate-info">
-                  <h3>{c.name}</h3>
-                  <p>{c.party}</p>
+        {/* Dashboard Shell Showcase matching Screenshot 2 */}
+        <div className="dashboard-shell-wrapper blur-animate delay-4">
+          <div className="dashboard-outer-glow">
+            <div className="dashboard-app-frame">
+              {/* Left Sidebar */}
+              <aside className="app-sidebar">
+                <div className="sidebar-brand">
+                  <div className="logo-star-icon" style={{ width: 24, height: 24, fontSize: '0.8rem' }}>✦</div>
+                  <span>TrueVote</span>
                 </div>
 
-                <div className="vote-tally-bar">
-                  <div 
-                    className="vote-tally-fill" 
-                    style={{ width: `${percentage}%` }}
-                  />
+                <div className="search-box">
+                  <span>🔍</span>
+                  <input type="text" placeholder="Search" readOnly />
                 </div>
 
-                <div className="tally-stats">
-                  <span>{c.votes.toLocaleString()} Votes</span>
-                  <span>{percentage}%</span>
+                <ul className="sidebar-nav">
+                  <li className="sidebar-item active">📊 Dashboard</li>
+                  <li className="sidebar-item">👥 Voters</li>
+                  <li className="sidebar-item">📑 All reports</li>
+                  <li className="sidebar-item">🌐 Geography</li>
+                  <li className="sidebar-item">💬 Conversations</li>
+                  <li className="sidebar-item">🤝 Deals</li>
+                  <li className="sidebar-item">📥 Export</li>
+                </ul>
+              </aside>
+
+              {/* Main Dashboard Panel */}
+              <main className="app-main-panel">
+                {/* Top Metrics Grid */}
+                <div className="metrics-top-grid">
+                  {/* Revenue / Votes Metric Card */}
+                  <div className="metric-card">
+                    <div className="metric-card-header">Total Votes</div>
+                    <div>
+                      <div className="metric-value-row">
+                        <span className="metric-number">15%</span>
+                        <span className="metric-arrow">↗</span>
+                      </div>
+                      <span className="metric-subtitle">Increase compared to last week</span>
+                    </div>
+                    <a href="#reports" className="metric-link">Votes report →</a>
+                  </div>
+
+                  {/* On-Chain Finality Card */}
+                  <div className="metric-card">
+                    <div className="metric-card-header">Lost deals</div>
+                    <div>
+                      <div className="metric-value-row">
+                        <span className="metric-number">4%</span>
+                      </div>
+                      <span className="metric-subtitle">You closed 96 out of 100 deals</span>
+                    </div>
+                    <a href="#deals" className="metric-link">All deals →</a>
+                  </div>
+
+                  {/* Semi-Circle Gauge Arc Card */}
+                  <div className="metric-card">
+                    <div className="metric-card-header">Quarter goal</div>
+                    <div className="gauge-wrapper">
+                      <svg className="gauge-svg" viewBox="0 0 100 50">
+                        {/* Background Track Arc */}
+                        <path
+                          d="M 10,50 A 40,40 0 0,1 90,50"
+                          fill="none"
+                          stroke="#eff6ff"
+                          strokeWidth="10"
+                          strokeLinecap="round"
+                        />
+                        {/* Progress Arc (84%) */}
+                        <path
+                          d="M 10,50 A 40,40 0 0,1 82,24"
+                          fill="none"
+                          stroke="#1d6bf3"
+                          strokeWidth="10"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="gauge-text">84%</div>
+                    </div>
+                    <a href="#goals" className="metric-link">All goals →</a>
+                  </div>
                 </div>
 
-                <button
-                  className={hasVoted && selectedCandidate === c.name ? "btn-pill-blue" : "btn-pill-outline"}
-                  onClick={() => handleVote(c.id, c.name)}
-                >
-                  {hasVoted ? (selectedCandidate === c.name ? "Voted ✓" : "Vote Now") : "Vote Now"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+                {/* Bottom Metrics Grid */}
+                <div className="metrics-bottom-grid">
+                  {/* Customers / Voters List Card */}
+                  <div className="content-box">
+                    <div className="box-header">
+                      <span className="box-title">Customers</span>
+                      <select className="sort-select">
+                        <option>Sort by Newest ▾</option>
+                      </select>
+                    </div>
 
-      {/* Features & Cryptographic Security */}
-      <section className="features-section" id="updates">
-        <div className="features-container">
-          <div className="security-img-container">
-            <img 
-              src="/images/blockchain_security.webp" 
-              alt="Blockchain Security & IPFS Storage" 
-            />
-          </div>
+                    <div className="voters-list">
+                      <div className="voter-row">
+                        <div className="voter-profile">
+                          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" alt="Chris" className="voter-avatar" />
+                          <div className="voter-details">
+                            <span className="voter-name">Chris Friedkly</span>
+                            <span className="voter-org">Supermarket Villanova</span>
+                          </div>
+                        </div>
+                      </div>
 
-          <div className="features-list">
-            <div className="feature-item">
-              <div className="feature-icon">🛡️</div>
-              <div className="feature-content">
-                <h4>Walletless Anonymous Voting</h4>
-                <p>No crypto wallet or gas fees required. Anonymous browser/device tokens prevent repeat submissions without compromising voter identity.</p>
-              </div>
+                      <div className="voter-row active-row">
+                        <div className="voter-profile">
+                          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Maggie" className="voter-avatar" />
+                          <div className="voter-details">
+                            <span className="voter-name">Maggie Johnson</span>
+                            <span className="voter-org">Oasis Organic Inc.</span>
+                          </div>
+                        </div>
+                        <div className="row-actions">
+                          <span>💬</span>
+                          <span>⭐</span>
+                          <span>✏️</span>
+                          <span>⋮</span>
+                        </div>
+                      </div>
+
+                      <div className="voter-row">
+                        <div className="voter-profile">
+                          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80" alt="Gael" className="voter-avatar" />
+                          <div className="voter-details">
+                            <span className="voter-name">Gael Harry</span>
+                            <span className="voter-org">New York Finest Fruits</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Growth Line Chart Card */}
+                  <div className="content-box">
+                    <div className="box-header">
+                      <span className="box-title">Growth</span>
+                      <select className="sort-select">
+                        <option>Yearly ▾</option>
+                      </select>
+                    </div>
+
+                    <div className="chart-container">
+                      <svg className="chart-svg" viewBox="0 0 500 150" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#1d6bf3" stopOpacity="0.35" />
+                            <stop offset="100%" stopColor="#1d6bf3" stopOpacity="0.0" />
+                          </linearGradient>
+                        </defs>
+                        {/* Grid lines */}
+                        <line x1="0" y1="30" x2="500" y2="30" stroke="#f1f5f9" strokeDasharray="4 4" />
+                        <line x1="0" y1="70" x2="500" y2="70" stroke="#f1f5f9" strokeDasharray="4 4" />
+                        <line x1="0" y1="110" x2="500" y2="110" stroke="#f1f5f9" strokeDasharray="4 4" />
+
+                        {/* Area Fill */}
+                        <polygon points="0,120 70,110 140,90 210,50 280,105 350,75 420,30 500,150 0,150" fill="url(#chartGradient)" />
+                        
+                        {/* Main Line */}
+                        <path d="M 0,120 Q 70,110 140,90 T 280,105 T 420,30 L 500,15" fill="none" stroke="#1d6bf3" strokeWidth="3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </main>
             </div>
-
-            <div className="feature-item">
-              <div className="feature-icon">⛓️</div>
-              <div className="feature-content">
-                <h4>Tamper-Resistant Blockchain Records</h4>
-                <p>Election metadata and cryptographic commitments are anchored on EVM smart contracts and decentralized IPFS storage via Pinata.</p>
-              </div>
-            </div>
-
-            <div className="feature-item">
-              <div className="feature-icon">🚀</div>
-              <div className="feature-content">
-                <h4>Automated Relayer Infrastructure</h4>
-                <p>A backend relayer submits voting transactions seamlessly to provide instant confirmation for voters while maintaining public verifiability.</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
-
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="vote-toast">
-          <span>{toastMessage}</span>
-        </div>
-      )}
     </div>
   );
 };
