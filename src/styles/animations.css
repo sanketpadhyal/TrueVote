@@ -1,6 +1,22 @@
 /* ==========================================================================
-   Hyper-Premium Glassy UI, Universal Animations & Button Styles
+   Hyper-Premium Glassy UI, Universal Animations & Typography Accents
    ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* Serif Font Accent Classes from reference screenshot */
+.serif-accent {
+  font-family: 'Playfair Display', 'Instrument Serif', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.serif-italic-accent {
+  font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
 
 /* Universal Glassmorphism Classes */
 .glass-panel {

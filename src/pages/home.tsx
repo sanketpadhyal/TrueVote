@@ -134,15 +134,14 @@ export const HomePage: React.FC = () => {
           <span className="trusted-text">Trusted by 100K+ voters</span>
         </div>
 
-        {/* Main Title */}
+        {/* Main Title with Serif Accent Font from screenshot */}
         <h1 className="main-title blur-animate delay-1">
           Turn Web3 Voting <br />
-          Into Instant Decisions
+          Into <span className="serif-italic-accent" style={{ color: '#1d6bf3', fontSize: '1.08em' }}>Instant Decisions</span>
         </h1>
 
         <p className="main-sub blur-animate delay-2">
-          One simple dashboard to track your election integrity, vote tallies,
-          relayer state and voter behavior—without the chaos.
+          One simple dashboard for election security <span className="serif-italic-accent" style={{ fontSize: '1.1em', color: '#0f172a' }}>without the blind spots.</span> Track vote tallies, relayer state and voter behavior—without the chaos.
         </p>
 
         {/* Action Button & Caption */}
