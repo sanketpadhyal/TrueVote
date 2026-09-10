@@ -114,11 +114,9 @@ export const HomePage: React.FC = () => {
         {/* Top Hackathon Badge with Icon */}
         <div className="trusted-pill blur-animate">
           <div className="hackathon-icon-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6" />
-              <path d="M3 13h18" />
-              <path d="m9 7.5 2 2 4-4" />
-              <path d="M7 10V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v6" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m9 11 3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
             </svg>
           </div>
           <span className="trusted-text">This is a Hackathon Project</span>
