@@ -899,14 +899,7 @@ html, body {
   justify-content: center;
   color: #64748b;
   text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.team-link:hover {
-  color: var(--brand-blue);
-  border-color: #cbd5e1;
-  background: #ffffff;
-  transform: translateY(-2px);
+  /* Static: NO hover animation or movement */
 }
 
 /* ==========================================================================
