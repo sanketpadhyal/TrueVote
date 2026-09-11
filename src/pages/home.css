@@ -458,55 +458,6 @@ html, body {
   margin-bottom: 3.5rem;
 }
 
-/* Feature Mini Highlights (under 3D showcase) */
-.features-mini-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1080px;
-  margin-top: 3rem;
-}
-
-.feature-mini-card {
-  background: #ffffff;
-  border: 1px solid var(--border-card);
-  border-radius: 18px;
-  padding: 1.85rem 1.65rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.03);
-}
-
-.feature-mini-icon {
-  width: 44px;
-  height: 44px;
-  background: #eaf2fe;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.35rem;
-  color: var(--brand-blue);
-}
-
-.feature-mini-title {
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-heading);
-  margin-bottom: 0.6rem;
-}
-
-.feature-mini-desc {
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: var(--text-sub);
-  font-weight: 500;
-}
-
 .benefits-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1177,12 +1128,6 @@ html, body {
   .benefits-title,
   .section-title {
     font-size: 2rem;
-  }
-
-  .features-mini-grid {
-    grid-template-columns: 1fr;
-    gap: 1.15rem;
-    margin-top: 2rem;
   }
 
   .benefits-grid {

@@ -218,47 +218,6 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* 3 Core Architecture Highlights */}
-          <div className="features-mini-grid blur-animate delay-2">
-            <div className="feature-mini-card">
-              <div className="feature-mini-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
-              <h4 className="feature-mini-title">Zero-Knowledge Privacy</h4>
-              <p className="feature-mini-desc">
-                Circom proof circuits guarantee full voter identity anonymity while confirming voter eligibility without exposing private credentials.
-              </p>
-            </div>
-
-            <div className="feature-mini-card">
-              <div className="feature-mini-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-              </div>
-              <h4 className="feature-mini-title">Gasless Relayer Engine</h4>
-              <p className="feature-mini-desc">
-                Sponsored meta-transactions allow voters to cast ballots without owning cryptocurrency, installing wallet extensions, or paying gas fees.
-              </p>
-            </div>
-
-            <div className="feature-mini-card">
-              <div className="feature-mini-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <ellipse cx="12" cy="5" rx="9" ry="3" />
-                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-                </svg>
-              </div>
-              <h4 className="feature-mini-title">Permanent IPFS Auditing</h4>
-              <p className="feature-mini-desc">
-                Ballot manifests and verification artifacts are cryptographically hashed and pinned across Pinata IPFS nodes for public auditability.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
