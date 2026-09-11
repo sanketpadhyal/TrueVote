@@ -277,6 +277,18 @@ html, body {
   /* Fixed position: strictly NO floating animations, NO drift, NO movement */
 }
 
+/* Blur-to-Normal Entrance for Floating Tech Stack Cards */
+.floating-icon-card.blur-animate {
+  opacity: 0;
+  filter: blur(12px);
+  transition: opacity 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.92s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
 .stack-logo-img {
   width: 44px;
   height: 44px;
@@ -285,29 +297,49 @@ html, body {
   filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.06));
 }
 
-/* Fixed Positions inside Hero Content Area */
+/* Fixed Positions inside Hero Content Area with Blur-to-Normal Transforms */
 .float-top-left {
   top: 14px;
   left: 14px;
-  transform: rotate(-8deg);
+  transform: translateY(16px) rotate(-8deg);
+}
+.float-top-left.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) rotate(-8deg);
 }
 
 .float-bottom-left {
   bottom: 24px;
   left: 36px;
-  transform: rotate(14deg);
+  transform: translateY(16px) rotate(14deg);
+}
+.float-bottom-left.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) rotate(14deg);
 }
 
 .float-top-right {
   top: 14px;
   right: 14px;
-  transform: rotate(8deg);
+  transform: translateY(16px) rotate(8deg);
+}
+.float-top-right.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) rotate(8deg);
 }
 
 .float-bottom-right {
   bottom: 24px;
   right: 36px;
-  transform: rotate(-12deg);
+  transform: translateY(16px) rotate(-12deg);
+}
+.float-bottom-right.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) rotate(-12deg);
 }
 
 @media (max-width: 1080px) {
@@ -324,12 +356,6 @@ html, body {
   .float-bottom-left { left: 14px; }
   .float-top-right { right: 4px; }
   .float-bottom-right { right: 14px; }
-}
-
-@media (max-width: 860px) {
-  .floating-icon-card {
-    display: none;
-  }
 }
 
 /* ==========================================================================
@@ -504,18 +530,59 @@ html, body {
     padding: 7rem 1.25rem 1.5rem 1.25rem;
   }
 
+  .hero-content-area {
+    padding: 0 0.5rem;
+    margin-bottom: 1.6rem;
+  }
+
   .main-title {
     font-size: 2.2rem;
     line-height: 1.15;
+    padding: 0 0.5rem;
   }
 
   .main-sub {
     font-size: 0.95rem;
     margin-bottom: 1.35rem;
+    padding: 0 0.5rem;
   }
 
+  /* Responsive Mobile Tech Stack Cards - Fixed Position, No Floating */
   .floating-icon-card {
-    display: none;
+    display: flex;
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    border-width: 1.5px;
+    box-shadow: 
+      0 10px 24px -4px rgba(15, 23, 42, 0.1),
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(226, 232, 240, 0.6);
+  }
+
+  .stack-logo-img {
+    width: 27px;
+    height: 27px;
+  }
+
+  .float-top-left {
+    top: 0px;
+    left: 4px;
+  }
+
+  .float-bottom-left {
+    bottom: 8px;
+    left: 8px;
+  }
+
+  .float-top-right {
+    top: 0px;
+    right: 4px;
+  }
+
+  .float-bottom-right {
+    bottom: 8px;
+    right: 8px;
   }
 
   .dashboard-perspective-wrapper {
@@ -539,13 +606,6 @@ html, body {
     border-radius: 12px;
   }
 
-  .blur-animate {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
-    transition: none !important;
-  }
-
   .benefits-section {
     padding: 3.5rem 1.25rem;
   }
@@ -557,5 +617,56 @@ html, body {
   .benefits-grid {
     grid-template-columns: 1fr;
     gap: 1.15rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-container {
+    padding: 6.5rem 0.85rem 1.25rem 0.85rem;
+  }
+
+  .hero-content-area {
+    padding: 0 0.25rem;
+  }
+
+  .main-title {
+    font-size: 1.95rem;
+    padding: 0 0.35rem;
+  }
+
+  .main-sub {
+    font-size: 0.88rem;
+    padding: 0 0.35rem;
+  }
+
+  .floating-icon-card {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .stack-logo-img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .float-top-left {
+    top: -6px;
+    left: 0px;
+  }
+
+  .float-bottom-left {
+    bottom: 2px;
+    left: 2px;
+  }
+
+  .float-top-right {
+    top: -6px;
+    right: 0px;
+  }
+
+  .float-bottom-right {
+    bottom: 2px;
+    right: 2px;
   }
 }

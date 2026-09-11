@@ -193,26 +193,27 @@
 
 /* Title & Description */
 .ios-dialogue-title {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-  margin: 0 0 0.5rem 0;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1d6bf3;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.2;
 }
 
 .ios-dialogue-text {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif);
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: #475569;
-  margin: 0 0 1.45rem 0;
-  max-width: 440px;
+  font-family: var(--font-main), -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #64748b;
+  margin: 0 0 1.6rem 0;
+  max-width: 420px;
 }
 
 .ios-dialogue-text strong {
-  color: #1e293b;
-  font-weight: 600;
+  color: #0f172a;
+  font-weight: 700;
 }
 
 /* Feature Mini Pills */
@@ -263,10 +264,10 @@
 
 .ios-action-btn:hover {
   background: linear-gradient(180deg, #1a62de 0%, #1452be 100%);
-  box-shadow: 
+  box-shadow:
     0 6px 20px rgba(29, 107, 243, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.35);
-  transform: scale(1.01);
+  /* Removed transform: scale(1.01) to prevent popup effect */
 }
 
 .ios-action-btn:active {

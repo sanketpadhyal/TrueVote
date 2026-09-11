@@ -109,20 +109,20 @@ export const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="hero-container">
         <div className="hero-content-area">
-          {/* Floating Tech Stack Cards (Fixed Positions within Hero Content) */}
-          <div className="floating-icon-card float-top-left" title="Pinata">
+          {/* Floating Tech Stack Cards (Fixed Positions with Blur-to-Normal Entrance) */}
+          <div className="floating-icon-card float-top-left blur-animate delay-1" title="Pinata">
             <img src="/images/stacks/Pinata.png" alt="Pinata" className="stack-logo-img" />
           </div>
 
-          <div className="floating-icon-card float-bottom-left" title="TypeScript">
+          <div className="floating-icon-card float-bottom-left blur-animate delay-2" title="TypeScript">
             <img src="/images/stacks/typescript.webp" alt="TypeScript" className="stack-logo-img" />
           </div>
 
-          <div className="floating-icon-card float-top-right" title="Railway">
+          <div className="floating-icon-card float-top-right blur-animate delay-1" title="Railway">
             <img src="/images/stacks/Railway.webp" alt="Railway" className="stack-logo-img" />
           </div>
 
-          <div className="floating-icon-card float-bottom-right" title="IPFS">
+          <div className="floating-icon-card float-bottom-right blur-animate delay-2" title="IPFS">
             <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
           </div>
 
