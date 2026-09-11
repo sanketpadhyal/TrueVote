@@ -184,7 +184,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
                   src="/images/stacks/muskmask.webp" 
                   alt="MetaMask" 
                   className="auth-btn-icon" 
-                  onError={(e) => { e.currentTarget.src = '/images/stacks/muskmask.png'; }}
                 />
                 <span>Continue with MetaMask</span>
               </>
