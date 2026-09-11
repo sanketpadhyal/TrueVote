@@ -68,14 +68,14 @@ export const HomePage: React.FC = () => {
       topElements.forEach((el) => el.classList.add('visible'));
     }, 50);
 
-    // Auto-popup dialogue box on first-time visit
+    // Auto-popup dialogue box on first-time visit (sequenced after badge blur entrance)
     let popupTimer: NodeJS.Timeout | null = null;
     const hasSeenHackathon = sessionStorage.getItem('truevote_hackathon_dialog_seen');
     if (!hasSeenHackathon) {
       popupTimer = setTimeout(() => {
         setIsHackathonModalOpen(true);
         sessionStorage.setItem('truevote_hackathon_dialog_seen', 'true');
-      }, 700);
+      }, 850);
     }
 
     return () => {

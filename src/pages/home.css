@@ -98,6 +98,20 @@ html, body {
   position: relative;
 }
 
+/* Dedicated Blur-to-Normal Entrance for Hackathon Pill */
+@keyframes blurInHeroPill {
+  0% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
 /* Top Hackathon Badge - Ultra-Premium Glassmorphic Pill */
 .trusted-pill {
   display: inline-flex;
@@ -111,6 +125,11 @@ html, body {
   border-radius: 9999px;
   margin-bottom: 1.4rem;
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.trusted-pill.blur-animate {
+  animation: blurInHeroPill 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards;
+  will-change: opacity, filter, transform;
 }
 
 .trusted-pill.clickable-pill {
