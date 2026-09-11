@@ -136,24 +136,23 @@
 /* Image Container */
 .ios-dialogue-image-box {
   width: 100%;
-  max-width: 420px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
-  margin-bottom: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 1.25rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .ios-dialogue-image {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
-  max-height: 200px;
-  object-fit: cover;
+  max-height: 220px;
+  object-fit: contain;
   display: block;
+  filter: drop-shadow(0 10px 24px rgba(15, 23, 42, 0.08));
 }
 
 /* Top Pill Badge */
