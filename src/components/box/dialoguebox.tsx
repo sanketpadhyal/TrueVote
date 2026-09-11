@@ -82,14 +82,6 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
           />
         </div>
 
-        {/* Badge Pill */}
-        <div className="ios-badge-pill">
-          <svg className="ios-badge-sparkle" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
-          </svg>
-          <span>Hackathon MVP Disclaimer</span>
-        </div>
-
         {/* Modal Title */}
         <h3 className="ios-dialogue-title" id="dialogue-title">
           Hackathon Project Prototype
