@@ -57,6 +57,12 @@ export const Navbar: React.FC = () => {
                 if (teamEl) teamEl.scrollIntoView({ behavior: 'smooth' });
               }}
             >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M15 19.5c0-2.5-2-4.5-4.5-4.5S6 17 6 19.5" />
+                <circle cx="10.5" cy="8.5" r="3.5" />
+                <path d="M18 19c0-1.8-1.2-3.3-2.8-3.8" />
+                <path d="M14.5 5.2a3.5 3.5 0 0 1 0 6.6" />
+              </svg>
               <FlipText>About Team</FlipText>
             </button>
 
@@ -88,6 +94,12 @@ export const Navbar: React.FC = () => {
             if (teamEl) teamEl.scrollIntoView({ behavior: 'smooth' });
           }}
         >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <path d="M15 19.5c0-2.5-2-4.5-4.5-4.5S6 17 6 19.5" />
+            <circle cx="10.5" cy="8.5" r="3.5" />
+            <path d="M18 19c0-1.8-1.2-3.3-2.8-3.8" />
+            <path d="M14.5 5.2a3.5 3.5 0 0 1 0 6.6" />
+          </svg>
           <FlipText>About Team</FlipText>
         </button>
       </div>
