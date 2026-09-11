@@ -15,25 +15,29 @@
   animation: iosOverlayFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.ios-dialogue-overlay.closing {
-  animation: iosOverlayFadeOut 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
 @keyframes iosOverlayFadeIn {
   from {
     opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
   }
 }
 
 @keyframes iosOverlayFadeOut {
   from {
     opacity: 1;
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
   }
   to {
     opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
   }
 }
 
@@ -62,8 +66,12 @@
   animation: iosPopupSpring 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
 }
 
+.ios-dialogue-overlay.closing {
+  animation: iosOverlayFadeOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .ios-dialogue-overlay.closing .ios-dialogue-card {
-  animation: iosPopupCollapse 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  animation: iosPopupReverse 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes iosPopupSpring {
@@ -84,14 +92,22 @@
   }
 }
 
-@keyframes iosPopupCollapse {
+/* Exact reverse of opening animation */
+@keyframes iosPopupReverse {
   0% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(4px) scale(1.015);
+    filter: blur(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-20px) scale(0.9);
+    transform: translateY(-40px) scale(0.85);
+    filter: blur(8px);
   }
 }
 

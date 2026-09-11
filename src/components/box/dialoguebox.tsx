@@ -14,7 +14,7 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
     setTimeout(() => {
       setIsAnimatingOut(false);
       onClose();
-    }, 280); // matches animation duration
+    }, 380); // matches reverse animation duration
   };
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
         setTimeout(() => {
           setIsAnimatingOut(false);
           onClose();
-        }, 280);
+        }, 380);
       }
     };
 

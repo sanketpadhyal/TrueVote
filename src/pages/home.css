@@ -120,10 +120,10 @@ html, body {
 }
 
 .trusted-pill.clickable-pill:hover {
-  transform: translateY(-2px) scale(1.02);
   background: rgba(239, 246, 255, 0.92);
   border-color: rgba(59, 130, 246, 0.55);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18), inset 0 1px 1px rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18), inset 0 1px 1px rgba(255, 255, 255, 1);
+  /* Removed transform: translateY(-2px) scale(1.02) to stop the popup effect */
 }
 
 .trusted-pill.clickable-pill:active {
@@ -197,7 +197,7 @@ html, body {
   justify-content: center;
   gap: 0.55rem;
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  /* Completely static: NO translateY, NO scale, NO jumpy shadows */
+  /* Static: No popup/lift transforms */
 }
 
 .btn-primary-blue svg {
@@ -208,7 +208,7 @@ html, body {
   background-color: #145ed4;
   border-color: #2b75eb;
   box-shadow: 0 0 0 2.5px rgba(26, 109, 246, 0.38);
-  /* Pure color change only */
+  /* Pure color change only - no popup effect */
 }
 
 .btn-primary-blue:hover svg {
