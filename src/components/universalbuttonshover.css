@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Framer-Style Universal Button Text Roll Hover Animation
+   Framer-Style Universal Button Text Roll Hover Animation (Slow & Buttery)
    ========================================================================== */
 
 .framer-flip-btn {
@@ -25,8 +25,11 @@
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  transition: transform 0.65s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
   will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .flip-text-primary {
@@ -35,15 +38,15 @@
 }
 
 .flip-text-secondary {
-  transform: translateY(125%);
+  transform: translateY(130%);
   opacity: 0;
 }
 
-/* On Button Hover: Primary rolls UP (-125%), Secondary rolls IN from bottom (0%) */
+/* On Button Hover: Primary smoothly glides UP (-130%), Secondary glides IN from bottom (0%) */
 .framer-flip-btn:hover .flip-text-primary,
 button:hover .flip-text-track .flip-text-primary,
 a:hover .flip-text-track .flip-text-primary {
-  transform: translateY(-125%);
+  transform: translateY(-130%);
   opacity: 0;
 }
 
