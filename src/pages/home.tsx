@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import Navbar from '../components/navbar';
+import { FlipText } from '../components/universalbuttonshover';
 import '../styles/animations.css';
 import './home.css';
 
@@ -126,10 +127,10 @@ export const HomePage: React.FC = () => {
         {/* Action Button & Caption with Tight Gap */}
         <div className="hero-action-group blur-animate delay-3">
           <button 
-            className="btn-primary-blue"
+            className="btn-primary-blue framer-flip-btn"
             onClick={() => triggerToast('⚡ Connecting relayer: Preparing anonymous ballot token...')}
           >
-            Get Started
+            <FlipText>Get Started</FlipText>
           </button>
           <div className="credit-caption">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FlipText } from './universalbuttonshover';
 import './navbar.css';
 import '../styles/animations.css';
 
@@ -49,8 +50,8 @@ export const Navbar: React.FC = () => {
 
           {/* Action CTA */}
           <div className="navbar-actions">
-            <button className="btn-hyper-blue">
-              Get Started
+            <button className="btn-hyper-blue framer-flip-btn">
+              <FlipText>Get Started</FlipText>
             </button>
 
             <button 
@@ -72,8 +73,8 @@ export const Navbar: React.FC = () => {
         </div>
         <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
         <a href="#benefits" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Benefits</a>
-        <button className="btn-hyper-blue" style={{ width: '100%' }}>
-          Get Started
+        <button className="btn-hyper-blue framer-flip-btn" style={{ width: '100%' }}>
+          <FlipText>Get Started</FlipText>
         </button>
       </div>
     </>

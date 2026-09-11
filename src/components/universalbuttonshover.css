@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Framer-Style Universal Button Text Roll Hover Animation
+   ========================================================================== */
+
+.framer-flip-btn {
+  overflow: hidden !important;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.flip-text-track {
+  display: inline-grid;
+  overflow: hidden;
+  position: relative;
+  height: 1.3em;
+  line-height: 1.3em;
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+.flip-text-item {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.flip-text-primary {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+.flip-text-secondary {
+  transform: translateY(125%);
+  opacity: 0;
+}
+
+/* On Button Hover: Primary rolls UP (-125%), Secondary rolls IN from bottom (0%) */
+.framer-flip-btn:hover .flip-text-primary,
+button:hover .flip-text-track .flip-text-primary,
+a:hover .flip-text-track .flip-text-primary {
+  transform: translateY(-125%);
+  opacity: 0;
+}
+
+.framer-flip-btn:hover .flip-text-secondary,
+button:hover .flip-text-track .flip-text-secondary,
+a:hover .flip-text-track .flip-text-secondary {
+  transform: translateY(0%);
+  opacity: 1;
+}
