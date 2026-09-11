@@ -50,8 +50,14 @@ export const Navbar: React.FC = () => {
 
           {/* Action CTA */}
           <div className="navbar-actions">
-            <button className="btn-hyper-blue framer-flip-btn">
-              <FlipText>Get Started</FlipText>
+            <button 
+              className="btn-hyper-blue framer-flip-btn"
+              onClick={() => {
+                const teamEl = document.getElementById('team');
+                if (teamEl) teamEl.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <FlipText>About Team</FlipText>
             </button>
 
             <button 
@@ -73,8 +79,16 @@ export const Navbar: React.FC = () => {
         </div>
         <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
         <a href="#benefits" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Benefits</a>
-        <button className="btn-hyper-blue framer-flip-btn" style={{ width: '100%' }}>
-          <FlipText>Get Started</FlipText>
+        <button 
+          className="btn-hyper-blue framer-flip-btn" 
+          style={{ width: '100%' }}
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            const teamEl = document.getElementById('team');
+            if (teamEl) teamEl.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          <FlipText>About Team</FlipText>
         </button>
       </div>
     </>
