@@ -190,10 +190,10 @@
 
 .ios-dialogue-text {
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   line-height: 1.55;
   color: #475569;
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 1.45rem 0;
   max-width: 440px;
 }
 

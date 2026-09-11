@@ -98,25 +98,7 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
         {/* Notice Description */}
         <p className="ios-dialogue-text">
           Welcome to <strong>TrueVote</strong>! This project is an experimental <strong>MVP (Minimum Viable Product)</strong> built specifically for hackathon judging and demonstration purposes.
-          <br /><br />
-          Kindly note that smart contract relayers, zero-knowledge voter privacy, and encrypted ballot tokens are operating in a simulated sandbox environment. <strong>Please do not treat this build as an audited production release.</strong>
         </p>
-
-        {/* Feature Highlights */}
-        <div className="ios-features-grid">
-          <div className="ios-feature-chip">
-            <span>⚡</span>
-            <span>Testnet Relayers</span>
-          </div>
-          <div className="ios-feature-chip">
-            <span>🛡️</span>
-            <span>Mock ZK Circuits</span>
-          </div>
-          <div className="ios-feature-chip">
-            <span>🗳️</span>
-            <span>Experimental MVP</span>
-          </div>
-        </div>
 
         {/* Primary Action Button */}
         <button className="ios-action-btn" onClick={handleClose}>
