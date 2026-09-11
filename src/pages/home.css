@@ -243,103 +243,92 @@ html, body {
   color: #64748b;
 }
 
-/* Floating 3D Tech Stack Cards */
+/* Hero Content Area Container (Keeps cards strictly inside hero text area) */
+.hero-content-area {
+  position: relative;
+  width: 100%;
+  max-width: 1160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.2rem;
+}
+
+/* Floating 3D Tech Stack Cards - FIXED POSITION ONLY, NO MOVEMENT */
 .floating-icon-card {
   position: absolute;
-  width: 86px;
-  height: 86px;
+  width: 82px;
+  height: 82px;
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 24px;
+  border-radius: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid rgba(255, 255, 255, 0.95);
   box-shadow: 
-    0 20px 40px -8px rgba(15, 23, 42, 0.08),
+    0 18px 36px -8px rgba(15, 23, 42, 0.08),
     0 1px 3px rgba(0, 0, 0, 0.03),
     0 0 0 1px rgba(226, 232, 240, 0.6),
     inset 0 2px 4px rgba(255, 255, 255, 0.9);
   z-index: 10;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
   user-select: none;
-}
-
-.floating-icon-card:hover {
-  box-shadow: 
-    0 24px 50px -6px rgba(15, 23, 42, 0.14),
-    0 0 0 1.5px rgba(59, 130, 246, 0.3),
-    inset 0 2px 4px #ffffff;
+  /* Fixed position: strictly NO floating animations, NO drift, NO movement */
 }
 
 .stack-logo-img {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.06));
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.floating-icon-card:hover .stack-logo-img {
-  transform: scale(1.08);
-}
-
-/* Individual Floating Positions with Natural Hovering Drift */
+/* Fixed Positions inside Hero Content Area */
 .float-top-left {
-  top: 14%;
-  left: 3%;
-  animation: floatBobTopLeft 7s ease-in-out infinite alternate;
+  top: 14px;
+  left: 14px;
+  transform: rotate(-8deg);
 }
 
 .float-bottom-left {
-  top: 54%;
-  left: 5%;
-  animation: floatBobBottomLeft 8s ease-in-out infinite alternate 1s;
+  bottom: 24px;
+  left: 36px;
+  transform: rotate(14deg);
 }
 
 .float-top-right {
-  top: 14%;
-  right: 3%;
-  animation: floatBobTopRight 7.5s ease-in-out infinite alternate 0.5s;
+  top: 14px;
+  right: 14px;
+  transform: rotate(8deg);
 }
 
 .float-bottom-right {
-  top: 54%;
-  right: 5%;
-  animation: floatBobBottomRight 8.5s ease-in-out infinite alternate 1.5s;
+  bottom: 24px;
+  right: 36px;
+  transform: rotate(-12deg);
 }
 
-@keyframes floatBobTopLeft {
-  0% { transform: translateY(0px) rotate(-8deg); }
-  100% { transform: translateY(-10px) rotate(-5deg); }
-}
-
-@keyframes floatBobBottomLeft {
-  0% { transform: translateY(0px) rotate(14deg); }
-  100% { transform: translateY(-12px) rotate(11deg); }
-}
-
-@keyframes floatBobTopRight {
-  0% { transform: translateY(0px) rotate(8deg); }
-  100% { transform: translateY(-11px) rotate(5deg); }
-}
-
-@keyframes floatBobBottomRight {
-  0% { transform: translateY(0px) rotate(-12deg); }
-  100% { transform: translateY(-10px) rotate(-15deg); }
-}
-
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
   .floating-icon-card {
-    width: 68px;
-    height: 68px;
+    width: 66px;
+    height: 66px;
     border-radius: 18px;
   }
   .stack-logo-img {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
+  }
+  .float-top-left { left: 4px; }
+  .float-bottom-left { left: 14px; }
+  .float-top-right { right: 4px; }
+  .float-bottom-right { right: 14px; }
+}
+
+@media (max-width: 860px) {
+  .floating-icon-card {
+    display: none;
   }
 }
 

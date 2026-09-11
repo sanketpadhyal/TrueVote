@@ -108,66 +108,68 @@ export const HomePage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="hero-container">
-        {/* Floating Tech Stack Cards */}
-        <div className="floating-icon-card float-top-left" title="Pinata">
-          <img src="/images/stacks/Pinata.png" alt="Pinata" className="stack-logo-img" />
-        </div>
-
-        <div className="floating-icon-card float-bottom-left" title="TypeScript">
-          <img src="/images/stacks/typescript.webp" alt="TypeScript" className="stack-logo-img" />
-        </div>
-
-        <div className="floating-icon-card float-top-right" title="Railway">
-          <img src="/images/stacks/Railway.webp" alt="Railway" className="stack-logo-img" />
-        </div>
-
-        <div className="floating-icon-card float-bottom-right" title="IPFS">
-          <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
-        </div>
-
-        {/* Top Hackathon Badge with Icon (Opens Dialogue Box) */}
-        <div 
-          className="trusted-pill blur-animate clickable-pill"
-          onClick={() => setIsHackathonModalOpen(true)}
-          role="button"
-          tabIndex={0}
-          title="Click to view Hackathon details"
-        >
-          <div className="hackathon-icon-box">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
-            </svg>
+        <div className="hero-content-area">
+          {/* Floating Tech Stack Cards (Fixed Positions within Hero Content) */}
+          <div className="floating-icon-card float-top-left" title="Pinata">
+            <img src="/images/stacks/Pinata.png" alt="Pinata" className="stack-logo-img" />
           </div>
-          <span className="trusted-text">This is a Hackathon Project</span>
-        </div>
 
-        {/* Main Title with Serif Accent */}
-        <h1 className="main-title blur-animate delay-1">
-          Turn Web3 Voting <br />
-          Into <span className="serif-italic-accent" style={{ color: '#1d6bf3', fontSize: '1.08em' }}>Instant Decisions</span>
-        </h1>
+          <div className="floating-icon-card float-bottom-left" title="TypeScript">
+            <img src="/images/stacks/typescript.webp" alt="TypeScript" className="stack-logo-img" />
+          </div>
 
-        <p className="main-sub blur-animate delay-2">
-          One simple platform for election security <span className="serif-italic-accent" style={{ fontSize: '1.08em', color: '#0f172a' }}>without the blind spots.</span> Zero-knowledge voter privacy, decentralized records and walletless voting.
-        </p>
+          <div className="floating-icon-card float-top-right" title="Railway">
+            <img src="/images/stacks/Railway.webp" alt="Railway" className="stack-logo-img" />
+          </div>
 
-        {/* Action Button & Caption with Tight Gap */}
-        <div className="hero-action-group blur-animate delay-3">
-          <button 
-            className="btn-primary-blue framer-flip-btn"
-            onClick={() => triggerToast('⚡ Connecting relayer: Preparing anonymous ballot token...')}
+          <div className="floating-icon-card float-bottom-right" title="IPFS">
+            <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
+          </div>
+
+          {/* Top Hackathon Badge with Icon (Opens Dialogue Box) */}
+          <div 
+            className="trusted-pill blur-animate clickable-pill"
+            onClick={() => setIsHackathonModalOpen(true)}
+            role="button"
+            tabIndex={0}
+            title="Click to view Hackathon details"
           >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-            </svg>
-            <FlipText>Get Started</FlipText>
-          </button>
-          <div className="credit-caption">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="20" height="14" x="2" y="5" rx="2" />
-              <line x1="2" x2="22" y1="10" y2="10" />
-            </svg>
-            <span>No crypto wallet or gas fees required</span>
+            <div className="hackathon-icon-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
+              </svg>
+            </div>
+            <span className="trusted-text">This is a Hackathon Project</span>
+          </div>
+
+          {/* Main Title with Serif Accent */}
+          <h1 className="main-title blur-animate delay-1">
+            Turn Web3 Voting <br />
+            Into <span className="serif-italic-accent" style={{ color: '#1d6bf3', fontSize: '1.08em' }}>Instant Decisions</span>
+          </h1>
+
+          <p className="main-sub blur-animate delay-2">
+            One simple platform for election security <span className="serif-italic-accent" style={{ fontSize: '1.08em', color: '#0f172a' }}>without the blind spots.</span> Zero-knowledge voter privacy, decentralized records and walletless voting.
+          </p>
+
+          {/* Action Button & Caption with Tight Gap */}
+          <div className="hero-action-group blur-animate delay-3">
+            <button 
+              className="btn-primary-blue framer-flip-btn"
+              onClick={() => triggerToast('⚡ Connecting relayer: Preparing anonymous ballot token...')}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+              </svg>
+              <FlipText>Get Started</FlipText>
+            </button>
+            <div className="credit-caption">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="14" x="2" y="5" rx="2" />
+                <line x1="2" x2="22" y1="10" y2="10" />
+              </svg>
+              <span>No crypto wallet or gas fees required</span>
+            </div>
           </div>
         </div>
 
