@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import Navbar from '../components/navbar';
 import { FlipText } from '../components/universalbuttonshover';
-import DialogueBox from '../components/box/dialoguebox';
+import AuthModal from '../components/auth';
 import '../styles/animations.css';
 import './home.css';
 
@@ -10,7 +10,7 @@ export const HomePage: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isHackathonModalOpen, setIsHackathonModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -90,7 +90,7 @@ export const HomePage: React.FC = () => {
     const hasSeenHackathon = sessionStorage.getItem('truevote_hackathon_dialog_seen');
     if (!hasSeenHackathon) {
       popupTimer = setTimeout(() => {
-        setIsHackathonModalOpen(true);
+        setIsAuthModalOpen(true);
         sessionStorage.setItem('truevote_hackathon_dialog_seen', 'true');
       }, 850);
     }
@@ -148,7 +148,7 @@ export const HomePage: React.FC = () => {
           {/* Top Pill with Icon (Opens Wallet Modal) */}
           <div 
             className="trusted-pill blur-animate clickable-pill"
-            onClick={() => setIsHackathonModalOpen(true)}
+            onClick={() => setIsAuthModalOpen(true)}
             role="button"
             tabIndex={0}
             title="Click to connect Web3 wallet"
@@ -181,7 +181,7 @@ export const HomePage: React.FC = () => {
                 if (connectedWallet) {
                   triggerToast(`⚡ Wallet connected (${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}): Preparing anonymous ballot token...`);
                 } else {
-                  setIsHackathonModalOpen(true);
+                  setIsAuthModalOpen(true);
                 }
               }}
             >
@@ -640,7 +640,7 @@ export const HomePage: React.FC = () => {
               <div className="footer-link-col">
                 <h5 className="footer-link-heading">About</h5>
                 <a href="#team" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('team'); }}>About Team</a>
-                <span className="footer-link-static" onClick={() => setIsHackathonModalOpen(true)} style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}>Hackathon Details</span>
+                <span className="footer-link-static" onClick={() => setIsAuthModalOpen(true)} style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}>Connect Wallet</span>
                 <span className="footer-link-static">Open Source MVP</span>
               </div>
             </div>
@@ -664,10 +664,10 @@ export const HomePage: React.FC = () => {
         </div>
       )}
 
-      {/* Web3 Wallet Access Modal */}
-      <DialogueBox 
-        isOpen={isHackathonModalOpen} 
-        onClose={() => setIsHackathonModalOpen(false)} 
+      {/* Web3 Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
         onConnect={(addr) => {
           setConnectedWallet(addr);
           triggerToast(`🦊 MetaMask connected: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
