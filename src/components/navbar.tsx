@@ -28,6 +28,18 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
+  const scrollToTop = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    if ((window as any).lenis) {
+      (window as any).lenis.scrollTo(0, { duration: 1.2 });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const scrollToSection = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
     setIsMobileMenuOpen(false);
@@ -60,11 +72,11 @@ export const Navbar: React.FC = () => {
       <header className={`navbar-header ${isScrolled ? 'scrolled' : ''} ${isMounted ? 'nav-visible' : 'nav-blur-initial'}`}>
         <div className="navbar-inner">
           {/* Logo with User's Brand Logo */}
-          <a href="/" className="navbar-brand">
-            <img 
-              src="/images/logo.png" 
-              alt="TrueVote Logo" 
-              className="navbar-logo-img" 
+          <a href="/" className="navbar-brand" onClick={scrollToTop}>
+            <img
+              src="/images/logo.png"
+              alt="TrueVote Logo"
+              className="navbar-logo-img"
             />
             <span className="navbar-brand-name">True<span className="brand-accent">Vote</span></span>
           </a>
