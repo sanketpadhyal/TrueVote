@@ -178,8 +178,13 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.55rem;
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   /* Completely static: NO translateY, NO scale, NO jumpy shadows */
+}
+
+.btn-primary-blue svg {
+  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .btn-primary-blue:hover {
@@ -187,6 +192,10 @@ html, body {
   border-color: #2b75eb;
   box-shadow: 0 0 0 2.5px rgba(26, 109, 246, 0.38);
   /* Pure color change only */
+}
+
+.btn-primary-blue:hover svg {
+  transform: scale(1.08);
 }
 
 .credit-caption {
