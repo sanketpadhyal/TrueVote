@@ -11,33 +11,32 @@
   background: rgba(15, 23, 42, 0.42);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-  opacity: 0;
-  animation: iosOverlayFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ios-dialogue-overlay.opening {
+  animation: iosOverlayFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ios-dialogue-overlay.closing {
+  animation: iosOverlayFadeOut 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
 }
 
 @keyframes iosOverlayFadeIn {
   from {
     opacity: 0;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(14px) saturate(180%);
-    -webkit-backdrop-filter: blur(14px) saturate(180%);
   }
 }
 
 @keyframes iosOverlayFadeOut {
   from {
     opacity: 1;
-    backdrop-filter: blur(14px) saturate(180%);
-    -webkit-backdrop-filter: blur(14px) saturate(180%);
   }
   to {
     opacity: 0;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
   }
 }
 
@@ -63,15 +62,14 @@
   align-items: center;
   text-align: center;
   transform-origin: center top;
-  animation: iosPopupSpring 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
 }
 
-.ios-dialogue-overlay.closing {
-  animation: iosOverlayFadeOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.ios-dialogue-card.opening {
+  animation: iosPopupSpring 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.ios-dialogue-overlay.closing .ios-dialogue-card {
-  animation: iosPopupReverse 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.ios-dialogue-card.closing {
+  animation: iosPopupReverse 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes iosPopupSpring {
@@ -80,7 +78,7 @@
     transform: translateY(-40px) scale(0.85);
     filter: blur(8px);
   }
-  70% {
+  65% {
     opacity: 1;
     transform: translateY(4px) scale(1.015);
     filter: blur(0);
@@ -99,7 +97,7 @@
     transform: translateY(0) scale(1);
     filter: blur(0);
   }
-  30% {
+  35% {
     opacity: 1;
     transform: translateY(4px) scale(1.015);
     filter: blur(0);

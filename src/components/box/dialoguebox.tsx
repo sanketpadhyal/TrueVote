@@ -7,31 +7,53 @@ interface DialogueBoxProps {
 }
 
 export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => {
-  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const [shouldRender, setShouldRender] = useState(isOpen);
+  const [isClosing, setIsClosing] = useState(false);
+  const isClosingRef = React.useRef(false);
+
+  // Sync internal state whenever isOpen changes
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setIsClosing(false);
+      isClosingRef.current = false;
+    } else if (shouldRender && !isClosingRef.current) {
+      // If parent changes isOpen to false directly, animate out first
+      setIsClosing(true);
+      isClosingRef.current = true;
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+        isClosingRef.current = false;
+      }, 420);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, shouldRender]);
 
   const handleClose = () => {
-    setIsAnimatingOut(true);
+    if (isClosingRef.current) return;
+    setIsClosing(true);
+    isClosingRef.current = true;
+
     setTimeout(() => {
-      setIsAnimatingOut(false);
+      setShouldRender(false);
+      setIsClosing(false);
+      isClosingRef.current = false;
       onClose();
-    }, 380); // matches reverse animation duration
+    }, 420); // matches reverse spring duration
   };
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!shouldRender) return;
 
-    // Prevent body scrolling while modal is open
+    // Prevent background scrolling while modal is active
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     // Close on Escape key press
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsAnimatingOut(true);
-        setTimeout(() => {
-          setIsAnimatingOut(false);
-          onClose();
-        }, 380);
+        handleClose();
       }
     };
 
@@ -41,13 +63,14 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRender]);
 
-  if (!isOpen && !isAnimatingOut) return null;
+  if (!shouldRender) return null;
 
   return (
     <div 
-      className={`ios-dialogue-overlay ${isAnimatingOut ? 'closing' : ''}`}
+      className={`ios-dialogue-overlay ${isClosing ? 'closing' : 'opening'}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           handleClose();
@@ -57,7 +80,7 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
       aria-modal="true"
       aria-labelledby="dialogue-title"
     >
-      <div className="ios-dialogue-card">
+      <div className={`ios-dialogue-card ${isClosing ? 'closing' : 'opening'}`}>
         {/* iOS Drag Indicator Pill */}
         <div className="ios-drag-pill" />
 
