@@ -129,7 +129,7 @@ export const HomePage: React.FC = () => {
             className="btn-primary-blue"
             onClick={() => triggerToast('⚡ Connecting relayer: Preparing anonymous ballot token...')}
           >
-            Get Started For Free
+            Get Started
           </button>
           <div className="credit-caption">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
