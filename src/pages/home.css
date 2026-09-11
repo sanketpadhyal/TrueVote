@@ -113,6 +113,23 @@ html, body {
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
+.trusted-pill.clickable-pill {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.trusted-pill.clickable-pill:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: rgba(239, 246, 255, 0.92);
+  border-color: rgba(59, 130, 246, 0.55);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18), inset 0 1px 1px rgba(255, 255, 255, 1);
+}
+
+.trusted-pill.clickable-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
 .hackathon-icon-box {
   width: 26px;
   height: 26px;

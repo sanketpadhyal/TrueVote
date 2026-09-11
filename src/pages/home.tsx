@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import Navbar from '../components/navbar';
 import { FlipText } from '../components/universalbuttonshover';
+import DialogueBox from '../components/box/dialoguebox';
 import '../styles/animations.css';
 import './home.css';
 
@@ -9,6 +10,7 @@ export const HomePage: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isHackathonModalOpen, setIsHackathonModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     // Check initial window width for mobile mode
@@ -66,8 +68,19 @@ export const HomePage: React.FC = () => {
       topElements.forEach((el) => el.classList.add('visible'));
     }, 50);
 
+    // Auto-popup dialogue box on first-time visit
+    let popupTimer: NodeJS.Timeout | null = null;
+    const hasSeenHackathon = sessionStorage.getItem('truevote_hackathon_dialog_seen');
+    if (!hasSeenHackathon) {
+      popupTimer = setTimeout(() => {
+        setIsHackathonModalOpen(true);
+        sessionStorage.setItem('truevote_hackathon_dialog_seen', 'true');
+      }, 700);
+    }
+
     return () => {
       clearTimeout(heroTimer);
+      if (popupTimer) clearTimeout(popupTimer);
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('scroll', handleScroll);
       lenis?.destroy();
@@ -104,8 +117,14 @@ export const HomePage: React.FC = () => {
           <div className="float-symbol sym-orange">☤</div>
         </div>
 
-        {/* Top Hackathon Badge with Icon */}
-        <div className="trusted-pill blur-animate">
+        {/* Top Hackathon Badge with Icon (Opens Dialogue Box) */}
+        <div 
+          className="trusted-pill blur-animate clickable-pill"
+          onClick={() => setIsHackathonModalOpen(true)}
+          role="button"
+          tabIndex={0}
+          title="Click to view Hackathon details"
+        >
           <div className="hackathon-icon-box">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
@@ -279,6 +298,12 @@ export const HomePage: React.FC = () => {
           <span>{toastMessage}</span>
         </div>
       )}
+
+      {/* iOS Glassmorphic Hackathon Dialogue Box */}
+      <DialogueBox 
+        isOpen={isHackathonModalOpen} 
+        onClose={() => setIsHackathonModalOpen(false)} 
+      />
     </div>
   );
 };
