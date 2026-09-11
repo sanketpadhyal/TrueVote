@@ -130,18 +130,8 @@ export const HomePage: React.FC = () => {
             className="btn-primary-blue framer-flip-btn"
             onClick={() => triggerToast('⚡ Connecting relayer: Preparing anonymous ballot token...')}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-              <path d="M12 2.5 4 7.2v9.6l8 4.7 8-4.7V7.2L12 2.5Z" />
-              <path d="m12 12-8-4.8" />
-              <path d="m12 12 8-4.8" />
-              <path d="M12 12v9.5" />
-              <circle cx="12" cy="12" r="2.2" fill="currentColor" />
-              <circle cx="12" cy="2.5" r="1.4" fill="currentColor" stroke="none" />
-              <circle cx="4" cy="7.2" r="1.4" fill="currentColor" stroke="none" />
-              <circle cx="20" cy="7.2" r="1.4" fill="currentColor" stroke="none" />
-              <circle cx="4" cy="16.8" r="1.4" fill="currentColor" stroke="none" />
-              <circle cx="20" cy="16.8" r="1.4" fill="currentColor" stroke="none" />
-              <circle cx="12" cy="21.5" r="1.4" fill="currentColor" stroke="none" />
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
             </svg>
             <FlipText>Get Started</FlipText>
           </button>
