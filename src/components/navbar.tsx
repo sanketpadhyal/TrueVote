@@ -34,6 +34,14 @@ export const Navbar: React.FC = () => {
     const element = document.getElementById(id);
     if (!element) return;
 
+    // Trigger blur-to-normal animation on target section when navigating from navbar
+    element.classList.remove('nav-highlight-animate');
+    void element.offsetWidth; // Force reflow
+    element.classList.add('nav-highlight-animate');
+    setTimeout(() => {
+      element.classList.remove('nav-highlight-animate');
+    }, 1400);
+
     if ((window as any).lenis) {
       (window as any).lenis.scrollTo(element, { offset: -80, duration: 1.2 });
     } else {

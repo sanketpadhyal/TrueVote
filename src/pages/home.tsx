@@ -21,6 +21,14 @@ export const HomePage: React.FC = () => {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
+
+    el.classList.remove('nav-highlight-animate');
+    void el.offsetWidth;
+    el.classList.add('nav-highlight-animate');
+    setTimeout(() => {
+      el.classList.remove('nav-highlight-animate');
+    }, 1400);
+
     if ((window as any).lenis) {
       (window as any).lenis.scrollTo(el, { offset: -80, duration: 1.2 });
     } else {
@@ -70,22 +78,7 @@ export const HomePage: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Blur-to-Normal Scroll Observer
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const elements = document.querySelectorAll('.blur-animate');
-    elements.forEach((el) => observer.observe(el));
-
-    // Smooth entrance on mount for hero elements
+    // Smooth entrance on mount for hero elements only
     const heroTimer = setTimeout(() => {
       const topElements = document.querySelectorAll('.hero-container .blur-animate');
       topElements.forEach((el) => el.classList.add('visible'));
@@ -110,7 +103,6 @@ export const HomePage: React.FC = () => {
         (window as any).lenis.destroy();
         (window as any).lenis = null;
       }
-      observer.disconnect();
     };
   }, []);
 
@@ -225,20 +217,20 @@ export const HomePage: React.FC = () => {
           BENEFITS SECTION (Matching Screenshot 3)
           ========================================================================== */}
       <section className="benefits-section" id="benefits">
-        <div className="benefits-pill-badge blur-animate">
+        <div className="benefits-pill-badge">
           Benefits
         </div>
 
-        <h2 className="benefits-title blur-animate delay-1">
+        <h2 className="benefits-title">
           Benefits That Truly <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Matter To You</span>
         </h2>
 
-        <p className="benefits-sub blur-animate delay-2">
+        <p className="benefits-sub">
           Monitor election metrics as they happen, so you can respond quickly and keep integrity on track.
         </p>
 
-        <div className="benefits-grid blur-animate delay-3">
+        <div className="benefits-grid">
           {/* Benefit 1 */}
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
@@ -332,20 +324,20 @@ export const HomePage: React.FC = () => {
           HOW IT WORKS SECTION
           ========================================================================== */}
       <section className="workflow-section" id="how-it-works">
-        <div className="section-pill-badge blur-animate">
+        <div className="section-pill-badge">
           Protocol Lifecycle
         </div>
 
-        <h2 className="section-title blur-animate delay-1">
+        <h2 className="section-title">
           How TrueVote Works <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>In 4 Simple Steps</span>
         </h2>
 
-        <p className="section-sub blur-animate delay-2">
+        <p className="section-sub">
           From anonymous citizen verification to immutable on-chain finality — engineered for effortless civic participation.
         </p>
 
-        <div className="workflow-steps-grid blur-animate delay-3">
+        <div className="workflow-steps-grid">
           <div className="workflow-step-card">
             <div className="workflow-step-header">
               <span className="workflow-step-num">01</span>
@@ -419,20 +411,20 @@ export const HomePage: React.FC = () => {
           SECURITY & ARCHITECTURE SECTION
           ========================================================================== */}
       <section className="security-section" id="security">
-        <div className="section-pill-badge blur-animate">
+        <div className="section-pill-badge">
           Cryptographic Assurance
         </div>
 
-        <h2 className="section-title blur-animate delay-1">
+        <h2 className="section-title">
           Mathematical Truth & <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Trustless Security</span>
         </h2>
 
-        <p className="section-sub blur-animate delay-2">
+        <p className="section-sub">
           Eliminating central vulnerabilities, coercion vectors, and administrative tampering with battle-tested Web3 primitives.
         </p>
 
-        <div className="security-grid blur-animate delay-3">
+        <div className="security-grid">
           <div className="security-card">
             <div className="security-card-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -496,20 +488,20 @@ export const HomePage: React.FC = () => {
           FAQ SECTION
           ========================================================================== */}
       <section className="faq-section" id="faq">
-        <div className="section-pill-badge blur-animate">
+        <div className="section-pill-badge">
           FAQ
         </div>
 
-        <h2 className="section-title blur-animate delay-1">
+        <h2 className="section-title">
           Frequently Asked <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Questions</span>
         </h2>
 
-        <p className="section-sub blur-animate delay-2">
+        <p className="section-sub">
           Everything you need to know about TrueVote's zero-knowledge voting protocol and privacy safeguards.
         </p>
 
-        <div className="faq-accordion-list blur-animate delay-3">
+        <div className="faq-accordion-list">
           {[
             {
               q: 'Do voters need cryptocurrency or an Ethereum wallet?',
@@ -557,20 +549,20 @@ export const HomePage: React.FC = () => {
           TEAM SECTION
           ========================================================================== */}
       <section className="team-section" id="team">
-        <div className="section-pill-badge blur-animate">
+        <div className="section-pill-badge">
           The Builders
         </div>
 
-        <h2 className="section-title blur-animate delay-1">
+        <h2 className="section-title">
           Pioneering the Future of <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Verifiable Democracy</span>
         </h2>
 
-        <p className="section-sub blur-animate delay-2">
+        <p className="section-sub">
           Engineers and researchers committed to advancing transparent, trustless, and censorship-resistant governance infrastructure.
         </p>
 
-        <div className="team-grid blur-animate delay-3">
+        <div className="team-grid">
           <div className="team-card">
             <div className="team-avatar-box">
               <div className="team-avatar-gradient grad-1">

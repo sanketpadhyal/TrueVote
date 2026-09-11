@@ -84,6 +84,48 @@ html, body {
 .delay-3 { transition-delay: 0.32s; }
 .delay-4 { transition-delay: 0.44s; }
 
+/* Navbar-Triggered Section Blur-to-Normal Entrance */
+@keyframes sectionNavBlurIn {
+  0% {
+    opacity: 0.2;
+    filter: blur(14px);
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+.nav-highlight-animate {
+  animation: sectionNavBlurIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, filter, transform;
+}
+
+.nav-highlight-animate .benefits-pill-badge,
+.nav-highlight-animate .section-pill-badge {
+  animation: sectionNavBlurIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+}
+
+.nav-highlight-animate .benefits-title,
+.nav-highlight-animate .section-title {
+  animation: sectionNavBlurIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.09s both;
+}
+
+.nav-highlight-animate .benefits-sub,
+.nav-highlight-animate .section-sub {
+  animation: sectionNavBlurIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+
+.nav-highlight-animate .benefits-grid,
+.nav-highlight-animate .workflow-steps-grid,
+.nav-highlight-animate .security-grid,
+.nav-highlight-animate .faq-accordion-list,
+.nav-highlight-animate .team-grid {
+  animation: sectionNavBlurIn 0.92s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
 /* Main Page Container */
 .landing-wrapper {
   min-height: 100vh;
