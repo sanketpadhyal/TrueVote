@@ -12,6 +12,28 @@ export const HomePage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isHackathonModalOpen, setIsHackathonModalOpen] = useState<boolean>(false);
 
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex((prev) => (prev === index ? null : index));
+  };
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if ((window as any).lenis) {
+      (window as any).lenis.scrollTo(el, { offset: -80, duration: 1.2 });
+    } else {
+      const navbarOffset = 80;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   useEffect(() => {
     // Check initial window width for mobile mode
     const checkMobile = () => {
@@ -29,6 +51,7 @@ export const HomePage: React.FC = () => {
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
       });
+      (window as any).lenis = lenis;
 
       const raf = (time: number) => {
         lenis?.raf(time);
@@ -83,7 +106,10 @@ export const HomePage: React.FC = () => {
       if (popupTimer) clearTimeout(popupTimer);
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('scroll', handleScroll);
-      lenis?.destroy();
+      if ((window as any).lenis) {
+        (window as any).lenis.destroy();
+        (window as any).lenis = null;
+      }
       observer.disconnect();
     };
   }, []);
@@ -190,6 +216,47 @@ export const HomePage: React.FC = () => {
                   className="privacy-hero-img"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* 3 Core Architecture Highlights */}
+          <div className="features-mini-grid blur-animate delay-2">
+            <div className="feature-mini-card">
+              <div className="feature-mini-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <h4 className="feature-mini-title">Zero-Knowledge Privacy</h4>
+              <p className="feature-mini-desc">
+                Circom proof circuits guarantee full voter identity anonymity while confirming voter eligibility without exposing private credentials.
+              </p>
+            </div>
+
+            <div className="feature-mini-card">
+              <div className="feature-mini-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+              </div>
+              <h4 className="feature-mini-title">Gasless Relayer Engine</h4>
+              <p className="feature-mini-desc">
+                Sponsored meta-transactions allow voters to cast ballots without owning cryptocurrency, installing wallet extensions, or paying gas fees.
+              </p>
+            </div>
+
+            <div className="feature-mini-card">
+              <div className="feature-mini-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <ellipse cx="12" cy="5" rx="9" ry="3" />
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                </svg>
+              </div>
+              <h4 className="feature-mini-title">Permanent IPFS Auditing</h4>
+              <p className="feature-mini-desc">
+                Ballot manifests and verification artifacts are cryptographically hashed and pinned across Pinata IPFS nodes for public auditability.
+              </p>
             </div>
           </div>
         </div>
@@ -302,7 +369,385 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Toast Feedback Notification */}
+      {/* ==========================================================================
+          HOW IT WORKS SECTION
+          ========================================================================== */}
+      <section className="workflow-section" id="how-it-works">
+        <div className="section-pill-badge blur-animate">
+          Protocol Lifecycle
+        </div>
+
+        <h2 className="section-title blur-animate delay-1">
+          How TrueVote Works <br />
+          <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>In 4 Simple Steps</span>
+        </h2>
+
+        <p className="section-sub blur-animate delay-2">
+          From anonymous citizen verification to immutable on-chain finality — engineered for effortless civic participation.
+        </p>
+
+        <div className="workflow-steps-grid blur-animate delay-3">
+          <div className="workflow-step-card">
+            <div className="workflow-step-header">
+              <span className="workflow-step-num">01</span>
+              <div className="workflow-step-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="workflow-step-title">Anonymous Verification</h3>
+            <p className="workflow-step-desc">
+              Generate a client-side Zero-Knowledge proof confirming registered voter eligibility. No national ID, email, or identity parameters are disclosed.
+            </p>
+            <div className="workflow-step-badge">Circom ZK Circuit</div>
+          </div>
+
+          <div className="workflow-step-card">
+            <div className="workflow-step-header">
+              <span className="workflow-step-num">02</span>
+              <div className="workflow-step-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="workflow-step-title">Client-Side Encryption</h3>
+            <p className="workflow-step-desc">
+              Your ballot selection is cryptographically sealed in your browser with homomorphic election public keys before any packet transmission.
+            </p>
+            <div className="workflow-step-badge">Browser-Only Encryption</div>
+          </div>
+
+          <div className="workflow-step-card">
+            <div className="workflow-step-header">
+              <span className="workflow-step-num">03</span>
+              <div className="workflow-step-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="workflow-step-title">Gasless Relayer Relay</h3>
+            <p className="workflow-step-desc">
+              Decentralized relayer nodes sponsor gas fees and dispatch the transaction directly to Ethereum Sepolia via EIP-712 meta-transactions.
+            </p>
+            <div className="workflow-step-badge">0 Gas Fees Required</div>
+          </div>
+
+          <div className="workflow-step-card">
+            <div className="workflow-step-header">
+              <span className="workflow-step-num">04</span>
+              <div className="workflow-step-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="workflow-step-title">Decentralized Audit</h3>
+            <p className="workflow-step-desc">
+              Nullifiers prevent duplicate voting, tallies update immutably on-chain, and ballot receipts are permanently pinned to Pinata IPFS.
+            </p>
+            <div className="workflow-step-badge">Pinata IPFS Finality</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================================================
+          SECURITY & ARCHITECTURE SECTION
+          ========================================================================== */}
+      <section className="security-section" id="security">
+        <div className="section-pill-badge blur-animate">
+          Cryptographic Assurance
+        </div>
+
+        <h2 className="section-title blur-animate delay-1">
+          Mathematical Truth & <br />
+          <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Trustless Security</span>
+        </h2>
+
+        <p className="section-sub blur-animate delay-2">
+          Eliminating central vulnerabilities, coercion vectors, and administrative tampering with battle-tested Web3 primitives.
+        </p>
+
+        <div className="security-grid blur-animate delay-3">
+          <div className="security-card">
+            <div className="security-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            </div>
+            <div className="security-tag">Privacy Core</div>
+            <h3 className="security-card-title">zk-SNARKs Membership Proofs</h3>
+            <p className="security-card-desc">
+              Voter eligibility is computed via Groth16 zk-SNARK circuits. Smart contracts verify valid voter inclusion within a Merkle tree without revealing the leaf or credential.
+            </p>
+          </div>
+
+          <div className="security-card">
+            <div className="security-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+              </svg>
+            </div>
+            <div className="security-tag">Sybil Resistance</div>
+            <h3 className="security-card-title">Deterministic Nullifier Hashes</h3>
+            <p className="security-card-desc">
+              Each voter generates a unique nullifier derived from their secret key and election ID. Contracts enforce single-vote execution while keeping voter choice decoupled.
+            </p>
+          </div>
+
+          <div className="security-card">
+            <div className="security-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+            </div>
+            <div className="security-tag">Decentralized Storage</div>
+            <h3 className="security-card-title">Pinata IPFS Distributed Storage</h3>
+            <p className="security-card-desc">
+              Election manifests, candidate metadata, and cryptographic proof commitments are pinned across redundant IPFS gateways, preventing server takedowns and data corruption.
+            </p>
+          </div>
+
+          <div className="security-card">
+            <div className="security-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+            </div>
+            <div className="security-tag">Verifiable Logic</div>
+            <h3 className="security-card-title">Permissionless Smart Contracts</h3>
+            <p className="security-card-desc">
+              All election rules and tally calculations are strictly enforced by open-source EVM contracts deployed on Ethereum Sepolia, with zero administrative backdoors.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================================================
+          FAQ SECTION
+          ========================================================================== */}
+      <section className="faq-section" id="faq">
+        <div className="section-pill-badge blur-animate">
+          FAQ
+        </div>
+
+        <h2 className="section-title blur-animate delay-1">
+          Frequently Asked <br />
+          <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Questions</span>
+        </h2>
+
+        <p className="section-sub blur-animate delay-2">
+          Everything you need to know about TrueVote's zero-knowledge voting protocol and privacy safeguards.
+        </p>
+
+        <div className="faq-accordion-list blur-animate delay-3">
+          {[
+            {
+              q: 'Do voters need cryptocurrency or an Ethereum wallet?',
+              a: 'No. TrueVote is designed for maximum accessibility. We utilize EIP-712 meta-transactions and dedicated gas relayers so voters can cast verifiable ballots directly from any modern web browser without paying gas fees or installing MetaMask.'
+            },
+            {
+              q: 'How does Zero-Knowledge protect my vote privacy?',
+              a: 'Zero-Knowledge proofs (zk-SNARKs) allow our cryptographic circuits to mathematically prove that you are an authorized, registered voter on the electoral roll without ever disclosing who you are, your credentials, or which candidate you selected.'
+            },
+            {
+              q: 'Can election administrators or organizers tamper with results?',
+              a: 'No. Every cast ballot is cryptographically committed on the Ethereum blockchain and pinned to decentralized IPFS storage. Once an election is launched, the smart contract deterministically computes tallies, making post-facto modification or deletion impossible.'
+            },
+            {
+              q: 'How does TrueVote prevent double-voting if ballots are anonymous?',
+              a: 'TrueVote generates a unique mathematical "nullifier" hash for each voter during proof creation. When a vote is cast, this nullifier is recorded in the smart contract. Any subsequent attempt to vote generates the identical nullifier and is immediately rejected, preserving voter anonymity while guaranteeing one vote per person.'
+            },
+            {
+              q: 'Can independent auditors verify the final election outcome?',
+              a: 'Yes. All ballot commitments, verification keys, and IPFS CIDs are completely transparent. Anyone in the world can run an independent audit node to mathematically verify that every vote tallied corresponds to a valid proof without decrypting individual voter ballots.'
+            }
+          ].map((item, idx) => (
+            <div 
+              key={idx} 
+              className={`faq-item ${openFaqIndex === idx ? 'open' : ''}`}
+              onClick={() => toggleFaq(idx)}
+            >
+              <button className="faq-question" type="button">
+                <span>{item.q}</span>
+                <svg className={`faq-chevron ${openFaqIndex === idx ? 'rotated' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {openFaqIndex === idx && (
+                <div className="faq-answer">
+                  <p>{item.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ==========================================================================
+          TEAM SECTION
+          ========================================================================== */}
+      <section className="team-section" id="team">
+        <div className="section-pill-badge blur-animate">
+          The Builders
+        </div>
+
+        <h2 className="section-title blur-animate delay-1">
+          Pioneering the Future of <br />
+          <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Verifiable Democracy</span>
+        </h2>
+
+        <p className="section-sub blur-animate delay-2">
+          Engineers and researchers committed to advancing transparent, trustless, and censorship-resistant governance infrastructure.
+        </p>
+
+        <div className="team-grid blur-animate delay-3">
+          <div className="team-card">
+            <div className="team-avatar-box">
+              <div className="team-avatar-gradient grad-1">
+                <span>SP</span>
+              </div>
+            </div>
+            <h3 className="team-name">Sanket Padhyal</h3>
+            <span className="team-role">Core Protocol Architect</span>
+            <p className="team-bio">
+              Specializing in EVM smart contract state architecture, meta-transaction relayer engines, and decentralized consensus design.
+            </p>
+            <div className="team-links">
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="team-link" title="GitHub">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="team-link" title="Twitter / X">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div className="team-card">
+            <div className="team-avatar-box">
+              <div className="team-avatar-gradient grad-2">
+                <span>ZK</span>
+              </div>
+            </div>
+            <h3 className="team-name">ZK Labs Core</h3>
+            <span className="team-role">Cryptography & Circuits</span>
+            <p className="team-bio">
+              Focused on Groth16 circuit compilation, Circom constraints optimization, and client-side proof generation performance.
+            </p>
+            <div className="team-links">
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="team-link" title="GitHub">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="team-link" title="Twitter / X">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div className="team-card">
+            <div className="team-avatar-box">
+              <div className="team-avatar-gradient grad-3">
+                <span>TV</span>
+              </div>
+            </div>
+            <h3 className="team-name">TrueVote Community</h3>
+            <span className="team-role">Open-Source Contributors</span>
+            <p className="team-bio">
+              Global developers and designers collaborating on decentralized UI/UX, Pinata IPFS pipelines, and civic integrations.
+            </p>
+            <div className="team-links">
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="team-link" title="GitHub">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="team-link" title="Twitter / X">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==========================================================================
+          FOOTER
+          ========================================================================== */}
+      <footer className="footer-section">
+        <div className="footer-inner">
+          <div className="footer-top">
+            <div className="footer-brand-col">
+              <div className="footer-brand-title">
+                <img src="/images/logo.png" alt="TrueVote" className="navbar-logo-img" style={{ width: 30, height: 30 }} />
+                <span>True<span className="brand-accent">Vote</span></span>
+              </div>
+              <p className="footer-brand-tagline">
+                Democracy Reimagined on Ethereum. Cryptographically verifiable, gasless, and privacy-preserving voting powered by zk-SNARKs and Pinata IPFS.
+              </p>
+              <div className="footer-status-pill">
+                <span className="status-dot"></span>
+                <span>Sepolia Testnet Active · IPFS Synced</span>
+              </div>
+            </div>
+
+            <div className="footer-links-grid">
+              <div className="footer-link-col">
+                <h5 className="footer-link-heading">Navigation</h5>
+                <a href="#features" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('features'); }}>Features</a>
+                <a href="#benefits" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('benefits'); }}>Benefits</a>
+                <a href="#how-it-works" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('how-it-works'); }}>How It Works</a>
+                <a href="#security" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('security'); }}>Security</a>
+                <a href="#faq" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('faq'); }}>FAQ</a>
+              </div>
+
+              <div className="footer-link-col">
+                <h5 className="footer-link-heading">Technology</h5>
+                <span className="footer-link-static">Circom zk-SNARKs</span>
+                <span className="footer-link-static">Pinata IPFS Gateway</span>
+                <span className="footer-link-static">EIP-712 Relayers</span>
+                <span className="footer-link-static">Ethereum Sepolia</span>
+              </div>
+
+              <div className="footer-link-col">
+                <h5 className="footer-link-heading">About</h5>
+                <a href="#team" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('team'); }}>About Team</a>
+                <span className="footer-link-static" onClick={() => setIsHackathonModalOpen(true)} style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}>Hackathon Details</span>
+                <span className="footer-link-static">Open Source MVP</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p className="footer-copyright">
+              © {new Date().getFullYear()} TrueVote. Built for decentralized, tamper-proof governance.
+            </p>
+            <div className="footer-bottom-badges">
+              <span className="footer-badge-tag">Zero-Knowledge</span>
+              <span className="footer-badge-tag">Decentralized IPFS</span>
+              <span className="footer-badge-tag">100% Verifiable</span>
+            </div>
+          </div>
+        </div>
+      </footer>
       {toastMessage && (
         <div className="vote-toast glass-panel-dark">
           <span>{toastMessage}</span>
