@@ -108,13 +108,21 @@ export const HomePage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="hero-container">
-        {/* Floating 3D Icon Badges */}
-        <div className="floating-icon-card float-top-left blur-animate delay-1">
-          <div className="float-symbol sym-blue">⚡</div>
+        {/* Floating Tech Stack Cards */}
+        <div className="floating-icon-card float-top-left" title="Pinata">
+          <img src="/images/stacks/Pinata.png" alt="Pinata" className="stack-logo-img" />
         </div>
 
-        <div className="floating-icon-card float-top-right blur-animate delay-1">
-          <div className="float-symbol sym-orange">☤</div>
+        <div className="floating-icon-card float-bottom-left" title="TypeScript">
+          <img src="/images/stacks/typescript.webp" alt="TypeScript" className="stack-logo-img" />
+        </div>
+
+        <div className="floating-icon-card float-top-right" title="Railway">
+          <img src="/images/stacks/Railway.webp" alt="Railway" className="stack-logo-img" />
+        </div>
+
+        <div className="floating-icon-card float-bottom-right" title="IPFS">
+          <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
         </div>
 
         {/* Top Hackathon Badge with Icon (Opens Dialogue Box) */}

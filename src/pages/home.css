@@ -243,46 +243,105 @@ html, body {
   color: #64748b;
 }
 
-/* Floating 3D Icon Cards - NO HOVER ROTATE OR LIFT */
+/* Floating 3D Tech Stack Cards */
 .floating-icon-card {
   position: absolute;
-  width: 58px;
-  height: 58px;
-  background: #ffffff;
-  border-radius: 16px;
+  width: 86px;
+  height: 86px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--border-card);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 20px 40px -8px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.03),
+    0 0 0 1px rgba(226, 232, 240, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9);
   z-index: 10;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  user-select: none;
 }
 
+.floating-icon-card:hover {
+  box-shadow: 
+    0 24px 50px -6px rgba(15, 23, 42, 0.14),
+    0 0 0 1.5px rgba(59, 130, 246, 0.3),
+    inset 0 2px 4px #ffffff;
+}
+
+.stack-logo-img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.06));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-icon-card:hover .stack-logo-img {
+  transform: scale(1.08);
+}
+
+/* Individual Floating Positions with Natural Hovering Drift */
 .float-top-left {
-  top: 22%;
-  left: 8%;
-  transform: rotate(-10deg);
+  top: 14%;
+  left: 3%;
+  animation: floatBobTopLeft 7s ease-in-out infinite alternate;
+}
+
+.float-bottom-left {
+  top: 54%;
+  left: 5%;
+  animation: floatBobBottomLeft 8s ease-in-out infinite alternate 1s;
 }
 
 .float-top-right {
-  top: 24%;
-  right: 8%;
-  transform: rotate(12deg);
+  top: 14%;
+  right: 3%;
+  animation: floatBobTopRight 7.5s ease-in-out infinite alternate 0.5s;
 }
 
-.float-symbol {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.15rem;
+.float-bottom-right {
+  top: 54%;
+  right: 5%;
+  animation: floatBobBottomRight 8.5s ease-in-out infinite alternate 1.5s;
 }
 
-.sym-blue { background: #dbeafe; color: var(--brand-blue); }
-.sym-orange { background: #ffedd5; color: #ea580c; }
+@keyframes floatBobTopLeft {
+  0% { transform: translateY(0px) rotate(-8deg); }
+  100% { transform: translateY(-10px) rotate(-5deg); }
+}
+
+@keyframes floatBobBottomLeft {
+  0% { transform: translateY(0px) rotate(14deg); }
+  100% { transform: translateY(-12px) rotate(11deg); }
+}
+
+@keyframes floatBobTopRight {
+  0% { transform: translateY(0px) rotate(8deg); }
+  100% { transform: translateY(-11px) rotate(5deg); }
+}
+
+@keyframes floatBobBottomRight {
+  0% { transform: translateY(0px) rotate(-12deg); }
+  100% { transform: translateY(-10px) rotate(-15deg); }
+}
+
+@media (max-width: 1024px) {
+  .floating-icon-card {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+  }
+  .stack-logo-img {
+    width: 36px;
+    height: 36px;
+  }
+}
 
 /* ==========================================================================
    3D PERSPECTIVE DASHBOARD SHOWCASE
