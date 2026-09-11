@@ -1,6 +1,6 @@
-/* iOS Glassmorphic Dialogue Box Styles */
+/* Sleek Developer-Grade Web3 Wallet Modal */
 
-.ios-dialogue-overlay {
+.wallet-modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 99999;
@@ -8,277 +8,285 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(15, 23, 42, 0.42);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-}
-
-.ios-dialogue-overlay.opening {
-  animation: iosOverlayFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.ios-dialogue-overlay.closing {
-  animation: iosOverlayFadeOut 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  background: rgba(8, 9, 14, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes iosOverlayFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.wallet-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-@keyframes iosOverlayFadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* Modal Card with iOS Frosted Glass Aesthetic */
-.ios-dialogue-card {
+/* Modal Card with Dark Obsidian Aesthetic */
+.wallet-modal-card {
   position: relative;
   width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  max-width: 410px;
+  background: #12101b;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
   box-shadow: 
-    0 25px 60px -12px rgba(15, 23, 42, 0.22),
-    0 0 0 1px rgba(226, 232, 240, 0.45),
-    inset 0 1px 2px rgba(255, 255, 255, 0.9);
-  padding: 1.75rem 1.85rem 1.65rem;
+    0 25px 65px -15px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 45px -10px rgba(124, 58, 237, 0.16);
+  padding: 2.85rem 2rem 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transform-origin: center top;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.93) translateY(14px);
+  transition: 
+    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.ios-dialogue-card.opening {
-  animation: iosPopupSpring 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.wallet-modal-overlay.active .wallet-modal-card {
+  opacity: 1;
+  transform: scale(1) translateY(0);
 }
 
-.ios-dialogue-card.closing {
-  animation: iosPopupReverse 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes iosPopupSpring {
-  0% {
-    opacity: 0;
-    transform: translateY(-40px) scale(0.85);
-    filter: blur(8px);
-  }
-  65% {
-    opacity: 1;
-    transform: translateY(4px) scale(1.015);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-/* Exact reverse of opening animation */
-@keyframes iosPopupReverse {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-  15% {
-    opacity: 1;
-    transform: translateY(4px) scale(1.015);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-60px) scale(0.9);
-    filter: blur(12px);
-  }
-}
-
-/* iOS Subtle Drag Pill Indicator */
-.ios-drag-pill {
-  width: 40px;
-  height: 4.5px;
-  background: rgba(148, 163, 184, 0.45);
-  border-radius: 9999px;
-  margin-bottom: 1rem;
-}
-
-/* iOS Close Circle Button */
-.ios-close-btn {
+/* Faint Decorative Horizontal Lines Matching Screenshot Aesthetic */
+.modal-accent-line {
   position: absolute;
-  top: 1.15rem;
-  right: 1.15rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.line-tl {
+  top: 22%;
+  left: 0;
+  width: 55px;
+}
+
+.line-ml {
+  top: 48%;
+  left: 12%;
+  width: 80px;
+}
+
+.line-mr {
+  top: 42%;
+  right: 0;
+  width: 85px;
+}
+
+.line-bl {
+  top: 78%;
+  left: 0;
+  width: 50px;
+}
+
+.line-br {
+  top: 68%;
+  right: 12%;
+  width: 105px;
+}
+
+/* Close '✕' Button in Top Right */
+.modal-close-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background: rgba(226, 232, 240, 0.7);
+  background: transparent;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569;
-  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.45);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 10;
 }
 
-.ios-close-btn:hover {
-  background: rgba(203, 213, 225, 0.95);
-  color: #0f172a;
-  transform: scale(1.06);
+.modal-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.05);
 }
 
-.ios-close-btn:active {
+.modal-close-btn:active {
   transform: scale(0.94);
 }
 
-/* Image Container */
-.ios-dialogue-image-box {
-  width: 100%;
+/* Center Brand Logo */
+.modal-logo-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  margin-bottom: 1.55rem;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  z-index: 2;
 }
 
-.ios-dialogue-image {
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 220px;
+.modal-logo-glow {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, rgba(29, 107, 243, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.modal-brand-logo {
+  width: 44px;
+  height: 44px;
   object-fit: contain;
-  display: block;
-  filter: drop-shadow(0 10px 24px rgba(15, 23, 42, 0.08));
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
-/* Top Pill Badge */
-.ios-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(239, 246, 255, 0.9);
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  border-radius: 9999px;
-  padding: 0.25rem 0.85rem;
-  font-size: 0.78rem;
+/* Modal Title & Subtitle */
+.modal-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #1d4ed8;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.75rem;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.25;
+  z-index: 2;
 }
 
-.ios-badge-sparkle {
-  width: 13px;
-  height: 13px;
-  color: #2563eb;
+.modal-subtitle {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.96rem;
+  color: #94a3b8;
+  margin: 0 0 2rem 0;
+  line-height: 1.45;
+  z-index: 2;
 }
 
-/* Title & Description */
-.ios-dialogue-title {
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #1d6bf3;
-  letter-spacing: -0.02em;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.2;
-}
-
-.ios-dialogue-text {
-  font-family: var(--font-main), -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #64748b;
-  margin: 0 0 1.6rem 0;
-  max-width: 420px;
-}
-
-.ios-dialogue-text strong {
-  color: #0f172a;
-  font-weight: 700;
-}
-
-/* Feature Mini Pills */
-.ios-features-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1.4rem;
+/* Continue with MetaMask Button */
+.wallet-continue-btn {
   width: 100%;
-}
-
-.ios-feature-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(241, 245, 249, 0.8);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: #7c3aed;
+  background: linear-gradient(180deg, #853be9 0%, #6e2fd1 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
-  padding: 0.32rem 0.75rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #334155;
-}
-
-/* Primary Action Button (iOS Style) */
-.ios-action-btn {
-  width: 100%;
-  max-width: 440px;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(180deg, #1d6bf3 0%, #175cd3 100%);
+  padding: 0.88rem 1.5rem;
   color: #ffffff;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 600;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  box-shadow: 
-    0 4px 14px rgba(29, 107, 243, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.75rem;
+  cursor: pointer;
+  box-shadow: 
+    0 6px 22px -3px rgba(124, 58, 237, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
 }
 
-.ios-action-btn:hover {
-  background: linear-gradient(180deg, #1a62de 0%, #1452be 100%);
-  box-shadow:
-    0 6px 20px rgba(29, 107, 243, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.35);
-  /* Removed transform: scale(1.01) to prevent popup effect */
+.wallet-continue-btn:hover {
+  background: linear-gradient(180deg, #8f45f0 0%, #7735db 100%);
+  box-shadow: 
+    0 8px 28px -2px rgba(124, 58, 237, 0.65),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
 }
 
-.ios-action-btn:active {
-  transform: scale(0.98);
+.wallet-continue-btn:active {
+  transform: translateY(0) scale(0.985);
 }
 
-/* Custom Scrollbar for Card */
-.ios-dialogue-card::-webkit-scrollbar {
-  width: 5px;
+.wallet-continue-btn.connecting {
+  opacity: 0.85;
+  cursor: wait;
 }
-.ios-dialogue-card::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
-  border-radius: 10px;
+
+.wallet-btn-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Spinner during Connection */
+.wallet-btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: modalSpin 0.75s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes modalSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Connected State Pill */
+.wallet-connected-pill {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  z-index: 2;
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: pulseGreen 1.5s infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+.connected-text {
+  color: #4ade80;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Error Message */
+.modal-error-message {
+  margin: 0.85rem 0 0;
+  font-size: 0.84rem;
+  color: #f87171;
+  line-height: 1.4;
+  z-index: 2;
 }

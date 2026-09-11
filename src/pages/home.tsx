@@ -11,6 +11,7 @@ export const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isHackathonModalOpen, setIsHackathonModalOpen] = useState<boolean>(false);
+  const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
@@ -144,20 +145,22 @@ export const HomePage: React.FC = () => {
             <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
           </div>
 
-          {/* Top Hackathon Badge with Icon (Opens Dialogue Box) */}
+          {/* Top Pill with Icon (Opens Wallet Modal) */}
           <div 
             className="trusted-pill blur-animate clickable-pill"
             onClick={() => setIsHackathonModalOpen(true)}
             role="button"
             tabIndex={0}
-            title="Click to view Hackathon details"
+            title="Click to connect Web3 wallet"
           >
             <div className="hackathon-icon-box">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
               </svg>
             </div>
-            <span className="trusted-text">This is a Hackathon Project</span>
+            <span className="trusted-text">
+              {connectedWallet ? `Wallet: ${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : 'Connect Web3 Wallet'}
+            </span>
           </div>
 
           {/* Main Title with Serif Accent */}
@@ -174,12 +177,18 @@ export const HomePage: React.FC = () => {
           <div className="hero-action-group blur-animate delay-3">
             <button 
               className="btn-primary-blue framer-flip-btn"
-              onClick={() => triggerToast('⚡ Connecting relayer: Preparing anonymous ballot token...')}
+              onClick={() => {
+                if (connectedWallet) {
+                  triggerToast(`⚡ Wallet connected (${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}): Preparing anonymous ballot token...`);
+                } else {
+                  setIsHackathonModalOpen(true);
+                }
+              }}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
                 <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
               </svg>
-              <FlipText>Get Started</FlipText>
+              <FlipText>{connectedWallet ? `Connected: ${connectedWallet.slice(0, 6)}...` : 'Get Started'}</FlipText>
             </button>
             <div className="credit-caption">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -655,10 +664,14 @@ export const HomePage: React.FC = () => {
         </div>
       )}
 
-      {/* iOS Glassmorphic Hackathon Dialogue Box */}
+      {/* Web3 Wallet Access Modal */}
       <DialogueBox 
         isOpen={isHackathonModalOpen} 
         onClose={() => setIsHackathonModalOpen(false)} 
+        onConnect={(addr) => {
+          setConnectedWallet(addr);
+          triggerToast(`🦊 MetaMask connected: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
+        }}
       />
     </div>
   );
