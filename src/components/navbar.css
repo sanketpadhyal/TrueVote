@@ -139,12 +139,37 @@
 
 .mobile-toggle-btn {
   display: none;
-  font-size: 1.5rem;
-  background: none;
-  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   cursor: pointer;
   color: #0f172a;
-  padding: 0.25rem;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.mobile-toggle-btn:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #1d6bf3;
+}
+
+.mobile-toggle-btn:active {
+  transform: scale(0.94);
+  background: #f1f5f9;
+}
+
+.mobile-toggle-btn.active {
+  background: #eff6ff;
+  border-color: rgba(29, 107, 243, 0.35);
+  color: #1d6bf3;
 }
 
 /* Mobile Drawer */
@@ -220,12 +245,15 @@
 
 @media (max-width: 1024px) {
   .navbar-inner {
-    padding: 0.95rem 1.5rem;
+    padding: 0.85rem 1.25rem;
   }
   .navbar-menu {
     display: none;
   }
+  .navbar-actions .btn-hyper-blue {
+    display: none;
+  }
   .mobile-toggle-btn {
-    display: block;
+    display: flex;
   }
 }

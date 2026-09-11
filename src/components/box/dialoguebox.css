@@ -97,15 +97,15 @@
     transform: translateY(0) scale(1);
     filter: blur(0);
   }
-  35% {
+  15% {
     opacity: 1;
     transform: translateY(4px) scale(1.015);
     filter: blur(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-40px) scale(0.85);
-    filter: blur(8px);
+    transform: translateY(-60px) scale(0.9);
+    filter: blur(12px);
   }
 }
 
