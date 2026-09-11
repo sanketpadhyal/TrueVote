@@ -1,0 +1,313 @@
+/* ==========================================================================
+   TrueVote Auth Modal Styles
+   Matches website theme: Light, airy, hyper-premium frosted glass
+   Animated with signature blur-to-normal + spring scale entrance
+   ========================================================================== */
+
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.36);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Modal Card with TrueVote Frosted Glass Aesthetic & Blur-To-Normal Animation */
+.auth-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(36px) saturate(210%);
+  -webkit-backdrop-filter: blur(36px) saturate(210%);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 
+    0 25px 70px -15px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(226, 232, 240, 0.8),
+    0 10px 40px -10px rgba(29, 107, 243, 0.12);
+  padding: 2.75rem 2.25rem 2.45rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+
+  /* Animated Entrance (Blur-to-Normal with scale) */
+  opacity: 0;
+  filter: blur(16px);
+  transform: scale(0.86) translateY(24px);
+  transition: 
+    opacity 0.44s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.44s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.44s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+}
+
+.auth-modal-card.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1) translateY(0);
+}
+
+/* Faint Decorative Accent Lines matching website aesthetic */
+.auth-card-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(226, 232, 240, 0.75);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.line-tl {
+  top: 22%;
+  left: 0;
+  width: 55px;
+}
+
+.line-ml {
+  top: 48%;
+  left: 10%;
+  width: 80px;
+}
+
+.line-mr {
+  top: 42%;
+  right: 0;
+  width: 85px;
+}
+
+.line-bl {
+  top: 78%;
+  left: 0;
+  width: 50px;
+}
+
+.line-br {
+  top: 68%;
+  right: 12%;
+  width: 100px;
+}
+
+/* Close '✕' Button in Top Right */
+.auth-close-btn {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.15rem;
+  width: 34px;
+  height: 34px;
+  background: rgba(241, 245, 249, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+
+.auth-close-btn:hover {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  transform: scale(1.06);
+}
+
+.auth-close-btn:active {
+  transform: scale(0.94);
+}
+
+/* Center Brand Logo Container with Frosted Glow */
+.auth-logo-wrapper {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(226, 232, 240, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.45rem;
+  box-shadow: 
+    0 10px 28px -6px rgba(29, 107, 243, 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  z-index: 2;
+  transition: transform 0.44s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-modal-card.visible .auth-logo-wrapper {
+  transform: scale(1);
+}
+
+.auth-logo-ambient-glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(29, 107, 243, 0.22) 0%, rgba(29, 107, 243, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.auth-brand-logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Title & Subtitle */
+.auth-modal-title {
+  font-family: var(--font-main), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.45rem 0;
+  line-height: 1.25;
+  z-index: 2;
+}
+
+.auth-brand-accent {
+  color: #1d6bf3;
+}
+
+.auth-modal-subtitle {
+  font-family: var(--font-main), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.96rem;
+  color: #64748b;
+  margin: 0 0 1.95rem 0;
+  line-height: 1.45;
+  z-index: 2;
+}
+
+/* Primary Action Button (Signature TrueVote Hyper Blue) */
+.auth-continue-btn {
+  width: 100%;
+  background: linear-gradient(180deg, #1d6bf3 0%, #1557d0 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  padding: 0.92rem 1.5rem;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  box-shadow: 
+    0 8px 24px -4px rgba(29, 107, 243, 0.42),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
+}
+
+.auth-continue-btn:hover {
+  background: linear-gradient(180deg, #2575fc 0%, #1a62de 100%);
+  box-shadow: 
+    0 12px 30px -3px rgba(29, 107, 243, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.auth-continue-btn:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.auth-continue-btn.connecting {
+  opacity: 0.88;
+  cursor: wait;
+}
+
+.auth-btn-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Spinner during Connection */
+.auth-btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: authSpin 0.75s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes authSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Connected State Pill */
+.auth-connected-pill {
+  width: 100%;
+  padding: 0.88rem 1.25rem;
+  border-radius: 14px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1.5px solid rgba(34, 197, 94, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  z-index: 2;
+}
+
+.auth-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 10px #22c55e;
+  animation: authPulseGreen 1.5s infinite;
+}
+
+@keyframes authPulseGreen {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+.auth-connected-text {
+  color: #15803d;
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Error Message */
+.auth-error-message {
+  margin: 0.85rem 0 0;
+  font-size: 0.84rem;
+  color: #ef4444;
+  line-height: 1.4;
+  z-index: 2;
+}

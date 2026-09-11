@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import Navbar from '../components/navbar';
 import { FlipText } from '../components/universalbuttonshover';
-import AuthModal from '../components/auth/authmodal';
+import AuthModal from '../components/authmodal';
 import '../styles/animations.css';
 import './home.css';
 
