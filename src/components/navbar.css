@@ -172,80 +172,111 @@
   color: #1d6bf3;
 }
 
-/* Mobile Drawer */
-.mobile-drawer {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  padding: 1.15rem 1.5rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  transform: translateY(-150%);
-  opacity: 0;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.38s ease;
-  z-index: 999;
-}
-
-.mobile-drawer.open {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.mobile-nav-link {
-  position: relative;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #475569;
-  text-decoration: none;
-  padding: 0.65rem 1rem;
-  border-radius: 8px;
-  transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  isolation: isolate;
-  display: block;
-}
-
-.mobile-nav-link::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  border: 1.5px solid #cbd5e1;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-  opacity: 0;
-  transform: scale(0.92);
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: -1;
-  pointer-events: none;
-}
-
-.mobile-nav-link:hover {
-  color: #0f172a;
-}
-
-.mobile-nav-link:hover::before {
-  opacity: 1;
-  transform: scale(1);
+/* Extended Mobile Navigation Panel inside Navbar */
+.mobile-expand-panel {
+  display: none;
 }
 
 @media (max-width: 1024px) {
   .navbar-inner {
     padding: 0.85rem 1.25rem;
   }
+
   .navbar-menu {
     display: none;
   }
+
   .navbar-actions .btn-hyper-blue {
     display: none;
   }
+
   .mobile-toggle-btn {
     display: flex;
   }
+
+  /* Extended Mobile Navigation Panel */
+  .mobile-expand-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .navbar-header.mobile-expanded {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(32px) saturate(210%);
+    -webkit-backdrop-filter: blur(32px) saturate(210%);
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  }
+
+  .navbar-header.mobile-expanded .mobile-expand-panel {
+    grid-template-rows: 1fr;
+  }
+
+  .mobile-expand-content {
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0 1.25rem;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .navbar-header.mobile-expanded .mobile-expand-content {
+    opacity: 1;
+    transform: translateY(0);
+    padding: 0.35rem 1.25rem 1.45rem 1.25rem;
+  }
+
+  .mobile-nav-link {
+    position: relative;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: #475569;
+    text-decoration: none;
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: block;
+    isolation: isolate;
+  }
+
+  .mobile-nav-link:hover,
+  .mobile-nav-link:active {
+    color: #0f172a;
+    background: rgba(241, 245, 249, 0.85);
+  }
+
+  .mobile-team-cta {
+    width: 100% !important;
+    margin-top: 0.55rem;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Semi-transparent Backdrop when Mobile Navbar is Extended */
+.navbar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  z-index: 998;
+}
+
+.navbar-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
 }

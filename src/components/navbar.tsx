@@ -69,7 +69,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className={`navbar-header ${isScrolled ? 'scrolled' : ''} ${isMounted ? 'nav-visible' : 'nav-blur-initial'}`}>
+      <header className={`navbar-header ${isScrolled ? 'scrolled' : ''} ${isMounted ? 'nav-visible' : 'nav-blur-initial'} ${isMobileMenuOpen ? 'mobile-expanded' : ''}`}>
         <div className="navbar-inner">
           {/* Logo with User's Brand Logo */}
           <a href="/" className="navbar-brand" onClick={scrollToTop}>
@@ -124,29 +124,36 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Seamlessly Extending Mobile Panel inside Navbar */}
+        <div className="mobile-expand-panel">
+          <div className="mobile-expand-content">
+            <a href="#features" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'features')}>Features</a>
+            <a href="#benefits" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'benefits')}>Benefits</a>
+            <a href="#how-it-works" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'how-it-works')}>How It Works</a>
+            <a href="#security" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'security')}>Security</a>
+            <a href="#faq" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'faq')}>FAQ</a>
+            <button 
+              className="btn-hyper-blue framer-flip-btn mobile-team-cta" 
+              onClick={(e) => scrollToSection(e, 'team')}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M15 19.5c0-2.5-2-4.5-4.5-4.5S6 17 6 19.5" />
+                <circle cx="10.5" cy="8.5" r="3.5" />
+                <path d="M18 19c0-1.8-1.2-3.3-2.8-3.8" />
+                <path d="M14.5 5.2a3.5 3.5 0 0 1 0 6.6" />
+              </svg>
+              <FlipText>About Team</FlipText>
+            </button>
+          </div>
+        </div>
       </header>
 
-      {/* Mobile Drawer Menu */}
-      <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
-        <a href="#features" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'features')}>Features</a>
-        <a href="#benefits" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'benefits')}>Benefits</a>
-        <a href="#how-it-works" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'how-it-works')}>How It Works</a>
-        <a href="#security" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'security')}>Security</a>
-        <a href="#faq" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'faq')}>FAQ</a>
-        <button 
-          className="btn-hyper-blue framer-flip-btn" 
-          style={{ width: '100%', marginTop: '0.5rem' }}
-          onClick={(e) => scrollToSection(e, 'team')}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-            <path d="M15 19.5c0-2.5-2-4.5-4.5-4.5S6 17 6 19.5" />
-            <circle cx="10.5" cy="8.5" r="3.5" />
-            <path d="M18 19c0-1.8-1.2-3.3-2.8-3.8" />
-            <path d="M14.5 5.2a3.5 3.5 0 0 1 0 6.6" />
-          </svg>
-          <FlipText>About Team</FlipText>
-        </button>
-      </div>
+      {/* Backdrop for tapping outside to close */}
+      <div 
+        className={`navbar-backdrop ${isMobileMenuOpen ? 'active' : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
     </>
   );
 };
