@@ -128,10 +128,6 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
-        <div className="mobile-drawer-brand">
-          <img src="/images/logo.png" alt="TrueVote" className="navbar-logo-img" style={{ width: 28, height: 28 }} />
-          <span className="navbar-brand-name">True<span className="brand-accent">Vote</span></span>
-        </div>
         <a href="#features" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'features')}>Features</a>
         <a href="#benefits" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'benefits')}>Benefits</a>
         <a href="#how-it-works" className="mobile-nav-link" onClick={(e) => scrollToSection(e, 'how-it-works')}>How It Works</a>
