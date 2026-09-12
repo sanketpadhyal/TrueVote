@@ -237,6 +237,36 @@ export async function deleteEventFromPinata(
 /**
  * Synchronizes and fetches existing election event files from Pinata IPFS.
  */
+/**
+ * Helper to fetch and parse JSON from IPFS gateways without Authorization headers
+ * (sending Authorization to public or dedicated gateways triggers CORS preflight rejection in browsers).
+ */
+async function fetchFromIpfsGateway(cid: string): Promise<any | null> {
+  const gateways = [
+    DEDICATED_PINATA_GATEWAY,
+    PINATA_GATEWAY,
+    'https://maroon-genetic-sawfish-271.mypinata.cloud/ipfs/',
+    'https://gateway.pinata.cloud/ipfs/',
+  ];
+
+  for (const gw of gateways) {
+    if (!gw) continue;
+    try {
+      const url = `${gw.endsWith('/') ? gw : gw + '/'}${cid}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const text = await res.text();
+        if (text && text.trim().startsWith('{')) {
+          return JSON.parse(text);
+        }
+      }
+    } catch (e) {
+      // try next gateway
+    }
+  }
+  return null;
+}
+
 export async function fetchEventsFromPinata(): Promise<any[]> {
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
   const apiKey = process.env.REACT_APP_PINATA_API_KEY;
@@ -260,24 +290,17 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
       for (const file of files) {
         if (file.name && file.name.startsWith('TrueVote-') && file.cid) {
           try {
-            const ipfsRes = await fetch(`${PINATA_GATEWAY}${file.cid}`, {
-              headers: {
-                Authorization: `Bearer ${jwt}`,
-              },
-            });
-            if (ipfsRes.ok) {
-              const eventData = await ipfsRes.json();
-              if (eventData && (eventData.id || eventData.votingNumber)) {
-                const id = String(eventData.id || eventData.votingNumber);
-                if (!seenIds.has(id)) {
-                  seenIds.add(id);
-                  events.push({
-                    ...eventData,
-                    ipfsFileId: file.id,
-                    ipfsHash: file.cid,
-                    ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
-                  });
-                }
+            const eventData = await fetchFromIpfsGateway(file.cid);
+            if (eventData && (eventData.id || eventData.votingNumber)) {
+              const id = String(eventData.id || eventData.votingNumber);
+              if (!seenIds.has(id)) {
+                seenIds.add(id);
+                events.push({
+                  ...eventData,
+                  ipfsFileId: file.id,
+                  ipfsHash: file.cid,
+                  ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
+                });
               }
             }
           } catch (e) {
@@ -312,23 +335,16 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
           const cid = row?.ipfs_pin_hash;
           if (name.startsWith('TrueVote-') && cid) {
             try {
-              const ipfsRes = await fetch(`${PINATA_GATEWAY}${cid}`, {
-                headers: {
-                  Authorization: `Bearer ${jwt}`,
-                },
-              });
-              if (ipfsRes.ok) {
-                const eventData = await ipfsRes.json();
-                if (eventData && (eventData.id || eventData.votingNumber)) {
-                  const id = String(eventData.id || eventData.votingNumber);
-                  if (!seenIds.has(id)) {
-                    seenIds.add(id);
-                    events.push({
-                      ...eventData,
-                      ipfsHash: cid,
-                      ipfsUrl: `${PINATA_GATEWAY}${cid}`,
-                    });
-                  }
+              const eventData = await fetchFromIpfsGateway(cid);
+              if (eventData && (eventData.id || eventData.votingNumber)) {
+                const id = String(eventData.id || eventData.votingNumber);
+                if (!seenIds.has(id)) {
+                  seenIds.add(id);
+                  events.push({
+                    ...eventData,
+                    ipfsHash: cid,
+                    ipfsUrl: `${PINATA_GATEWAY}${cid}`,
+                  });
                 }
               }
             } catch (e) {
@@ -353,13 +369,6 @@ export async function fetchEventByIdFromPinata(targetId: string): Promise<any | 
   const cleanTarget = targetId.trim().toLowerCase();
   const idSuffix = cleanTarget.includes('-') ? cleanTarget.split('-').pop()! : cleanTarget;
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
-
-  const gateways = [
-    PINATA_GATEWAY,
-    DEDICATED_PINATA_GATEWAY,
-    'https://maroon-genetic-sawfish-271.mypinata.cloud/ipfs/',
-    'https://gateway.pinata.cloud/ipfs/',
-  ];
 
   try {
     const v3Res = await fetch('https://api.pinata.cloud/v3/files/public?limit=50', {
@@ -388,39 +397,28 @@ export async function fetchEventByIdFromPinata(targetId: string): Promise<any | 
 
       for (const file of sortedFiles) {
         if (file.cid) {
-          for (const gw of gateways) {
-            try {
-              const url = `${gw.endsWith('/') ? gw : gw + '/'}${file.cid}`;
-              const ipfsRes = await fetch(url, {
-                headers: {
-                  Authorization: `Bearer ${jwt}`,
-                },
-              });
-              if (ipfsRes.ok) {
-                const text = await ipfsRes.text();
-                if (text && text.trim().startsWith('{')) {
-                  const eventData = JSON.parse(text);
-                  const evId = String(eventData.id || '').toLowerCase();
-                  const evNum = String(eventData.votingNumber || '').toLowerCase();
+          try {
+            const eventData = await fetchFromIpfsGateway(file.cid);
+            if (eventData) {
+              const evId = String(eventData.id || '').toLowerCase();
+              const evNum = String(eventData.votingNumber || '').toLowerCase();
 
-                  if (
-                    evId === cleanTarget ||
-                    evNum === cleanTarget ||
-                    (idSuffix && evNum.includes(idSuffix)) ||
-                    (idSuffix && evId.includes(idSuffix))
-                  ) {
-                    return {
-                      ...eventData,
-                      ipfsFileId: file.id,
-                      ipfsHash: file.cid,
-                      ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
-                    };
-                  }
-                }
+              if (
+                evId === cleanTarget ||
+                evNum === cleanTarget ||
+                (idSuffix && evNum.includes(idSuffix)) ||
+                (idSuffix && evId.includes(idSuffix))
+              ) {
+                return {
+                  ...eventData,
+                  ipfsFileId: file.id,
+                  ipfsHash: file.cid,
+                  ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
+                };
               }
-            } catch (e) {
-              // try next gateway
             }
+          } catch (e) {
+            // continue
           }
         }
       }

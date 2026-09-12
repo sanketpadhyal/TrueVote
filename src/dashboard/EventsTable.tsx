@@ -46,20 +46,27 @@ export const EventsTable: React.FC = () => {
 
       if (pinataEvents && pinataEvents.length > 0) {
         const map = new Map<string, EventItem>();
-        for (const ev of combined) {
+        for (let i = 0; i < combined.length; i++) {
+          const ev = combined[i];
           map.set(ev.id, ev);
-          map.set(ev.votingNumber, ev);
         }
-        for (const pEv of pinataEvents) {
-          if (!map.has(pEv.id) && !map.has(pEv.votingNumber)) {
-            map.set(pEv.id, pEv);
+        for (let j = 0; j < pinataEvents.length; j++) {
+          const pEv = pinataEvents[j];
+          let foundKey: string | null = null;
+          map.forEach((v, k) => {
+            if (!foundKey && (v.id === pEv.id || (v.votingNumber && v.votingNumber === pEv.votingNumber))) {
+              foundKey = k;
+            }
+          });
+          if (foundKey) {
+            map.set(foundKey, { ...map.get(foundKey), ...pEv });
           } else {
-            // Update with fresh Pinata data
-            const existing = map.get(pEv.id) || map.get(pEv.votingNumber);
-            map.set(pEv.id, { ...existing, ...pEv });
+            map.set(pEv.id, pEv);
           }
         }
-        combined = Array.from(new Set(map.values()));
+        const updatedList: EventItem[] = [];
+        map.forEach((item) => updatedList.push(item));
+        combined = updatedList;
         setEvents(combined);
       }
 
@@ -243,12 +250,15 @@ export const EventsTable: React.FC = () => {
         <button
           type="button"
           className="btn-ipfs-sync"
-          onClick={() => {
+          onClick={async () => {
             setIsSyncSpinning(true);
-            syncExistingEvents();
-            setTimeout(() => {
-              setIsSyncSpinning(false);
-            }, 750);
+            try {
+              await syncExistingEvents();
+            } finally {
+              setTimeout(() => {
+                setIsSyncSpinning(false);
+              }, 750);
+            }
           }}
           aria-label="Sync with IPFS"
         >
