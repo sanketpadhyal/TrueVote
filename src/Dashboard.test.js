@@ -14,7 +14,7 @@ describe('Dashboard Component', () => {
     expect(screen.queryByText(/Hi Agnes!/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Check how voting is carried out in your organization/i)).toBeInTheDocument();
     expect(screen.getByText(/Current license status/i)).toBeInTheDocument();
-    expect(screen.getByText(/220/i)).toBeInTheDocument();
+    expect(screen.getByText(/the votes used/i)).toBeInTheDocument();
     expect(screen.getByText(/voting activity/i)).toBeInTheDocument();
   });
 

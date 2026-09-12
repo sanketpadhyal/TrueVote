@@ -6,6 +6,20 @@ interface StatsPanelProps {
   activities?: ActivityItem[];
 }
 
+const getStoredLicenseStatus = (): LicenseStatus => {
+  if (typeof window === 'undefined') return { usedVotes: 0, totalVotes: 500 };
+  try {
+    const stored = localStorage.getItem('truevote_license_status');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (typeof parsed.usedVotes === 'number') return parsed;
+    }
+  } catch (e) {
+    console.error('Error reading license status:', e);
+  }
+  return { usedVotes: 0, totalVotes: 500 };
+};
+
 const getStoredActivities = (): ActivityItem[] => {
   if (typeof window === 'undefined') return [];
   try {
@@ -21,9 +35,10 @@ const getStoredActivities = (): ActivityItem[] => {
 };
 
 export const StatsPanel: React.FC<StatsPanelProps> = ({
-  licenseStatus = { usedVotes: 220, totalVotes: 500 },
+  licenseStatus,
   activities,
 }) => {
+  const currentLicense = licenseStatus !== undefined ? licenseStatus : getStoredLicenseStatus();
   const currentActivities = activities !== undefined ? activities : getStoredActivities();
 
   return (
@@ -33,8 +48,8 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
         <h3 className="stats-section-title">Current license status</h3>
         <div className="license-card">
           <div className="license-stat-number">
-            <span className="stat-highlight">{licenseStatus.usedVotes}</span>
-            <span className="stat-total"> out of {licenseStatus.totalVotes}</span>
+            <span className="stat-highlight">{currentLicense.usedVotes}</span>
+            <span className="stat-total"> out of {currentLicense.totalVotes}</span>
           </div>
           <div className="license-stat-label">the votes used</div>
         </div>
