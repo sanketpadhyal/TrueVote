@@ -238,7 +238,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       startTime: activationType === 'automatic' ? startTime : undefined,
       endDate: activationType === 'automatic' ? endDate : undefined,
       endTime: activationType === 'automatic' ? endTime : undefined,
-      isActivated: activationType === 'manual' ? true : undefined,
+      isActivated: false,
       createdAt: new Date().toISOString(),
       timezone: 'IST (UTC+05:30)',
       shareableLink: `${window.location.origin}/voting/${eventId}`,

@@ -98,86 +98,126 @@ export const VotingPage: React.FC = () => {
     setCaptchaOptions(shuffled.sort(() => 0.5 - Math.random()));
   }, []);
 
-  // Load Event Data
+  // Load Event Data with real-time sync across tabs and updates
   useEffect(() => {
-    const targetId = eventId || 'default-event';
-    const storedEventsStr = localStorage.getItem('truevote_events');
-    let foundEvent: EventItem | null = null;
+    const loadEventData = () => {
+      const targetId = (eventId || '').trim().toLowerCase();
+      const storedEventsStr = localStorage.getItem('truevote_events');
+      let foundEvent: EventItem | null = null;
 
-    if (storedEventsStr) {
-      try {
-        const events: EventItem[] = JSON.parse(storedEventsStr);
-        if (Array.isArray(events)) {
-          foundEvent = events.find((e) => e.id === targetId) || null;
-          if (!foundEvent && !eventId && events.length > 0) {
-            foundEvent = events[0];
+      if (storedEventsStr) {
+        try {
+          const events: EventItem[] = JSON.parse(storedEventsStr);
+          if (Array.isArray(events) && events.length > 0) {
+            if (targetId) {
+              foundEvent =
+                events.find(
+                  (e) =>
+                    e.id.toLowerCase() === targetId ||
+                    (e.votingNumber && e.votingNumber.toLowerCase() === targetId)
+                ) || null;
+            }
+            if (!foundEvent && !eventId) {
+              foundEvent = events[0];
+            }
           }
+        } catch (e) {
+          console.error('Error loading events for voting page:', e);
         }
-      } catch (e) {
-        console.error(e);
       }
-    }
 
-    // If still not found, provide an active high-tech demo referendum
-    if (!foundEvent) {
-      foundEvent = {
-        id: targetId,
-        name: 'TrueVote Cryptographic Governance Referendum 2026',
-        bio: 'Official decentralized ballot for verifying community protocol enhancements and zero-knowledge privacy parameters.',
-        votingNumber: 'VOTE-2026',
-        optionsCount: 2,
-        options: [
-          { id: 'opt-1', label: 'Approve zk-SNARK Protocol Upgrade', votesCount: 38 },
-          { id: 'opt-2', label: 'Maintain Current Verifier Standard', votesCount: 14 },
-        ],
-        totalAllowedVotes: 250,
-        totalVotesCast: 52,
-        activationType: 'automatic',
-        startDate: '2026-09-01',
-        startTime: '00:00',
-        endDate: '2026-12-31',
-        endTime: '23:59',
-        isActivated: true,
-        createdAt: new Date().toISOString(),
-        timezone: 'IST (UTC+05:30)',
-      };
-    }
-
-    setEvent(foundEvent);
-
-    // Check if voter already voted for this event (No Twice Voting Guard)
-    const voterId = getAnonymousVoterId();
-    const nullifierKey = `truevote_voted_nullifier_${foundEvent.id}_${voterId}`;
-    const previousReceipt = localStorage.getItem(nullifierKey);
-    if (previousReceipt) {
-      try {
-        setStoredReceipt(JSON.parse(previousReceipt));
-        setHasAlreadyVoted(true);
-      } catch (e) {
-        setHasAlreadyVoted(true);
+      // If still not found, provide fallback demo referendum
+      if (!foundEvent) {
+        foundEvent = {
+          id: eventId || 'demo-referendum',
+          name: 'TrueVote Cryptographic Governance Referendum 2026',
+          bio: 'Official decentralized ballot for verifying community protocol enhancements and zero-knowledge privacy parameters.',
+          votingNumber: 'VOTE-2026',
+          optionsCount: 2,
+          options: [
+            { id: 'opt-1', label: 'Approve zk-SNARK Protocol Upgrade', votesCount: 38 },
+            { id: 'opt-2', label: 'Maintain Current Verifier Standard', votesCount: 14 },
+          ],
+          totalAllowedVotes: 250,
+          totalVotesCast: 52,
+          activationType: 'automatic',
+          startDate: '2026-09-01',
+          startTime: '00:00',
+          endDate: '2026-12-31',
+          endTime: '23:59',
+          isActivated: true,
+          createdAt: new Date().toISOString(),
+          timezone: 'IST (UTC+05:30)',
+        };
       }
-    }
+
+      setEvent(foundEvent);
+
+      // Check if voter already voted for this event (No Twice Voting Guard)
+      const voterId = getAnonymousVoterId();
+      const nullifierKey = `truevote_voted_nullifier_${foundEvent.id}_${voterId}`;
+      const previousReceipt = localStorage.getItem(nullifierKey);
+      if (previousReceipt) {
+        try {
+          setStoredReceipt(JSON.parse(previousReceipt));
+          setHasAlreadyVoted(true);
+        } catch (e) {
+          setHasAlreadyVoted(true);
+        }
+      }
+    };
+
+    loadEventData();
+
+    window.addEventListener('truevote_events_updated', loadEventData);
+    window.addEventListener('storage', loadEventData);
+
+    return () => {
+      window.removeEventListener('truevote_events_updated', loadEventData);
+      window.removeEventListener('storage', loadEventData);
+    };
   }, [eventId]);
 
-  // Check Schedule (IST Enforcement)
+  // Check Schedule & Strict Activation Enforcement
   const isVotingActive = React.useMemo(() => {
     if (!event) return false;
-    if (event.activationType === 'manual') {
-      return event.isActivated !== false;
+
+    // Explicit deactivation override
+    if (event.isActivated === false) {
+      return false;
     }
-    // Automatic: check IST date & time
+
+    if (event.activationType === 'manual') {
+      // Manual events MUST be explicitly activated by admin (isActivated === true)
+      return event.isActivated === true;
+    }
+
+    // Automatic activation: verify against Indian Standard Time (IST) window
     if (event.startDate && event.endDate) {
       const nowIst = getIstCurrentTime();
       const startDateTime = new Date(`${event.startDate}T${event.startTime || '00:00'}:00`);
       const endDateTime = new Date(`${event.endDate}T${event.endTime || '23:59'}:59`);
-      return nowIst >= startDateTime && nowIst <= endDateTime;
+      if (nowIst < startDateTime || nowIst > endDateTime) {
+        return false;
+      }
+      return true;
     }
-    return true;
+
+    return event.isActivated === true;
   }, [event]);
 
   // Cast Ballot Handler
   const handleCastBallot = async () => {
     setErrorMessage('');
+
+    if (!isVotingActive) {
+      setErrorMessage(
+        event?.activationType === 'manual'
+          ? 'Voting is currently inactive. This event has not been activated by the administrator.'
+          : 'Voting is currently inactive or outside the scheduled Indian Standard Time window.'
+      );
+      return;
+    }
 
     // 1. Anti-Bot Verification Check
     if (honeypotVal.trim() !== '') {
@@ -482,23 +522,39 @@ export const VotingPage: React.FC = () => {
               {/* Inactive Schedule Notice */}
               {!isVotingActive && (
                 <div className="voting-inactive-notice">
-                  <span className="notice-icon">⚠️</span>
-                  <span>
-                    Polls are currently inactive or outside the designated Indian Standard Time window ({event.startDate || 'TBD'} to {event.endDate || 'TBD'} IST).
-                  </span>
+                  <div className="inactive-notice-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                  <div className="inactive-notice-text">
+                    <strong className="inactive-notice-heading">Voting Is Currently Inactive</strong>
+                    <p className="inactive-notice-desc">
+                      {event.activationType === 'manual'
+                        ? 'This voting event has not been activated by the administrator. Ballots cannot be cast until it is activated in the dashboard.'
+                        : `Polls are only open between ${event.startDate || 'TBD'} (${event.startTime || '00:00'}) and ${event.endDate || 'TBD'} (${event.endTime || '23:59'}) IST.`}
+                    </p>
+                  </div>
                 </div>
               )}
 
               {/* Ballot Options List */}
-              <div className="ballot-options-list">
+              <div className={`ballot-options-list ${!isVotingActive ? 'ballot-list-disabled' : ''}`}>
                 <h3 className="section-label">Select Your Ballot Choice</h3>
                 {event.options.map((option: BallotOption, idx: number) => {
                   const isSelected = selectedOptionId === option.id;
                   return (
                     <div
                       key={option.id}
-                      className={`ballot-option-card ${isSelected ? 'selected' : ''}`}
-                      onClick={() => setSelectedOptionId(option.id)}
+                      className={`ballot-option-card ${isSelected ? 'selected' : ''} ${!isVotingActive ? 'card-disabled' : ''}`}
+                      onClick={() => {
+                        if (!isVotingActive) {
+                          setErrorMessage('Voting is locked: this event is currently inactive.');
+                          return;
+                        }
+                        setSelectedOptionId(option.id);
+                      }}
                     >
                       <div className="ballot-radio-indicator">
                         <div className={`radio-dot ${isSelected ? 'radio-checked' : ''}`}></div>
@@ -518,7 +574,7 @@ export const VotingPage: React.FC = () => {
               </div>
 
               {/* Bot vs Human Verification Challenge */}
-              <div className="cybersecurity-challenge-box">
+              <div className={`cybersecurity-challenge-box ${!isVotingActive ? 'challenge-box-disabled' : ''}`}>
                 <div className="challenge-header">
                   <div className="challenge-icon-wrap">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -547,8 +603,10 @@ export const VotingPage: React.FC = () => {
                       <button
                         key={opt}
                         type="button"
+                        disabled={!isVotingActive}
                         className={`captcha-chip ${isSolved ? 'chip-verified' : ''}`}
                         onClick={() => {
+                          if (!isVotingActive) return;
                           if (isCorrect) {
                             setIsCaptchaSolved(true);
                             setErrorMessage('');
@@ -575,7 +633,7 @@ export const VotingPage: React.FC = () => {
               <div className="ballot-cast-actions">
                 <button
                   type="button"
-                  className="btn-blue-pill btn-cast-pill"
+                  className={`btn-blue-pill btn-cast-pill ${!isVotingActive ? 'btn-disabled' : ''}`}
                   onClick={handleCastBallot}
                   disabled={isSubmitting || !isVotingActive || !selectedOptionId}
                 >
@@ -583,6 +641,14 @@ export const VotingPage: React.FC = () => {
                     <>
                       <span className="spinner-border-sm"></span>
                       <span>Encrypting & Casting Ballot...</span>
+                    </>
+                  ) : !isVotingActive ? (
+                    <>
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span>Voting Inactive</span>
                     </>
                   ) : (
                     <>
