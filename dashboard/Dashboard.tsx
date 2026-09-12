@@ -4,6 +4,10 @@ import HeroBanner from './HeroBanner';
 import EventsTable from './EventsTable';
 import ActionCards from './ActionCards';
 import StatsPanel from './StatsPanel';
+import EventsTab from './EventsTab';
+import ParticipantsTab from './ParticipantsTab';
+import TeamTab from './TeamTab';
+import SettingsTab from './SettingsTab';
 import './dashboard.css';
 
 export const Dashboard: React.FC = () => {
@@ -13,26 +17,46 @@ export const Dashboard: React.FC = () => {
     alert('Create new voting event modal / action triggered!');
   };
 
+  const renderActiveTabContent = () => {
+    switch (activeTab) {
+      case 'events':
+        return <EventsTab onCreateEvent={handleNewEvent} />;
+      case 'participants':
+        return <ParticipantsTab />;
+      case 'team':
+        return <TeamTab />;
+      case 'settings':
+        return <SettingsTab />;
+      case 'dashboard':
+      default:
+        return (
+          <div className="tab-pane-wrapper tab-content-animate">
+            <header className="dashboard-header">
+              <h1 className="dashboard-title">Dashboard</h1>
+            </header>
+
+            {/* Greeting Hero Banner */}
+            <HeroBanner />
+
+            {/* Events Table */}
+            <EventsTable />
+
+            {/* Action Cards (Bottom) */}
+            <ActionCards onNewEvent={handleNewEvent} />
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="wyborek-dashboard-root">
+    <div className={`wyborek-dashboard-root tab-active-${activeTab}`}>
       {/* 1. Left Sidebar */}
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* 2. Main Center Content Container */}
       <main className="wyborek-main-content">
-        <div className="main-content-card">
-          <header className="dashboard-header">
-            <h1 className="dashboard-title">Dashboard</h1>
-          </header>
-
-          {/* Greeting Hero Banner */}
-          <HeroBanner />
-
-          {/* Events Table */}
-          <EventsTable />
-
-          {/* Action Cards (Bottom) */}
-          <ActionCards onNewEvent={handleNewEvent} />
+        <div className="main-content-card" key={activeTab}>
+          {renderActiveTabContent()}
         </div>
       </main>
 

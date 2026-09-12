@@ -5,3 +5,7 @@ export { HeroBanner } from './HeroBanner';
 export { EventsTable } from './EventsTable';
 export { ActionCards } from './ActionCards';
 export { StatsPanel } from './StatsPanel';
+export { EventsTab } from './EventsTab';
+export { ParticipantsTab } from './ParticipantsTab';
+export { TeamTab } from './TeamTab';
+export { SettingsTab } from './SettingsTab';
