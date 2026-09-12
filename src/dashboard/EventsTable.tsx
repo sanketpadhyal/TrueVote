@@ -26,20 +26,10 @@ export const EventsTable: React.FC = () => {
   const [selectedAnalyticsEventId, setSelectedAnalyticsEventId] = useState<string | null>(null);
   const [selectedPauseQuitEvent, setSelectedPauseQuitEvent] = useState<EventItem | null>(null);
 
-  // iOS Frosted Glass Decryption & IPFS Sync State
-  const [isDecrypting, setIsDecrypting] = useState<boolean>(!isTest && initialEvents.length === 0);
-  const [decryptionStep, setDecryptionStep] = useState<number>(1);
-  const [decryptionProgress, setDecryptionProgress] = useState<number>(25);
   const [isSyncSpinning, setIsSyncSpinning] = useState<boolean>(false);
 
-  const syncExistingEvents = async (isManual = false) => {
+  const syncExistingEvents = async () => {
     if (isTest) return;
-
-    if (isManual || events.length === 0) {
-      setIsDecrypting(true);
-      setDecryptionStep(1);
-      setDecryptionProgress(25);
-    }
 
     try {
       // Step 1: Check local backup first
@@ -52,14 +42,7 @@ export const EventsTable: React.FC = () => {
       }
 
       // Step 2: Query Pinata IPFS
-      setDecryptionStep(2);
-      setDecryptionProgress(55);
-
       const pinataEvents = await fetchEventsFromPinata();
-
-      // Step 3: Verifying signatures & schemas
-      setDecryptionStep(3);
-      setDecryptionProgress(85);
 
       if (pinataEvents && pinataEvents.length > 0) {
         const map = new Map<string, EventItem>();
@@ -79,10 +62,6 @@ export const EventsTable: React.FC = () => {
         combined = Array.from(new Set(map.values()));
         setEvents(combined);
       }
-
-      // Step 4: Decryption complete & state restoration
-      setDecryptionStep(4);
-      setDecryptionProgress(100);
 
       if (combined.length > 0) {
         try {
@@ -111,13 +90,8 @@ export const EventsTable: React.FC = () => {
           console.error(e);
         }
       }
-
-      setTimeout(() => {
-        setIsDecrypting(false);
-      }, 700);
     } catch (pinataErr) {
       console.warn('Pinata auto-sync notice:', pinataErr);
-      setIsDecrypting(false);
     }
   };
 
@@ -134,7 +108,7 @@ export const EventsTable: React.FC = () => {
     window.addEventListener('storage', handleStorageUpdate);
 
     // Initial restoration from IPFS
-    syncExistingEvents(false);
+    syncExistingEvents();
 
     return () => {
       window.removeEventListener('truevote_events_updated', handleStorageUpdate);
@@ -265,72 +239,35 @@ export const EventsTable: React.FC = () => {
 
   return (
     <div className="dashboard-table-container">
-      {isDecrypting ? (
-        <div className="ios-decryption-container">
-          <div className="ios-decryption-card">
-            <div className="ios-decryption-shield">
-              <div className="ios-spinner-ring" />
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-            </div>
-            <h3 className="ios-decryption-title">Decrypting Ballots from IPFS</h3>
-            <p className="ios-decryption-subtitle">
-              Authenticating Web3 creator signatures and restoring tamper-proof election schemas from decentralized nodes.
-            </p>
-
-            <div className="ios-progress-track">
-              <div
-                className="ios-progress-bar"
-                style={{ width: `${decryptionProgress}%` }}
-              />
-            </div>
-
-            <div className="ios-decryption-step-text">
-              <span className="ios-dot-pulse" />
-              <span>
-                {decryptionStep === 1 && 'Authenticating with Web3 node...'}
-                {decryptionStep === 2 && 'Locating encrypted ballot manifests on Pinata IPFS...'}
-                {decryptionStep === 3 && 'Verifying cryptographic creator signatures & zk-proofs...'}
-                {decryptionStep === 4 && 'Decryption complete. Restoring verified election records...'}
-              </span>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-            <button
-              type="button"
-              className="btn-ipfs-sync"
-              onClick={() => {
-                setIsSyncSpinning(true);
-                setTimeout(() => {
-                  syncExistingEvents(true);
-                }, 400);
-                setTimeout(() => {
-                  setIsSyncSpinning(false);
-                }, 800);
-              }}
-              aria-label="Sync with IPFS"
-            >
-              <svg
-                className={`sync-icon ${isSyncSpinning ? 'sync-icon-spinning' : ''}`}
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-              </svg>
-              <span>Sync with IPFS</span>
-            </button>
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+        <button
+          type="button"
+          className="btn-ipfs-sync"
+          onClick={() => {
+            setIsSyncSpinning(true);
+            syncExistingEvents();
+            setTimeout(() => {
+              setIsSyncSpinning(false);
+            }, 750);
+          }}
+          aria-label="Sync with IPFS"
+        >
+          <svg
+            className={`sync-icon ${isSyncSpinning ? 'sync-icon-spinning' : ''}`}
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </svg>
+          <span>Sync with IPFS</span>
+        </button>
+      </div>
 
           <div className="table-responsive-wrapper">
             <table className="dashboard-table">
@@ -489,8 +426,6 @@ export const EventsTable: React.FC = () => {
           </tbody>
         </table>
       </div>
-    </>
-  )}
 
       {/* Real-time iOS Analytics Modal with Live Graphs */}
       <RealtimeAnalyticsModal
