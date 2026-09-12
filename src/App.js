@@ -5,6 +5,7 @@ import HomePage from './pages/home';
 import FaqPage from './components/faq';
 import TeamPage from './components/team';
 import DashboardPage from './pages/dashboard';
+import VotingPage from './voting/VotingPage';
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
         <Route path="/team" element={<TeamPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/:tab" element={<DashboardPage />} />
+        <Route path="/voting/:eventId" element={<VotingPage />} />
+        <Route path="/voting" element={<VotingPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </BrowserRouter>

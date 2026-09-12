@@ -7,6 +7,7 @@ import ActionCards from './ActionCards';
 import StatsPanel from './StatsPanel';
 import EventsTab from './EventsTab';
 import LogoutModal from './LogoutModal';
+import NewEventModal from './NewEventModal';
 import './dashboard.css';
 
 export const Dashboard: React.FC = () => {
@@ -14,6 +15,7 @@ export const Dashboard: React.FC = () => {
   const location = useLocation();
   const params = useParams<{ tab?: string }>();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
+  const [isNewEventModalOpen, setIsNewEventModalOpen] = useState<boolean>(false);
 
   // Helper to derive tab from route parameter or window location
   const getTabFromRoute = React.useCallback((): string => {
@@ -46,7 +48,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleNewEvent = () => {
-    alert('Create new voting event modal / action triggered!');
+    setIsNewEventModalOpen(true);
   };
 
   const handleConfirmLogout = () => {
@@ -105,6 +107,15 @@ export const Dashboard: React.FC = () => {
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirmLogout={handleConfirmLogout}
+      />
+
+      {/* 5. iOS-Style New Event Creation Modal */}
+      <NewEventModal
+        isOpen={isNewEventModalOpen}
+        onClose={() => setIsNewEventModalOpen(false)}
+        onEventCreated={() => {
+          // Event was saved to localStorage & dispatched
+        }}
       />
     </div>
   );

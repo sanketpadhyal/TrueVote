@@ -18,6 +18,18 @@ const getStoredEvents = (): EventItem[] => {
 export const EventsTable: React.FC = () => {
   const [events, setEvents] = useState<EventItem[]>(getStoredEvents);
 
+  React.useEffect(() => {
+    const handleStorageUpdate = () => {
+      setEvents(getStoredEvents());
+    };
+    window.addEventListener('truevote_events_updated', handleStorageUpdate);
+    window.addEventListener('storage', handleStorageUpdate);
+    return () => {
+      window.removeEventListener('truevote_events_updated', handleStorageUpdate);
+      window.removeEventListener('storage', handleStorageUpdate);
+    };
+  }, []);
+
   const toggleActivation = (id: string) => {
     setEvents((prev) => {
       const updated = prev.map((ev) =>
@@ -25,6 +37,7 @@ export const EventsTable: React.FC = () => {
       );
       try {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
+        window.dispatchEvent(new Event('truevote_events_updated'));
       } catch (e) {
         console.error(e);
       }
@@ -51,7 +64,14 @@ export const EventsTable: React.FC = () => {
                 return (
                   <tr key={event.id} className={`table-row ${isAlt ? 'row-alt' : ''}`}>
                     <td className="td-event">
-                      <span className="event-title-text">{event.name}</span>
+                      <a
+                        href={`/voting/${event.id}`}
+                        className="event-title-text"
+                        title="Open anonymous voting ballot"
+                        style={{ textDecoration: 'none', color: 'inherit' }}
+                      >
+                        {event.name}
+                      </a>
                     </td>
                     <td className="td-voting">{event.votingNumber}</td>
                     <td className="td-activation">{event.activationType}</td>
