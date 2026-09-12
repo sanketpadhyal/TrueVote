@@ -1,4 +1,7 @@
-/* iOS Glassmorphic Dialogue Box Styles */
+/* ==========================================================================
+   TrueVote Hackathon Dialogue Box Styles
+   Matches website theme: Light, airy frosted glass, serif typography accents
+   ========================================================================== */
 
 .ios-dialogue-overlay {
   position: fixed;
@@ -8,17 +11,17 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(15, 23, 42, 0.42);
+  background: rgba(15, 23, 42, 0.36);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
 }
 
 .ios-dialogue-overlay.opening {
-  animation: iosOverlayFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: iosOverlayFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .ios-dialogue-overlay.closing {
-  animation: iosOverlayFadeOut 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: iosOverlayFadeOut 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: none;
 }
 
@@ -40,106 +43,120 @@
   }
 }
 
-/* Modal Card with iOS Frosted Glass Aesthetic */
+/* Modal Card with Website Frosted Glass Aesthetic */
 .ios-dialogue-card {
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 490px;
   max-height: 90vh;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(36px) saturate(210%);
+  -webkit-backdrop-filter: blur(36px) saturate(210%);
+  border-radius: 26px;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
   box-shadow: 
-    0 25px 60px -12px rgba(15, 23, 42, 0.22),
-    0 0 0 1px rgba(226, 232, 240, 0.45),
-    inset 0 1px 2px rgba(255, 255, 255, 0.9);
-  padding: 1.75rem 1.85rem 1.65rem;
+    0 25px 70px -15px rgba(15, 23, 42, 0.16),
+    0 0 0 1px rgba(226, 232, 240, 0.8),
+    0 10px 40px -10px rgba(29, 107, 243, 0.12);
+  padding: 2.25rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transform-origin: center top;
+  overflow: hidden;
 }
 
 .ios-dialogue-card.opening {
-  animation: iosPopupSpring 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: iosPopupSpring 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .ios-dialogue-card.closing {
-  animation: iosPopupReverse 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: iosPopupReverse 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes iosPopupSpring {
   0% {
     opacity: 0;
-    transform: translateY(-40px) scale(0.85);
-    filter: blur(8px);
-  }
-  65% {
-    opacity: 1;
-    transform: translateY(4px) scale(1.015);
-    filter: blur(0);
+    transform: scale(0.88) translateY(24px);
+    filter: blur(14px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1) translateY(0);
     filter: blur(0);
   }
 }
 
-/* Exact reverse of opening animation */
 @keyframes iosPopupReverse {
   0% {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-  35% {
-    opacity: 1;
-    transform: translateY(4px) scale(1.015);
+    transform: scale(1) translateY(0);
     filter: blur(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-40px) scale(0.85);
-    filter: blur(8px);
+    transform: scale(0.92) translateY(18px);
+    filter: blur(10px);
   }
 }
 
-/* iOS Subtle Drag Pill Indicator */
-.ios-drag-pill {
-  width: 40px;
-  height: 4.5px;
-  background: rgba(148, 163, 184, 0.45);
-  border-radius: 9999px;
-  margin-bottom: 1rem;
+/* Faint Decorative Geometric Lines */
+.hackathon-card-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(226, 232, 240, 0.75);
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* iOS Close Circle Button */
+.line-tl {
+  top: 18%;
+  left: 0;
+  width: 55px;
+}
+
+.line-mr {
+  top: 42%;
+  right: 0;
+  width: 80px;
+}
+
+.line-bl {
+  top: 80%;
+  left: 0;
+  width: 50px;
+}
+
+.line-br {
+  top: 72%;
+  right: 12%;
+  width: 95px;
+}
+
+/* Close Circle Button */
 .ios-close-btn {
   position: absolute;
   top: 1.15rem;
   right: 1.15rem;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: rgba(226, 232, 240, 0.7);
-  border: none;
+  background: rgba(241, 245, 249, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569;
-  transition: all 0.2s ease;
+  color: #64748b;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 10;
 }
 
 .ios-close-btn:hover {
-  background: rgba(203, 213, 225, 0.95);
+  background: #ffffff;
   color: #0f172a;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   transform: scale(1.06);
 }
 
@@ -147,130 +164,68 @@
   transform: scale(0.94);
 }
 
-/* Image Container */
+/* Banner Image */
 .ios-dialogue-image-box {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.15rem;
   background: transparent;
-  border: none;
-  box-shadow: none;
+  z-index: 2;
 }
 
 .ios-dialogue-image {
   width: auto;
   max-width: 100%;
   height: auto;
-  max-height: 220px;
+  max-height: 200px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 10px 24px rgba(15, 23, 42, 0.08));
-}
-
-/* Top Pill Badge */
-.ios-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(239, 246, 255, 0.9);
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  border-radius: 9999px;
-  padding: 0.25rem 0.85rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #1d4ed8;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.75rem;
-}
-
-.ios-badge-sparkle {
-  width: 13px;
-  height: 13px;
-  color: #2563eb;
+  filter: drop-shadow(0 8px 20px rgba(15, 23, 42, 0.06));
 }
 
 /* Title & Description */
 .ios-dialogue-title {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif);
-  font-size: 1.4rem;
+  font-family: var(--font-main), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.55rem;
   font-weight: 700;
   color: #0f172a;
   letter-spacing: -0.025em;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.55rem 0;
+  line-height: 1.25;
+  z-index: 2;
 }
 
 .ios-dialogue-text {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif);
-  font-size: 0.92rem;
+  font-family: var(--font-main), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.96rem;
   line-height: 1.55;
-  color: #475569;
-  margin: 0 0 1.45rem 0;
-  max-width: 440px;
+  color: #64748b;
+  margin: 0 0 1.65rem 0;
+  max-width: 430px;
+  z-index: 2;
 }
 
 .ios-dialogue-text strong {
-  color: #1e293b;
+  color: #0f172a;
   font-weight: 600;
 }
 
-/* Feature Mini Pills */
-.ios-features-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1.4rem;
-  width: 100%;
-}
-
-.ios-feature-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(241, 245, 249, 0.8);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 12px;
-  padding: 0.32rem 0.75rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #334155;
-}
-
-/* Primary Action Button (iOS Style) */
+/* Primary Action Button (Matching TrueVote Theme) */
 .ios-action-btn {
   width: 100%;
-  max-width: 440px;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(180deg, #1d6bf3 0%, #175cd3 100%);
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0.9rem 1.5rem;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  box-shadow: 
-    0 4px 14px rgba(29, 107, 243, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-}
-
-.ios-action-btn:hover {
-  background: linear-gradient(180deg, #1a62de 0%, #1452be 100%);
-  box-shadow: 
-    0 6px 20px rgba(29, 107, 243, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.35);
-  transform: scale(1.01);
-}
-
-.ios-action-btn:active {
-  transform: scale(0.98);
+  gap: 0.65rem;
+  z-index: 2;
+  cursor: pointer;
 }
 
 /* Custom Scrollbar for Card */
