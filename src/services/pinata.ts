@@ -3,7 +3,6 @@
  * Handles uploading verifiable ballot event metadata and anonymous election schemas.
  */
 
-const PINATA_API_URL = 'https://api.pinata.cloud/pinning/pinJSONToIPFS';
 const PINATA_GATEWAY = process.env.REACT_APP_PINATA_GATEWAY_URL || 'https://gateway.pinata.cloud/ipfs/';
 
 const DEFAULT_JWT = process.env.REACT_APP_PINATA_JWT ||
@@ -17,11 +16,58 @@ export interface PinataPinResponse {
   isRealPin?: boolean;
 }
 
+const PINATA_V3_UPLOAD_URL = 'https://uploads.pinata.cloud/v3/files';
+const PINATA_LEGACY_URL = 'https://api.pinata.cloud/pinning/pinJSONToIPFS';
+
 export async function uploadEventToPinata(eventData: Record<string, any>): Promise<PinataPinResponse> {
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
   const apiKey = process.env.REACT_APP_PINATA_API_KEY;
   const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
 
+  // 1. Try Pinata V3 Files API (Full support for public IPFS uploads)
+  try {
+    if (typeof FormData !== 'undefined') {
+      const fileName = `TrueVote-${eventData.votingNumber || eventData.id}.json`;
+      const blob = new Blob([JSON.stringify(eventData, null, 2)], { type: 'application/json' });
+      const formData = new FormData();
+      formData.append('file', blob, fileName);
+      formData.append('name', fileName);
+      formData.append('network', 'public');
+
+      const v3Headers: Record<string, string> = {};
+      if (jwt) {
+        v3Headers['Authorization'] = `Bearer ${jwt}`;
+      }
+
+      const v3Response = await fetch(PINATA_V3_UPLOAD_URL, {
+        method: 'POST',
+        headers: v3Headers,
+        body: formData,
+      });
+
+      if (v3Response.ok) {
+        const resData = await v3Response.json();
+        const cid = resData?.data?.cid;
+        if (cid) {
+          console.log('Successfully pinned event to Pinata IPFS (V3):', cid);
+          return {
+            IpfsHash: cid,
+            PinSize: resData?.data?.size || 1024,
+            Timestamp: resData?.data?.created_at || new Date().toISOString(),
+            gatewayUrl: `${PINATA_GATEWAY}${cid}`,
+            isRealPin: true,
+          };
+        }
+      } else {
+        const errText = await v3Response.text();
+        console.warn('Pinata V3 upload returned status:', v3Response.status, errText);
+      }
+    }
+  } catch (v3Err) {
+    console.warn('Pinata V3 attempt failed, attempting legacy pinJSONToIPFS:', v3Err);
+  }
+
+  // 2. Try Pinata Legacy pinJSONToIPFS API
   const payload = {
     pinataOptions: {
       cidVersion: 1,
@@ -52,7 +98,7 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
   }
 
   try {
-    const response = await fetch(PINATA_API_URL, {
+    const response = await fetch(PINATA_LEGACY_URL, {
       method: 'POST',
       headers,
       body: JSON.stringify(payload),
