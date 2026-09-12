@@ -30,6 +30,7 @@ export const EventsTable: React.FC = () => {
   const [isDecrypting, setIsDecrypting] = useState<boolean>(!isTest && initialEvents.length === 0);
   const [decryptionStep, setDecryptionStep] = useState<number>(1);
   const [decryptionProgress, setDecryptionProgress] = useState<number>(25);
+  const [isSyncSpinning, setIsSyncSpinning] = useState<boolean>(false);
 
   const syncExistingEvents = async (isManual = false) => {
     if (isTest) return;
@@ -303,10 +304,28 @@ export const EventsTable: React.FC = () => {
             <button
               type="button"
               className="btn-ipfs-sync"
-              onClick={() => syncExistingEvents(true)}
-              title="Force refresh and decrypt latest election schemas from Pinata IPFS"
+              onClick={() => {
+                setIsSyncSpinning(true);
+                setTimeout(() => {
+                  syncExistingEvents(true);
+                }, 400);
+                setTimeout(() => {
+                  setIsSyncSpinning(false);
+                }, 800);
+              }}
+              aria-label="Sync with IPFS"
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                className={`sync-icon ${isSyncSpinning ? 'sync-icon-spinning' : ''}`}
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
               </svg>
               <span>Sync with IPFS</span>
