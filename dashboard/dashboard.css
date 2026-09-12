@@ -1,4 +1,4 @@
-/* Wyborek Election Dashboard Styling */
+/* Wyborek Election Dashboard Styling - Pixel Perfect & Fully Responsive */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -14,37 +14,42 @@
   --dash-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .wyborek-dashboard-root {
-  display: flex;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) 320px;
   min-height: 100vh;
   width: 100%;
+  max-width: 100vw;
   background-color: #ffffff;
   font-family: var(--dash-font);
   color: var(--dash-navy-text);
-  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* =========================================================
    1. Left Sidebar
    ========================================================= */
 .wyborek-sidebar {
-  width: 140px;
-  min-width: 140px;
   background-color: var(--dash-navy-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 36px 0 28px 0;
+  padding: 32px 0 24px 0;
   position: sticky;
   top: 0;
   height: 100vh;
-  box-sizing: border-box;
-  z-index: 10;
+  z-index: 20;
+  overflow-y: auto;
 }
 
 .wyborek-logo-wrap {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  padding: 0 8px;
 }
 
 .wyborek-brand {
@@ -56,7 +61,7 @@
 
 .brand-text {
   color: #ffffff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
   display: flex;
@@ -79,9 +84,9 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .nav-item {
@@ -93,8 +98,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px 10px;
-  color: #a3b1cc;
+  padding: 12px 6px;
+  color: #94a3b8;
   position: relative;
   transition: all 0.2s ease;
   outline: none;
@@ -109,7 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   transition: transform 0.2s ease;
 }
 
@@ -118,18 +123,18 @@
 }
 
 .nav-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   text-align: center;
   line-height: 1.25;
   letter-spacing: 0.1px;
-  max-width: 90px;
+  max-width: 80px;
 }
 
 /* Active State */
 .nav-item.active {
   color: var(--dash-mint);
-  background: linear-gradient(90deg, rgba(0, 229, 163, 0.03) 0%, rgba(0, 229, 163, 0.12) 100%);
+  background: linear-gradient(90deg, rgba(0, 229, 163, 0.03) 0%, rgba(0, 229, 163, 0.15) 100%);
 }
 
 .nav-item.active .nav-icon-wrap svg {
@@ -145,7 +150,7 @@
   background: linear-gradient(180deg, #00e5a3 0%, #00b4d8 100%);
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
-  box-shadow: 0 0 12px rgba(0, 229, 163, 0.6);
+  box-shadow: 0 0 10px rgba(0, 229, 163, 0.6);
 }
 
 /* User Profile */
@@ -154,17 +159,17 @@
   flex-direction: column;
   align-items: center;
   margin-top: auto;
-  padding-top: 20px;
+  padding-top: 16px;
 }
 
 .user-avatar-container {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  margin-bottom: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .user-avatar {
@@ -175,29 +180,29 @@
 }
 
 .user-name-text {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #cad5e8;
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 /* =========================================================
    2. Main Center Content Container
    ========================================================= */
 .wyborek-main-content {
-  flex: 1;
   padding: 24px 20px;
   background-color: #f7f9fd;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  overflow: hidden;
 }
 
 .main-content-card {
   background-color: #ffffff;
   border-radius: 28px;
-  padding: 32px 36px;
+  padding: 28px 32px;
   box-shadow: 0 8px 30px rgba(7, 11, 40, 0.04);
   display: flex;
   flex-direction: column;
@@ -206,11 +211,11 @@
 }
 
 .dashboard-header {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .dashboard-title {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--dash-navy-text);
   letter-spacing: -0.4px;
@@ -221,63 +226,72 @@
 .dashboard-hero-banner {
   background: var(--dash-peach-bg);
   border-radius: 20px;
-  padding: 28px 36px;
+  padding: 24px 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
   position: relative;
-  min-height: 160px;
+  min-height: 145px;
   box-sizing: border-box;
 }
 
 .hero-banner-content {
-  max-width: 380px;
+  max-width: 340px;
   z-index: 2;
+  position: relative;
 }
 
 .hero-banner-title {
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 800;
   color: #ffffff;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   letter-spacing: -0.3px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .hero-banner-desc {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   color: #ffffff;
-  line-height: 1.45;
+  line-height: 1.4;
   margin: 0;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .hero-banner-artwork {
   position: absolute;
   right: 0;
-  top: 0;
   bottom: 0;
-  width: 50%;
-  max-width: 460px;
+  top: 0;
+  height: 100%;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .hero-banner-img {
   height: 100%;
+  max-height: 155px;
   width: auto;
-  max-width: 100%;
   object-fit: contain;
   object-position: bottom right;
 }
 
 /* Table */
 .dashboard-table-container {
-  margin-top: 28px;
+  margin-top: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+.table-responsive-wrapper {
+  width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dashboard-table {
@@ -287,16 +301,22 @@
 }
 
 .dashboard-table th {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--dash-navy-text);
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-bottom: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.th-dates {
+  text-align: right;
+  padding-right: 20px !important;
 }
 
 .dashboard-table td {
-  padding: 14px 14px;
-  font-size: 12.5px;
+  padding: 12px 14px;
+  font-size: 12px;
   color: var(--dash-navy-text);
   vertical-align: middle;
 }
@@ -317,49 +337,81 @@
 .th-event, .td-event {
   font-weight: 600;
   width: 36%;
-  padding-left: 16px !important;
+  padding-left: 14px !important;
+}
+
+.event-title-text {
+  display: inline-block;
+  line-height: 1.35;
 }
 
 .th-voting, .td-voting {
   font-weight: 500;
-  width: 18%;
+  width: 16%;
+  white-space: nowrap;
 }
 
 .th-activation, .td-activation {
   font-weight: 500;
   width: 16%;
+  white-space: nowrap;
 }
 
-.th-dates {
-  font-weight: 700;
-  width: 30%;
+.td-dates-cell {
+  width: 32%;
+  text-align: right;
+  padding-right: 18px !important;
 }
 
-.td-start-date, .td-end-date {
+.dates-columns-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+  text-align: right;
+}
+
+.date-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.date-day {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--dash-navy-text);
+  white-space: nowrap;
+}
+
+.date-time {
+  font-size: 11px;
   font-weight: 500;
   color: var(--dash-navy-text);
   white-space: nowrap;
 }
 
-.td-action {
-  text-align: right;
-  padding-right: 24px !important;
+.action-button-align {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .btn-activate {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   background-color: #ffffff;
   border: 1.5px solid var(--dash-mint);
   border-radius: 9999px;
-  padding: 6px 18px;
-  font-size: 12px;
+  padding: 5px 16px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--dash-navy-text);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .btn-activate .power-icon {
@@ -390,45 +442,54 @@
 .dashboard-action-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 32px;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 .action-card {
   background-color: var(--dash-mint-bg);
-  border-radius: 20px;
-  padding: 16px 24px;
+  border-radius: 18px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 130px;
+  min-height: 115px;
   box-sizing: border-box;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .action-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 229, 163, 0.1);
+  box-shadow: 0 6px 18px rgba(0, 229, 163, 0.12);
 }
 
 .action-card-artwork {
-  height: 90px;
+  height: 80px;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .action-card-img {
   height: 100%;
-  max-width: 140px;
+  max-width: 125px;
   object-fit: contain;
+}
+
+.participant-img {
+  max-width: 115px;
+}
+
+.action-card-button-wrap {
+  flex-shrink: 0;
 }
 
 .btn-action-card {
   background-color: #ffffff;
   border: 1.5px solid var(--dash-mint);
   border-radius: 9999px;
-  padding: 9px 26px;
-  font-size: 12.5px;
+  padding: 8px 22px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--dash-navy-text);
   cursor: pointer;
@@ -447,13 +508,13 @@
    3. Right Stats Panel
    ========================================================= */
 .wyborek-stats-panel {
-  width: 320px;
-  min-width: 300px;
   background-color: #ffffff;
-  padding: 32px 28px;
+  padding: 28px 22px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stats-section-title {
@@ -465,42 +526,42 @@
 }
 
 .license-status-section {
-  margin-bottom: 32px;
+  margin-bottom: 26px;
 }
 
 .license-card {
   background-color: var(--dash-navy-dark);
   border-radius: 20px;
-  padding: 26px 24px;
-  box-shadow: 0 8px 24px rgba(7, 11, 40, 0.12);
+  padding: 22px 20px;
+  box-shadow: 0 8px 24px rgba(7, 11, 40, 0.1);
 }
 
 .license-stat-number {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #ffffff;
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 5px;
 }
 
 .stat-highlight {
   color: var(--dash-mint);
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
 }
 
 .stat-total {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: #ffffff;
 }
 
 .license-stat-label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--dash-navy-muted);
-  margin-top: 6px;
+  margin-top: 5px;
 }
 
 /* Activity Feed */
@@ -508,14 +569,15 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
 }
 
 .activity-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   overflow-y: auto;
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 280px);
   padding-right: 4px;
 }
 
@@ -531,10 +593,11 @@
 .activity-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 4px;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 5px 2px;
+  border-radius: 6px;
   transition: background-color 0.15s ease;
+  min-width: 0;
 }
 
 .activity-item:hover {
@@ -542,33 +605,38 @@
 }
 
 .activity-icon-container {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
   background-color: #eef6fb;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .activity-details {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .activity-user-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 11.5px;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .activity-user-name {
   font-weight: 700;
   color: var(--dash-navy-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .activity-dot {
@@ -581,59 +649,227 @@
 }
 
 .activity-timestamp {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--dash-navy-muted);
 }
 
 /* =========================================================
-   Responsive Breakpoints
+   Responsive Breakpoints - PC, Laptop, Tablet, Mobile
    ========================================================= */
-@media (max-width: 1200px) {
+
+/* Laptops & medium monitors (1180px - 1380px) */
+@media (max-width: 1380px) {
   .wyborek-dashboard-root {
-    flex-direction: column;
+    grid-template-columns: 96px minmax(0, 1fr) 280px;
   }
+  .main-content-card {
+    padding: 24px 24px;
+  }
+  .hero-banner-content {
+    max-width: 290px;
+  }
+  .hero-banner-title {
+    font-size: 22px;
+  }
+  .action-card {
+    padding: 12px 16px;
+  }
+  .action-card-img {
+    max-width: 100px;
+  }
+  .dates-columns-wrapper {
+    gap: 14px;
+  }
+}
+
+/* Small Laptops & Tablets Landscape (960px - 1180px) */
+@media (max-width: 1180px) {
+  .wyborek-dashboard-root {
+    grid-template-columns: 88px minmax(0, 1fr) 250px;
+  }
+  .wyborek-stats-panel {
+    padding: 24px 16px;
+  }
+  .stat-highlight {
+    font-size: 23px;
+  }
+  .stat-total {
+    font-size: 16px;
+  }
+  .activity-user-row {
+    font-size: 11px;
+    gap: 4px;
+  }
+}
+
+/* Tablets Portrait (768px - 960px) */
+@media (max-width: 960px) {
+  .wyborek-dashboard-root {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+  .wyborek-stats-panel {
+    grid-column: 2;
+    padding: 24px 20px;
+    border-top: 1px solid var(--dash-border);
+  }
+  .activity-list {
+    max-height: 380px;
+  }
+  .hero-banner-artwork {
+    opacity: 0.85;
+  }
+}
+
+/* Mobile Devices (< 768px) */
+@media (max-width: 768px) {
+  .wyborek-dashboard-root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  /* Mobile Top App Bar */
   .wyborek-sidebar {
     width: 100%;
     height: auto;
+    position: sticky;
+    top: 0;
     flex-direction: row;
-    padding: 16px 24px;
-    position: relative;
+    padding: 12px 18px;
+    justify-content: space-between;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
   }
+
+  .wyborek-logo-wrap {
+    margin-bottom: 0;
+    padding: 0;
+  }
+
   .wyborek-nav {
     flex-direction: row;
     margin-top: 0;
-    justify-content: center;
+    flex: 0 1 auto;
+    gap: 6px;
+    overflow-x: auto;
   }
+
+  .nav-item {
+    padding: 6px 8px;
+  }
+
+  .nav-label {
+    display: none; /* Icon-only on small mobile screens */
+  }
+
+  .nav-icon-wrap {
+    margin-bottom: 0;
+  }
+
+  .nav-active-pill {
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+  }
+
   .wyborek-user-profile {
     margin-top: 0;
     padding-top: 0;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
   }
-  .user-name-text {
-    text-align: left;
-  }
-  .wyborek-stats-panel {
-    width: 100%;
-    max-width: none;
-  }
-  .hero-banner-artwork {
-    width: 40%;
-  }
-}
 
-@media (max-width: 768px) {
-  .dashboard-action-cards {
-    grid-template-columns: 1fr;
+  .user-avatar-container {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 0;
   }
-  .hero-banner-artwork {
+
+  .user-name-text {
     display: none;
   }
+
+  /* Main content on mobile */
+  .wyborek-main-content {
+    padding: 14px 12px;
+  }
+
+  .main-content-card {
+    padding: 18px 14px;
+    border-radius: 20px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+  }
+
+  .dashboard-hero-banner {
+    padding: 20px 18px;
+    border-radius: 16px;
+    min-height: auto;
+  }
+
   .hero-banner-content {
     max-width: 100%;
   }
-  .main-content-card {
-    padding: 20px 16px;
+
+  .hero-banner-title {
+    font-size: 20px;
+  }
+
+  .hero-banner-desc {
+    font-size: 13px;
+  }
+
+  .hero-banner-artwork {
+    display: none;
+  }
+
+  /* Action Cards Stack */
+  .dashboard-action-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .action-card {
+    padding: 12px 16px;
+    border-radius: 14px;
+    min-height: 90px;
+  }
+
+  .action-card-artwork {
+    height: 65px;
+  }
+
+  .action-card-img {
+    max-width: 95px;
+  }
+
+  .btn-action-card {
+    padding: 7px 18px;
+    font-size: 11.5px;
+  }
+
+  /* Stats panel on mobile */
+  .wyborek-stats-panel {
+    padding: 18px 16px 36px 16px;
+    border-top: 8px solid #f7f9fd;
+  }
+
+  .license-card {
+    padding: 18px 16px;
+    border-radius: 16px;
+  }
+
+  .activity-list {
+    max-height: none;
   }
 }

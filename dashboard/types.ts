@@ -4,7 +4,9 @@ export interface EventItem {
   votingNumber: string;
   activationType: 'automatic' | 'manual';
   startDate?: string;
+  startTime?: string;
   endDate?: string;
+  endTime?: string;
   isActivated?: boolean;
 }
 
