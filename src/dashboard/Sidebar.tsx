@@ -80,14 +80,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside className="wyborek-sidebar">
       <div className="wyborek-logo-wrap">
-        <a href="/" className="wyborek-brand" title="TrueVote / Wyborek">
-          <span className="brand-text">
-            wyb<span className="brand-o">
-              <svg viewBox="0 0 24 24" width="20" height="20">
-                <circle cx="12" cy="12" r="9" stroke="#00e5a3" strokeWidth="3.5" fill="none" />
-                <path d="M12 7v10M7 12h10" stroke="#00e5a3" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </span>rek
+        <a href="/" className="wyborek-brand" title="TrueVote">
+          <img
+            src="/images/logo.png"
+            alt="TrueVote Logo"
+            className="sidebar-logo-img"
+          />
+          <span className="brand-text sidebar-brand-text">
+            True<span className="brand-accent">Vote</span>
           </span>
         </a>
       </div>

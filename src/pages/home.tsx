@@ -214,7 +214,7 @@ export const HomePage: React.FC = () => {
             <div className="dashboard-outer-glow">
               <div className="dashboard-image-showcase glass-panel">
                 <img
-                  src="/dashboard/images/ChatGPT Image Sep 12, 2026, 01_06_40 PM.webp"
+                  src="/dashboard/images/Screenshot 2026-09-12 at 17.27.50.webp"
                   alt="TrueVote ZKP-Based Anonymous Voting & Cryptographic Shield"
                   className="privacy-hero-img"
                 />

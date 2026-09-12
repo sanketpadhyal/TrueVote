@@ -48,35 +48,42 @@
 }
 
 .wyborek-logo-wrap {
-  margin-bottom: 20px;
-  padding: 0 8px;
+  margin-bottom: 24px;
+  padding: 0 6px;
+  width: 100%;
 }
 
 .wyborek-brand {
   text-decoration: none;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  transition: transform 0.2s ease;
 }
 
-.brand-text {
+.wyborek-brand:hover {
+  transform: translateY(-1px);
+}
+
+.sidebar-logo-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 10px rgba(0, 229, 163, 0.35));
+}
+
+.sidebar-brand-text {
   color: #ffffff;
-  font-size: 20px;
+  font-size: 13px;
   font-weight: 800;
-  letter-spacing: -0.5px;
-  display: flex;
-  align-items: center;
+  letter-spacing: -0.2px;
+  line-height: 1;
 }
 
-.brand-o {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 1px;
-}
-
-.brand-o svg {
-  display: block;
+.sidebar-brand-text .brand-accent {
+  color: var(--dash-mint);
 }
 
 .wyborek-nav {
@@ -503,22 +510,23 @@
 
 /* Action Cards */
 .dashboard-action-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: flex;
   margin-top: 24px;
+  width: 100%;
 }
 
 .action-card {
   background-color: var(--dash-mint-bg);
   border-radius: 18px;
-  padding: 14px 20px;
+  padding: 14px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-height: 115px;
   box-sizing: border-box;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 520px;
 }
 
 .action-card:hover {
@@ -535,12 +543,8 @@
 
 .action-card-img {
   height: 100%;
-  max-width: 125px;
+  max-width: 130px;
   object-fit: contain;
-}
-
-.participant-img {
-  max-width: 115px;
 }
 
 .action-card-button-wrap {
@@ -857,6 +861,21 @@
   .wyborek-logo-wrap {
     margin-bottom: 0;
     padding: 0;
+    width: auto;
+  }
+
+  .wyborek-brand {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .sidebar-logo-img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .sidebar-brand-text {
+    font-size: 15px;
   }
 
   .wyborek-nav {

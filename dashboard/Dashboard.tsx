@@ -13,10 +13,6 @@ export const Dashboard: React.FC = () => {
     alert('Create new voting event modal / action triggered!');
   };
 
-  const handleNewParticipant = () => {
-    alert('Add new participant modal / action triggered!');
-  };
-
   return (
     <div className="wyborek-dashboard-root">
       {/* 1. Left Sidebar */}
@@ -36,10 +32,7 @@ export const Dashboard: React.FC = () => {
           <EventsTable />
 
           {/* Action Cards (Bottom) */}
-          <ActionCards
-            onNewEvent={handleNewEvent}
-            onNewParticipant={handleNewParticipant}
-          />
+          <ActionCards onNewEvent={handleNewEvent} />
         </div>
       </main>
 
