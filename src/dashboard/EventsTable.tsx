@@ -106,7 +106,7 @@ export const EventsTable: React.FC = () => {
                           type="button"
                           className="btn-live-stats"
                           onClick={() => setSelectedAnalyticsEventId(event.id)}
-                          title="View live real-time votes & graphs"
+                          aria-label="Live Stats"
                         >
                           <svg
                             width="14"
