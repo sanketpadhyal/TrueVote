@@ -444,7 +444,7 @@
 
 .th-event, .td-event {
   font-weight: 600;
-  width: 36%;
+  width: 28%;
   padding-left: 14px !important;
 }
 
@@ -455,18 +455,18 @@
 
 .th-voting, .td-voting {
   font-weight: 500;
-  width: 16%;
+  width: 14%;
   white-space: nowrap;
 }
 
 .th-activation, .td-activation {
   font-weight: 500;
-  width: 16%;
+  width: 14%;
   white-space: nowrap;
 }
 
 .td-dates-cell {
-  width: 32%;
+  width: 44%;
   text-align: right;
   padding-right: 18px !important;
 }
@@ -3465,6 +3465,66 @@ input:checked + .slider.round:before {
   color: #475569 !important;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* Green Resume / Activate Button */
+.btn-action-resume {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.22) !important;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: none !important;
+  transform: none !important;
+  white-space: nowrap;
+}
+
+.btn-action-resume:hover,
+.btn-action-resume:focus,
+.btn-action-resume:active {
+  background: #059669 !important;
+  color: #ffffff !important;
+  transform: none !important;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.22) !important;
+}
+
+/* Dedicated Table Row Delete Button */
+.btn-table-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  background-color: #fff1f2;
+  border: 1.5px solid #fecdd3;
+  color: #e11d48;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-table-delete:hover {
+  background-color: #e11d48;
+  border-color: #be123c;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(225, 29, 72, 0.25);
+  transform: scale(1.05);
+}
+
+.btn-table-delete:active {
+  transform: scale(0.95);
 }
 
 /* =========================================================

@@ -7,6 +7,7 @@ interface PauseOrQuitModalProps {
   onClose: () => void;
   event: EventItem | null;
   onPause: (eventId: string) => void;
+  onResume?: (eventId: string) => void;
   onDelete?: (event: EventItem) => Promise<void> | void;
   onQuit?: (eventId: string) => void;
 }
@@ -16,6 +17,7 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
   onClose,
   event,
   onPause,
+  onResume,
   onDelete,
   onQuit,
 }) => {
@@ -73,6 +75,8 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
 
   if (!shouldRender || !event || typeof document === 'undefined') return null;
 
+  const isActive = event.isActivated;
+
   return createPortal(
     <div
       className={`action-sheet-backdrop ${isClosing ? 'is-closing' : 'is-entering'}`}
@@ -115,7 +119,7 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
               height="28"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#f59e0b"
+              stroke={isActive ? '#f59e0b' : '#10b981'}
               strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -127,36 +131,62 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
           </div>
 
           <h2 id="pause-quit-title" className="action-sheet-title">
-            Manage Active Voting Event
+            {isActive ? 'Manage Active Voting Event' : 'Manage Voting Event'}
           </h2>
           <p className="action-sheet-desc">
-            <strong>"{event.name}"</strong> ({event.votingNumber}) is currently active and
-            accepting anonymous ballots. What would you like to do?
+            <strong>"{event.name}"</strong> ({event.votingNumber}) is currently{' '}
+            {isActive ? 'active and accepting anonymous ballots' : 'paused or inactive'}. What would you like to do?
           </p>
         </div>
 
         {/* Action Buttons Row Styled Like Screenshot 3 */}
         <div className="action-sheet-actions-row">
-          {/* Pause Action Button with Cube Icon & Amber Halo */}
-          <button
-            type="button"
-            className="btn-action-pause"
-            onClick={() => {
-              onPause(event.id);
-              handleDismiss();
-            }}
-          >
-            <svg
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              style={{ flexShrink: 0 }}
+          {/* Pause or Resume Action Button */}
+          {isActive ? (
+            <button
+              type="button"
+              className="btn-action-pause"
+              onClick={() => {
+                onPause(event.id);
+                handleDismiss();
+              }}
             >
-              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-            </svg>
-            <span>Pause Voting</span>
-          </button>
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ flexShrink: 0 }}
+              >
+                <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+              </svg>
+              <span>Pause Voting</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn-action-resume"
+              onClick={() => {
+                if (onResume) {
+                  onResume(event.id);
+                } else {
+                  onPause(event.id);
+                }
+                handleDismiss();
+              }}
+            >
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ flexShrink: 0 }}
+              >
+                <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+              </svg>
+              <span>Activate Voting</span>
+            </button>
+          )}
 
           {/* Delete This Vote Action Button with Cube Icon & Red Halo */}
           <button

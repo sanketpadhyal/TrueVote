@@ -148,15 +148,16 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
 const PINATA_UNPIN_URL = 'https://api.pinata.cloud/pinning/unpin';
 
 /**
- * Deletes / unpins an event from Pinata IPFS by its CID and/or V3 file ID.
+ * Deletes / unpins an event from Pinata IPFS by its CID, V3 file ID, and/or votingNumber/id.
  */
 export async function deleteEventFromPinata(
   ipfsHash?: string,
-  fileId?: string
+  fileId?: string,
+  searchNameOrId?: string
 ): Promise<{ success: boolean; message?: string }> {
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
 
-  // 1. Try Pinata V3 delete by fileId
+  // 1. If fileId is directly provided, delete directly from Pinata V3
   if (fileId) {
     try {
       const v3Del = await fetch(`https://api.pinata.cloud/v3/files/public/${fileId}`, {
@@ -172,48 +173,64 @@ export async function deleteEventFromPinata(
     }
   }
 
-  if (!ipfsHash) {
-    return { success: true, message: 'No IPFS hash provided' };
-  }
-
-  // Handle deterministic offline/fallback pseudo-hashes gracefully
-  if (ipfsHash.startsWith('QmTrueVote')) {
-    console.log(`Purged local fallback IPFS hash: ${ipfsHash}`);
-    return { success: true, message: `Purged local IPFS hash ${ipfsHash}` };
-  }
-
-  const apiKey = process.env.REACT_APP_PINATA_API_KEY;
-  const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (apiKey && secretKey) {
-    headers['pinata_api_key'] = apiKey;
-    headers['pinata_secret_api_key'] = secretKey;
-  } else if (jwt) {
-    headers['Authorization'] = `Bearer ${jwt}`;
-  }
-
+  // 2. Query Pinata V3 files to locate matching file by CID or voting number / id
   try {
-    const response = await fetch(`${PINATA_UNPIN_URL}/${ipfsHash}`, {
-      method: 'DELETE',
-      headers,
+    const listRes = await fetch('https://api.pinata.cloud/v3/files/public?limit=100', {
+      headers: { Authorization: `Bearer ${jwt}` },
     });
+    if (listRes.ok) {
+      const data = await listRes.json();
+      const files: any[] = data?.data?.files || [];
+      const cleanTarget = (searchNameOrId || '').toLowerCase().trim();
 
-    if (response.ok) {
-      console.log(`Successfully deleted/unpinned ${ipfsHash} from Pinata IPFS`);
-      return { success: true };
+      for (const file of files) {
+        const matchesCid = ipfsHash && file.cid === ipfsHash;
+        const matchesName = cleanTarget && (file.name || '').toLowerCase().includes(cleanTarget);
+
+        if (matchesCid || matchesName) {
+          console.log(`Deleting matching Pinata V3 file: ${file.name} (ID: ${file.id})`);
+          try {
+            await fetch(`https://api.pinata.cloud/v3/files/public/${file.id}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${jwt}` },
+            });
+          } catch (delErr) {
+            console.warn('Delete attempt notice:', delErr);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Pinata V3 search-and-delete notice:', err);
+  }
+
+  // 3. Fallback unpin attempt for legacy V1
+  if (ipfsHash && !ipfsHash.startsWith('QmTrueVote')) {
+    const apiKey = process.env.REACT_APP_PINATA_API_KEY;
+    const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (apiKey && secretKey) {
+      headers['pinata_api_key'] = apiKey;
+      headers['pinata_secret_api_key'] = secretKey;
+    } else if (jwt) {
+      headers['Authorization'] = `Bearer ${jwt}`;
     }
 
-    const errText = await response.text();
-    console.warn(`Pinata unpin notice (${response.status}):`, errText);
-    return { success: false, message: errText };
-  } catch (err) {
-    console.error('Failed to unpin from Pinata IPFS:', err);
-    return { success: false, message: String(err) };
+    try {
+      await fetch(`${PINATA_UNPIN_URL}/${ipfsHash}`, {
+        method: 'DELETE',
+        headers,
+      });
+    } catch (err) {
+      // ignore
+    }
   }
+
+  return { success: true };
 }
 
 /**

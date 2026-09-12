@@ -234,8 +234,19 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
         params: [manifest, walletAddress],
       });
       if (sig) return sig;
-    } catch (e) {
-      console.warn('Web3 personal_sign notice (proceeding with cryptographic signature):', e);
+    } catch (e: any) {
+      const msg = String(e?.message || '').toLowerCase();
+      if (
+        e?.code === 4001 ||
+        e?.code === 'ACTION_REJECTED' ||
+        msg.includes('reject') ||
+        msg.includes('denied') ||
+        msg.includes('cancel') ||
+        msg.includes('abort')
+      ) {
+        throw new Error('Wallet authorization rejected by user. Event creation cancelled.');
+      }
+      throw new Error(e?.message || 'Wallet signature required to authorize election.');
     }
   }
 
@@ -246,8 +257,17 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
       if (res?.signature) {
         return '0x' + Array.from(res.signature).map((b: any) => b.toString(16).padStart(2, '0')).join('');
       }
-    } catch (e) {
-      console.warn('Solana sign notice:', e);
+    } catch (e: any) {
+      const msg = String(e?.message || '').toLowerCase();
+      if (
+        e?.code === 4001 ||
+        msg.includes('reject') ||
+        msg.includes('denied') ||
+        msg.includes('cancel')
+      ) {
+        throw new Error('Solana wallet authorization rejected by user. Event creation cancelled.');
+      }
+      throw new Error(e?.message || 'Wallet signature required to authorize election.');
     }
   }
 
@@ -284,7 +304,15 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
       `Creator: ${connectedWallet}\n\n` +
       `By authorizing, this tamper-proof ballot schema is cryptographically signed and pinned to Pinata IPFS.`;
 
-    const creatorSignature = await generateWalletSignature(signatureManifest, connectedWallet);
+    let creatorSignature = '';
+    try {
+      creatorSignature = await generateWalletSignature(signatureManifest, connectedWallet);
+    } catch (sigErr: any) {
+      console.warn('Wallet signing aborted:', sigErr);
+      setErrorMsg(sigErr?.message || 'Wallet signature rejected. Election creation cancelled.');
+      setIsSubmitting(false);
+      return; // Stop immediately! Never create event or link!
+    }
 
     const eventPayload: EventItem = {
       id: eventId,
@@ -300,7 +328,7 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
       startTime: activationType === 'automatic' ? startTime : undefined,
       endDate: activationType === 'automatic' ? endDate : undefined,
       endTime: activationType === 'automatic' ? endTime : undefined,
-      isActivated: false,
+      isActivated: activationType === 'automatic' ? true : false,
       createdAt: new Date().toISOString(),
       timezone: 'IST (UTC+05:30)',
       shareableLink: `${window.location.origin}/voting/${eventId}`,
