@@ -202,7 +202,18 @@ export const VotingPage: React.FC = () => {
       // 3. Decentralized IPFS sync via Pinata (Crucial for Incognito mode or cross-browser voting)
       try {
         if (targetId) {
-          const pinataEvent = await fetchEventByIdFromPinata(targetId);
+          let pinataEvent = await fetchEventByIdFromPinata(targetId);
+          if (!pinataEvent) {
+            const allPinata = await fetchEventsFromPinata();
+            const clean = targetId.trim().toLowerCase();
+            const cleanSuffix = clean.includes('-') ? clean.split('-').pop() : '';
+            pinataEvent = allPinata.find((e: any) =>
+              String(e.id || '').toLowerCase() === clean ||
+              String(e.votingNumber || '').toLowerCase() === clean ||
+              (cleanSuffix && String(e.votingNumber || '').toLowerCase().includes(cleanSuffix)) ||
+              (cleanSuffix && String(e.id || '').toLowerCase().includes(cleanSuffix))
+            );
+          }
           if (isMounted && pinataEvent) {
             foundEvent = pinataEvent;
             setEvent(pinataEvent);

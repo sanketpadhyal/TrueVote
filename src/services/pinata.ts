@@ -3,7 +3,8 @@
  * Handles uploading verifiable ballot event metadata and anonymous election schemas.
  */
 
-const PINATA_GATEWAY = process.env.REACT_APP_PINATA_GATEWAY_URL || 'https://gateway.pinata.cloud/ipfs/';
+const DEDICATED_PINATA_GATEWAY = 'https://maroon-genetic-sawfish-271.mypinata.cloud/ipfs/';
+const PINATA_GATEWAY = process.env.REACT_APP_PINATA_GATEWAY_URL || DEDICATED_PINATA_GATEWAY;
 
 const DEFAULT_JWT = process.env.REACT_APP_PINATA_JWT ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1MjI1MjA0Mi1jOGQwLTRiMmQtOTZiZi05ODUzYTNjZDE1MjYiLCJlbWFpbCI6InNhbmtldDk5ZUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNTJkYjYwYjNhODU1ZjkzYjg5NjUiLCJzY29wZWRLZXlTZWNyZXQiOiJlOWE2ZTlhMzRlYjVhZWJiN2VjOWYyNTEzNDlmOWY4OGQ3NWU1NzgyMDZlYTY0NjE2ZTFkZmZhMTQ5ZDRlYjk2IiwiZXhwIjoxODIwNzczNzMzfQ.j5kO5Bp_MdZ0tRKdbUMOVHhXojIZJoi8eXo3qMJn_po';
@@ -350,7 +351,15 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
 export async function fetchEventByIdFromPinata(targetId: string): Promise<any | null> {
   if (!targetId) return null;
   const cleanTarget = targetId.trim().toLowerCase();
+  const idSuffix = cleanTarget.includes('-') ? cleanTarget.split('-').pop()! : cleanTarget;
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
+
+  const gateways = [
+    PINATA_GATEWAY,
+    DEDICATED_PINATA_GATEWAY,
+    'https://maroon-genetic-sawfish-271.mypinata.cloud/ipfs/',
+    'https://gateway.pinata.cloud/ipfs/',
+  ];
 
   try {
     const v3Res = await fetch('https://api.pinata.cloud/v3/files/public?limit=50', {
@@ -366,12 +375,12 @@ export async function fetchEventByIdFromPinata(targetId: string): Promise<any | 
       // Sort newest first
       files.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-      // If file name has a hint of the targetId, check those first
+      // If file name has a hint of the targetId or voting number suffix (e.g. 7882), check those first
       const sortedFiles = [...files].sort((a, b) => {
         const aName = (a.name || '').toLowerCase();
         const bName = (b.name || '').toLowerCase();
-        const aHas = aName.includes(cleanTarget);
-        const bHas = bName.includes(cleanTarget);
+        const aHas = aName.includes(cleanTarget) || (idSuffix && aName.includes(idSuffix));
+        const bHas = bName.includes(cleanTarget) || (idSuffix && bName.includes(idSuffix));
         if (aHas && !bHas) return -1;
         if (!aHas && bHas) return 1;
         return 0;
@@ -379,29 +388,39 @@ export async function fetchEventByIdFromPinata(targetId: string): Promise<any | 
 
       for (const file of sortedFiles) {
         if (file.cid) {
-          try {
-            const ipfsRes = await fetch(`${PINATA_GATEWAY}${file.cid}`, {
-              headers: {
-                Authorization: `Bearer ${jwt}`,
-              },
-            });
-            if (ipfsRes.ok) {
-              const eventData = await ipfsRes.json();
-              if (
-                eventData &&
-                (String(eventData.id || '').toLowerCase() === cleanTarget ||
-                 String(eventData.votingNumber || '').toLowerCase() === cleanTarget)
-              ) {
-                return {
-                  ...eventData,
-                  ipfsFileId: file.id,
-                  ipfsHash: file.cid,
-                  ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
-                };
+          for (const gw of gateways) {
+            try {
+              const url = `${gw.endsWith('/') ? gw : gw + '/'}${file.cid}`;
+              const ipfsRes = await fetch(url, {
+                headers: {
+                  Authorization: `Bearer ${jwt}`,
+                },
+              });
+              if (ipfsRes.ok) {
+                const text = await ipfsRes.text();
+                if (text && text.trim().startsWith('{')) {
+                  const eventData = JSON.parse(text);
+                  const evId = String(eventData.id || '').toLowerCase();
+                  const evNum = String(eventData.votingNumber || '').toLowerCase();
+
+                  if (
+                    evId === cleanTarget ||
+                    evNum === cleanTarget ||
+                    (idSuffix && evNum.includes(idSuffix)) ||
+                    (idSuffix && evId.includes(idSuffix))
+                  ) {
+                    return {
+                      ...eventData,
+                      ipfsFileId: file.id,
+                      ipfsHash: file.cid,
+                      ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
+                    };
+                  }
+                }
               }
+            } catch (e) {
+              // try next gateway
             }
-          } catch (e) {
-            console.warn('IPFS single fetch notice:', e);
           }
         }
       }
