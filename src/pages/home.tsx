@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import Navbar from '../components/navbar';
 import { FlipText } from '../components/universalbuttonshover';
+import DialogueBox from '../components/box/dialoguebox';
 import AuthModal from '../components/authmodal';
 import '../styles/animations.css';
 import './home.css';
@@ -10,6 +11,7 @@ export const HomePage: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isHackathonModalOpen, setIsHackathonModalOpen] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
@@ -138,7 +140,7 @@ export const HomePage: React.FC = () => {
           {/* Top Hackathon Badge with Icon */}
           <div 
             className="trusted-pill blur-animate clickable-pill"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => setIsHackathonModalOpen(true)}
             role="button"
             tabIndex={0}
             title="This is a Hackathon Project"
@@ -622,7 +624,7 @@ export const HomePage: React.FC = () => {
               <div className="footer-link-col">
                 <h5 className="footer-link-heading">About</h5>
                 <a href="#team" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('team'); }}>About Team</a>
-                <span className="footer-link-static" onClick={() => setIsAuthModalOpen(true)} style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}>Connect Wallet</span>
+                <span className="footer-link-static" onClick={() => setIsHackathonModalOpen(true)} style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}>Hackathon Details</span>
                 <span className="footer-link-static">Open Source MVP</span>
               </div>
             </div>
@@ -645,6 +647,12 @@ export const HomePage: React.FC = () => {
           <span>{toastMessage}</span>
         </div>
       )}
+
+      {/* Hackathon Prototype Dialogue Box */}
+      <DialogueBox 
+        isOpen={isHackathonModalOpen} 
+        onClose={() => setIsHackathonModalOpen(false)} 
+      />
 
       {/* Web3 Auth Modal */}
       <AuthModal 

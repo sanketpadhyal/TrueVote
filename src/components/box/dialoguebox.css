@@ -1,1 +1,283 @@
-/* Deprecated: Migrated to src/components/auth/authmodal.css */
+/* iOS Glassmorphic Dialogue Box Styles */
+
+.ios-dialogue-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+}
+
+.ios-dialogue-overlay.opening {
+  animation: iosOverlayFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ios-dialogue-overlay.closing {
+  animation: iosOverlayFadeOut 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes iosOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes iosOverlayFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Modal Card with iOS Frosted Glass Aesthetic */
+.ios-dialogue-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 25px 60px -12px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(226, 232, 240, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  padding: 1.75rem 1.85rem 1.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform-origin: center top;
+}
+
+.ios-dialogue-card.opening {
+  animation: iosPopupSpring 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ios-dialogue-card.closing {
+  animation: iosPopupReverse 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes iosPopupSpring {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.85);
+    filter: blur(8px);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(4px) scale(1.015);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Exact reverse of opening animation */
+@keyframes iosPopupReverse {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(4px) scale(1.015);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.85);
+    filter: blur(8px);
+  }
+}
+
+/* iOS Subtle Drag Pill Indicator */
+.ios-drag-pill {
+  width: 40px;
+  height: 4.5px;
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+/* iOS Close Circle Button */
+.ios-close-btn {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.15rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(226, 232, 240, 0.7);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.ios-close-btn:hover {
+  background: rgba(203, 213, 225, 0.95);
+  color: #0f172a;
+  transform: scale(1.06);
+}
+
+.ios-close-btn:active {
+  transform: scale(0.94);
+}
+
+/* Image Container */
+.ios-dialogue-image-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.ios-dialogue-image {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 10px 24px rgba(15, 23, 42, 0.08));
+}
+
+/* Top Pill Badge */
+.ios-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(239, 246, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 9999px;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+
+.ios-badge-sparkle {
+  width: 13px;
+  height: 13px;
+  color: #2563eb;
+}
+
+/* Title & Description */
+.ios-dialogue-title {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.5rem 0;
+}
+
+.ios-dialogue-text {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #475569;
+  margin: 0 0 1.45rem 0;
+  max-width: 440px;
+}
+
+.ios-dialogue-text strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* Feature Mini Pills */
+.ios-features-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.4rem;
+  width: 100%;
+}
+
+.ios-feature-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(241, 245, 249, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Primary Action Button (iOS Style) */
+.ios-action-btn {
+  width: 100%;
+  max-width: 440px;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(180deg, #1d6bf3 0%, #175cd3 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  box-shadow: 
+    0 4px 14px rgba(29, 107, 243, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.ios-action-btn:hover {
+  background: linear-gradient(180deg, #1a62de 0%, #1452be 100%);
+  box-shadow: 
+    0 6px 20px rgba(29, 107, 243, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  transform: scale(1.01);
+}
+
+.ios-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* Custom Scrollbar for Card */
+.ios-dialogue-card::-webkit-scrollbar {
+  width: 5px;
+}
+.ios-dialogue-card::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+}
