@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { EventItem } from './types';
+import RealtimeAnalyticsModal from './RealtimeAnalyticsModal';
+import PauseOrQuitModal from './PauseOrQuitModal';
 
 const getStoredEvents = (): EventItem[] => {
   if (typeof window === 'undefined') return [];
@@ -17,6 +19,8 @@ const getStoredEvents = (): EventItem[] => {
 
 export const EventsTable: React.FC = () => {
   const [events, setEvents] = useState<EventItem[]>(getStoredEvents);
+  const [selectedAnalyticsEventId, setSelectedAnalyticsEventId] = useState<string | null>(null);
+  const [selectedPauseQuitEvent, setSelectedPauseQuitEvent] = useState<EventItem | null>(null);
 
   React.useEffect(() => {
     const handleStorageUpdate = () => {
@@ -30,10 +34,10 @@ export const EventsTable: React.FC = () => {
     };
   }, []);
 
-  const toggleActivation = (id: string) => {
+  const updateEventStatus = (id: string, updates: Partial<EventItem>) => {
     setEvents((prev) => {
       const updated = prev.map((ev) =>
-        ev.id === id ? { ...ev, isActivated: !ev.isActivated } : ev
+        ev.id === id ? { ...ev, ...updates } : ev
       );
       try {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
@@ -45,6 +49,26 @@ export const EventsTable: React.FC = () => {
     });
   };
 
+  const handleActivationClick = (event: EventItem) => {
+    if (event.isActivated) {
+      // If already active, trigger iOS popup to ask "Pause or Quit?"
+      setSelectedPauseQuitEvent(event);
+    } else {
+      // If inactive, activate directly
+      updateEventStatus(event.id, { isActivated: true });
+    }
+  };
+
+  const handlePauseEvent = (id: string) => {
+    updateEventStatus(id, { isActivated: false });
+    setSelectedPauseQuitEvent(null);
+  };
+
+  const handleQuitEvent = (id: string) => {
+    updateEventStatus(id, { isActivated: false });
+    setSelectedPauseQuitEvent(null);
+  };
+
   return (
     <div className="dashboard-table-container">
       <div className="table-responsive-wrapper">
@@ -54,7 +78,7 @@ export const EventsTable: React.FC = () => {
               <th className="th-event">event</th>
               <th className="th-voting">voting</th>
               <th className="th-activation">activation</th>
-              <th className="th-dates">activation date</th>
+              <th className="th-dates">activation date & live stats</th>
             </tr>
           </thead>
           <tbody>
@@ -76,43 +100,75 @@ export const EventsTable: React.FC = () => {
                     <td className="td-voting">{event.votingNumber}</td>
                     <td className="td-activation">{event.activationType}</td>
                     <td className="td-dates-cell">
-                      {event.activationType === 'manual' ? (
-                        <div className="action-button-align">
-                          <button
-                            type="button"
-                            className={`btn-activate ${event.isActivated ? 'is-active' : ''}`}
-                            onClick={() => toggleActivation(event.id)}
-                            aria-label={event.isActivated ? 'Deactivate event' : 'Activate event'}
+                      <div className="table-actions-group">
+                        {/* Real-time Analytics Button */}
+                        <button
+                          type="button"
+                          className="btn-live-stats"
+                          onClick={() => setSelectedAnalyticsEventId(event.id)}
+                          title="View live real-time votes & graphs"
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           >
-                            <span>{event.isActivated ? 'active' : 'activate'}</span>
-                            <svg
-                              className="power-icon"
-                              width="15"
-                              height="15"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                          </svg>
+                          <span>Live Stats</span>
+                        </button>
+
+                        {/* Activation Toggle Button / Scheduled Dates */}
+                        {event.activationType === 'manual' ? (
+                          <div className="action-button-align">
+                            <button
+                              type="button"
+                              className={`btn-activate ${event.isActivated ? 'is-active' : ''}`}
+                              onClick={() => handleActivationClick(event)}
+                              aria-label={event.isActivated ? 'Deactivate event' : 'Activate event'}
+                              title={
+                                event.isActivated
+                                  ? 'Active — click to pause or quit'
+                                  : 'Click to activate voting'
+                              }
                             >
-                              <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
-                              <line x1="12" y1="2" x2="12" y2="12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="dates-columns-wrapper">
-                          <div className="date-block">
-                            <span className="date-day">{event.startDate}</span>
-                            <span className="date-time">{event.startTime}</span>
+                              <span>{event.isActivated ? 'active' : 'activate'}</span>
+                              <svg
+                                className="power-icon"
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                                <line x1="12" y1="2" x2="12" y2="12" />
+                              </svg>
+                            </button>
                           </div>
-                          <div className="date-block">
-                            <span className="date-day">{event.endDate}</span>
-                            <span className="date-time">{event.endTime}</span>
+                        ) : (
+                          <div className="dates-columns-wrapper">
+                            <div className="date-block">
+                              <span className="date-day">{event.startDate}</span>
+                              <span className="date-time">{event.startTime}</span>
+                            </div>
+                            <div className="date-block">
+                              <span className="date-day">{event.endDate}</span>
+                              <span className="date-time">{event.endTime}</span>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -140,6 +196,22 @@ export const EventsTable: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Real-time iOS Analytics Modal with Live Graphs */}
+      <RealtimeAnalyticsModal
+        isOpen={Boolean(selectedAnalyticsEventId)}
+        onClose={() => setSelectedAnalyticsEventId(null)}
+        eventId={selectedAnalyticsEventId}
+      />
+
+      {/* iOS Action Sheet: Pause or Quit Confirmation */}
+      <PauseOrQuitModal
+        isOpen={Boolean(selectedPauseQuitEvent)}
+        onClose={() => setSelectedPauseQuitEvent(null)}
+        event={selectedPauseQuitEvent}
+        onPause={handlePauseEvent}
+        onQuit={handleQuitEvent}
+      />
     </div>
   );
 };
