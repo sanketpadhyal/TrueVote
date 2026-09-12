@@ -14,10 +14,13 @@ export interface PinataPinResponse {
   PinSize: number;
   Timestamp: string;
   gatewayUrl: string;
+  isRealPin?: boolean;
 }
 
 export async function uploadEventToPinata(eventData: Record<string, any>): Promise<PinataPinResponse> {
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
+  const apiKey = process.env.REACT_APP_PINATA_API_KEY;
+  const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
 
   const payload = {
     pinataOptions: {
@@ -37,19 +40,27 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
     pinataContent: eventData,
   };
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (jwt) {
+    headers['Authorization'] = `Bearer ${jwt}`;
+  } else if (apiKey && secretKey) {
+    headers['pinata_api_key'] = apiKey;
+    headers['pinata_secret_api_key'] = secretKey;
+  }
+
   try {
     const response = await fetch(PINATA_API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.warn('Pinata upload HTTP error, generating cryptographic local IPFS CID:', errText);
+      console.warn('Pinata upload HTTP error (check API Key scopes in Pinata dashboard):', errText);
       throw new Error(`Pinata error: ${response.status} - ${errText}`);
     }
 
@@ -60,9 +71,10 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
       PinSize: data.PinSize || 1024,
       Timestamp: data.Timestamp || new Date().toISOString(),
       gatewayUrl: `${PINATA_GATEWAY}${ipfsHash}`,
+      isRealPin: true,
     };
   } catch (error) {
-    console.error('Failed to pin to Pinata IPFS, creating deterministic fallback CID:', error);
+    console.error('Failed to pin to Pinata IPFS (falling back to local resilient storage):', error);
     // Deterministic pseudo-CID for offline / network resilience
     const pseudoHash = `QmTrueVote${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36)}`;
     return {
@@ -70,6 +82,7 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
       PinSize: 1024,
       Timestamp: new Date().toISOString(),
       gatewayUrl: `${PINATA_GATEWAY}${pseudoHash}`,
+      isRealPin: false,
     };
   }
 }
