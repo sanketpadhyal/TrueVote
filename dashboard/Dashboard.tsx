@@ -30,7 +30,7 @@ export const Dashboard: React.FC = () => {
           </header>
 
           {/* Greeting Hero Banner */}
-          <HeroBanner userName="Agnes" organizationName="Wyborek" />
+          <HeroBanner organizationName="Wyborek" />
 
           {/* Events Table */}
           <EventsTable />

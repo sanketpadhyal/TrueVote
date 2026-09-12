@@ -8,10 +8,11 @@ const renderWithRouter = (ui) => {
 };
 
 describe('Dashboard Component', () => {
-  test('renders dashboard titles, hero banner, and user greeting', () => {
+  test('renders dashboard titles and hero banner', () => {
     renderWithRouter(<Dashboard />);
     expect(screen.getByRole('heading', { level: 1, name: /Dashboard/i })).toBeInTheDocument();
-    expect(screen.getByText(/Hi Agnes!/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Hi Agnes!/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Check how voting is carried out in your organization/i)).toBeInTheDocument();
     expect(screen.getByText(/Current license status/i)).toBeInTheDocument();
     expect(screen.getByText(/220/i)).toBeInTheDocument();
     expect(screen.getByText(/voting activity/i)).toBeInTheDocument();
