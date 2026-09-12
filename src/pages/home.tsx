@@ -11,6 +11,7 @@ export const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -134,24 +135,20 @@ export const HomePage: React.FC = () => {
             <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
           </div>
 
-          {/* Top Pill with MetaMask Icon (Opens Wallet Modal) */}
+          {/* Top Hackathon Badge with Icon */}
           <div 
             className="trusted-pill blur-animate clickable-pill"
             onClick={() => setIsAuthModalOpen(true)}
             role="button"
             tabIndex={0}
-            title="Click to connect MetaMask"
+            title="This is a Hackathon Project"
           >
-            <div className="hackathon-icon-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img 
-                src="/images/stacks/muskmask.webp" 
-                alt="MetaMask" 
-                style={{ width: 14, height: 14, objectFit: 'contain' }} 
-              />
+            <div className="hackathon-icon-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
+              </svg>
             </div>
-            <span className="trusted-text">
-              {connectedWallet ? `Connected: ${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : 'Connect MetaMask'}
-            </span>
+            <span className="trusted-text">This is a Hackathon Project</span>
           </div>
 
           {/* Main Title with Serif Accent */}
