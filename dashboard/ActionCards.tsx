@@ -4,7 +4,6 @@ import eventArtHd from './images/event_illustration_hd.jpg';
 
 interface ActionCardsProps {
   onNewEvent?: () => void;
-  onNewParticipant?: () => void;
 }
 
 export const ActionCards: React.FC<ActionCardsProps> = ({

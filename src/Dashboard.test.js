@@ -22,6 +22,7 @@ describe('Dashboard Component', () => {
     renderWithRouter(<Dashboard />);
     expect(screen.getByText(/new event/i)).toBeInTheDocument();
     expect(screen.queryByText(/new participant/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^participants$/i)).not.toBeInTheDocument();
     expect(screen.getByTitle(/TrueVote/i)).toBeInTheDocument();
     expect(screen.getByText(/No Voting Events Created Yet/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Log out/i })).toBeInTheDocument();

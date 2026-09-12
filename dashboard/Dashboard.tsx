@@ -6,7 +6,6 @@ import EventsTable from './EventsTable';
 import ActionCards from './ActionCards';
 import StatsPanel from './StatsPanel';
 import EventsTab from './EventsTab';
-import ParticipantsTab from './ParticipantsTab';
 import TeamTab from './TeamTab';
 import SettingsTab from './SettingsTab';
 import LogoutModal from './LogoutModal';
@@ -22,13 +21,12 @@ export const Dashboard: React.FC = () => {
   const getTabFromRoute = React.useCallback((): string => {
     if (params.tab) {
       const t = params.tab.toLowerCase();
-      if (['events', 'participants', 'team', 'settings'].includes(t)) {
+      if (['events', 'team', 'settings'].includes(t)) {
         return t;
       }
     }
     const path = (location?.pathname || (typeof window !== 'undefined' ? window.location.pathname : '')).toLowerCase();
     if (path.includes('/dashboard/events')) return 'events';
-    if (path.includes('/dashboard/participants')) return 'participants';
     if (path.includes('/dashboard/team')) return 'team';
     if (path.includes('/dashboard/settings')) return 'settings';
     return 'dashboard';
@@ -66,8 +64,6 @@ export const Dashboard: React.FC = () => {
     switch (activeTab) {
       case 'events':
         return <EventsTab onCreateEvent={handleNewEvent} />;
-      case 'participants':
-        return <ParticipantsTab />;
       case 'team':
         return <TeamTab />;
       case 'settings':
