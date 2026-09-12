@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
 import EventsTable from './EventsTable';
+import { EventItem } from './types';
+
+const getStoredEvents = (): EventItem[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem('truevote_events');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return [];
+};
 
 interface EventsTabProps {
   onCreateEvent?: () => void;
@@ -8,6 +23,12 @@ interface EventsTabProps {
 export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
   const [filter, setFilter] = useState<'all' | 'active' | 'upcoming' | 'completed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const events = getStoredEvents();
+
+  const totalEvents = events.length;
+  const activeEvents = events.filter((e) => e.isActivated || e.activationType === 'automatic').length;
+  const upcomingEvents = 0;
+  const avgTurnout = totalEvents > 0 ? '—' : '0%';
 
   const handleCreate = () => {
     if (onCreateEvent) {
@@ -42,8 +63,8 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
             <span className="tab-stat-label">Total Events</span>
             <span className="tab-stat-badge badge-blue">Registry</span>
           </div>
-          <div className="tab-stat-value">40</div>
-          <div className="tab-stat-desc">Across all categories</div>
+          <div className="tab-stat-value">{totalEvents}</div>
+          <div className="tab-stat-desc">{totalEvents === 0 ? 'No events registered' : 'Across all categories'}</div>
         </div>
 
         <div className="tab-stat-card">
@@ -53,8 +74,8 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
               <span className="pulse-dot"></span> Live
             </span>
           </div>
-          <div className="tab-stat-value">12</div>
-          <div className="tab-stat-desc">Accepting ballots now</div>
+          <div className="tab-stat-value">{activeEvents}</div>
+          <div className="tab-stat-desc">{activeEvents === 0 ? 'No ballots open' : 'Accepting ballots now'}</div>
         </div>
 
         <div className="tab-stat-card">
@@ -62,8 +83,8 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
             <span className="tab-stat-label">Upcoming</span>
             <span className="tab-stat-badge badge-amber">Scheduled</span>
           </div>
-          <div className="tab-stat-value">8</div>
-          <div className="tab-stat-desc">Starts within 7 days</div>
+          <div className="tab-stat-value">{upcomingEvents}</div>
+          <div className="tab-stat-desc">{upcomingEvents === 0 ? 'No upcoming sessions' : 'Starts within 7 days'}</div>
         </div>
 
         <div className="tab-stat-card">
@@ -71,8 +92,8 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
             <span className="tab-stat-label">Avg. Turnout</span>
             <span className="tab-stat-badge badge-purple">ZKP Verified</span>
           </div>
-          <div className="tab-stat-value">94.2%</div>
-          <div className="tab-stat-desc">+3.8% from last month</div>
+          <div className="tab-stat-value">{avgTurnout}</div>
+          <div className="tab-stat-desc">{totalEvents === 0 ? 'No votes recorded' : 'Verified participation'}</div>
         </div>
       </div>
 
@@ -85,7 +106,7 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
           </svg>
           <input
             type="text"
-            placeholder="Search events, mayor elections, meetings..."
+            placeholder="Search voting events and referendums..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="tab-search-input"
