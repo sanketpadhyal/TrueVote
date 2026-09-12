@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import HeroBanner from './HeroBanner';
@@ -18,25 +18,32 @@ export const Dashboard: React.FC = () => {
   const params = useParams<{ tab?: string }>();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
 
-  // Derive active tab from URL route: /dashboard/:tab or pathname
-  const getActiveTab = (): string => {
+  // Helper to derive tab from route parameter or window location
+  const getTabFromRoute = React.useCallback((): string => {
     if (params.tab) {
       const t = params.tab.toLowerCase();
       if (['events', 'participants', 'team', 'settings'].includes(t)) {
         return t;
       }
     }
-    const path = location.pathname.toLowerCase();
+    const path = (location?.pathname || (typeof window !== 'undefined' ? window.location.pathname : '')).toLowerCase();
     if (path.includes('/dashboard/events')) return 'events';
     if (path.includes('/dashboard/participants')) return 'participants';
     if (path.includes('/dashboard/team')) return 'team';
     if (path.includes('/dashboard/settings')) return 'settings';
     return 'dashboard';
-  };
+  }, [params.tab, location?.pathname]);
 
-  const activeTab = getActiveTab();
+  const [activeTab, setActiveTab] = useState<string>(getTabFromRoute);
+
+  // Synchronize activeTab whenever location or params change
+  useEffect(() => {
+    const routeTab = getTabFromRoute();
+    setActiveTab(routeTab);
+  }, [getTabFromRoute]);
 
   const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
     if (newTab === 'dashboard') {
       navigate('/dashboard');
     } else {
