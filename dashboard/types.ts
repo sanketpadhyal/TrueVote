@@ -20,7 +20,7 @@ export interface ActivityItem {
 
 export interface LicenseStatus {
   usedVotes: number;
-  totalVotes: number;
+  totalVotes?: number;
 }
 
 export interface NavigationItem {

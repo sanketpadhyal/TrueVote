@@ -6,18 +6,23 @@ interface StatsPanelProps {
   activities?: ActivityItem[];
 }
 
-const getStoredLicenseStatus = (): LicenseStatus => {
-  if (typeof window === 'undefined') return { usedVotes: 0, totalVotes: 500 };
+const getStoredVotesUsed = (): number => {
+  if (typeof window === 'undefined') return 0;
   try {
-    const stored = localStorage.getItem('truevote_license_status');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (typeof parsed.usedVotes === 'number') return parsed;
+    const stored = localStorage.getItem('truevote_votes_used');
+    if (stored !== null) {
+      const num = Number(stored);
+      if (!isNaN(num)) return num;
+    }
+    const licenseStored = localStorage.getItem('truevote_license_status');
+    if (licenseStored) {
+      const parsed = JSON.parse(licenseStored);
+      if (typeof parsed.usedVotes === 'number') return parsed.usedVotes;
     }
   } catch (e) {
-    console.error('Error reading license status:', e);
+    console.error('Error reading votes used:', e);
   }
-  return { usedVotes: 0, totalVotes: 500 };
+  return 0;
 };
 
 const getStoredActivities = (): ActivityItem[] => {
@@ -38,7 +43,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
   licenseStatus,
   activities,
 }) => {
-  const currentLicense = licenseStatus !== undefined ? licenseStatus : getStoredLicenseStatus();
+  const votesUsed = licenseStatus?.usedVotes ?? getStoredVotesUsed();
   const currentActivities = activities !== undefined ? activities : getStoredActivities();
 
   return (
@@ -48,8 +53,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
         <h3 className="stats-section-title">Current license status</h3>
         <div className="license-card">
           <div className="license-stat-number">
-            <span className="stat-highlight">{currentLicense.usedVotes}</span>
-            <span className="stat-total"> out of {currentLicense.totalVotes}</span>
+            <span className="stat-highlight">{votesUsed}</span>
           </div>
           <div className="license-stat-label">the votes used</div>
         </div>
