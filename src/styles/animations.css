@@ -138,3 +138,28 @@
   color: #ffffff;
   /* NO transforms */
 }
+
+/* Blur-to-Normal Universal Animation System (Silky smooth 60/120fps ease) */
+.blur-animate {
+  opacity: 0;
+  filter: blur(12px);
+  transform: translateY(16px);
+  transition: opacity 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.92s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.blur-animate.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+.delay-1 { transition-delay: 0.12s; }
+.delay-2 { transition-delay: 0.22s; }
+.delay-3 { transition-delay: 0.32s; }
+.delay-4 { transition-delay: 0.44s; }
+.delay-5 { transition-delay: 0.56s; }

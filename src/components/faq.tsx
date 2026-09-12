@@ -91,7 +91,13 @@ export const FaqPage: React.FC = () => {
     }
     rafId = requestAnimationFrame(raf);
 
+    const animTimer = setTimeout(() => {
+      const elements = document.querySelectorAll('.faq-page-main .blur-animate');
+      elements.forEach((el) => el.classList.add('visible'));
+    }, 50);
+
     return () => {
+      clearTimeout(animTimer);
       cancelAnimationFrame(rafId);
       lenis.destroy();
       (window as any).lenis = null;
@@ -117,7 +123,7 @@ export const FaqPage: React.FC = () => {
       <main className="faq-page-main">
         {/* Header Hero */}
         <section className="faq-hero-container">
-          <div className="faq-pill-badge">
+          <div className="faq-pill-badge blur-animate">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
@@ -126,17 +132,17 @@ export const FaqPage: React.FC = () => {
             <span>FAQ & Knowledge Base</span>
           </div>
 
-          <h1 className="faq-main-title">
+          <h1 className="faq-main-title blur-animate delay-1">
             Frequently Asked <br />
             <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Questions</span>
           </h1>
 
-          <p className="faq-main-sub">
+          <p className="faq-main-sub blur-animate delay-2">
             Everything you need to know about TrueVote's zero-knowledge voting protocol, gasless relayer infrastructure, and cryptographic election integrity.
           </p>
 
           {/* Search Input */}
-          <div className="faq-search-box">
+          <div className="faq-search-box blur-animate delay-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -161,7 +167,7 @@ export const FaqPage: React.FC = () => {
           </div>
 
           {/* Filter Pills */}
-          <div className="faq-filter-pills">
+          <div className="faq-filter-pills blur-animate delay-3">
             {[
               { id: 'all', label: 'All Questions' },
               { id: 'zkp', label: 'Zero-Knowledge & Privacy' },
@@ -182,7 +188,7 @@ export const FaqPage: React.FC = () => {
         </section>
 
         {/* FAQ Accordion List */}
-        <section className="faq-content-section">
+        <section className="faq-content-section blur-animate delay-4">
           {filteredFaqs.length > 0 ? (
             <div className="faq-accordion-list">
               {filteredFaqs.map((item) => (
@@ -230,7 +236,7 @@ export const FaqPage: React.FC = () => {
         </section>
 
         {/* Bottom Help Banner */}
-        <section className="faq-help-banner">
+        <section className="faq-help-banner blur-animate delay-5">
           <div className="faq-help-card">
             <div className="faq-help-icon">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

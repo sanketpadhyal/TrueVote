@@ -30,7 +30,13 @@ export const TeamPage: React.FC = () => {
     }
     rafId = requestAnimationFrame(raf);
 
+    const animTimer = setTimeout(() => {
+      const elements = document.querySelectorAll('.team-page-main .blur-animate');
+      elements.forEach((el) => el.classList.add('visible'));
+    }, 50);
+
     return () => {
+      clearTimeout(animTimer);
       cancelAnimationFrame(rafId);
       lenis.destroy();
       (window as any).lenis = null;
@@ -44,7 +50,7 @@ export const TeamPage: React.FC = () => {
       <main className="team-page-main">
         {/* Hero Header */}
         <section className="team-hero-container">
-          <div className="team-pill-badge">
+          <div className="team-pill-badge blur-animate">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -54,18 +60,18 @@ export const TeamPage: React.FC = () => {
             <span>The Builders</span>
           </div>
 
-          <h1 className="team-main-title">
+          <h1 className="team-main-title blur-animate delay-1">
             Pioneering the Future of <br />
             <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Verifiable Democracy</span>
           </h1>
 
-          <p className="team-main-sub">
+          <p className="team-main-sub blur-animate delay-2">
             Engineers and researchers committed to advancing transparent, trustless, and censorship-resistant governance infrastructure.
           </p>
         </section>
 
         {/* Builder Profile Showcase */}
-        <section className="team-builder-section">
+        <section className="team-builder-section blur-animate delay-3">
           <div className="team-card-prominent">
             <div className="team-avatar-box">
               <div className="team-avatar-gradient grad-1">
@@ -120,7 +126,7 @@ export const TeamPage: React.FC = () => {
         </section>
 
         {/* Guiding Principles Grid */}
-        <section className="team-principles-section">
+        <section className="team-principles-section blur-animate delay-4">
           <div className="principles-header">
             <span className="principles-sub-badge">Architectural Pillars</span>
             <h3 className="principles-title">
@@ -182,7 +188,7 @@ export const TeamPage: React.FC = () => {
         </section>
 
         {/* Prototype CTA Banner */}
-        <section className="team-cta-banner">
+        <section className="team-cta-banner blur-animate delay-5">
           <div className="team-cta-box">
             <h3>Experience TrueVote in Action</h3>
             <p>Inspect the smart contract architecture, view the open-source MVP specifications, and test the zero-knowledge voting workflow.</p>
