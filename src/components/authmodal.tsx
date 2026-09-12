@@ -34,7 +34,8 @@ const getRealMetaMaskProvider = () => {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
-  const [isAnimatingIn, setIsAnimatingIn] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const isClosingRef = React.useRef(false);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'not_installed' | 'error'>('idle');
   const [account, setAccount] = useState<string | null>(() => {
     return localStorage.getItem('truevote_connected_wallet') || null;
@@ -50,31 +51,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
     }
   }, []);
 
-  // Manage mount lifecycle and smooth animated entrance
+  // Sync internal state whenever isOpen changes for iOS spring animation
   useEffect(() => {
-    let timer: NodeJS.Timeout;
     if (isOpen) {
       setShouldRender(true);
-      timer = setTimeout(() => {
-        setIsAnimatingIn(true);
-      }, 30);
-    } else {
-      setIsAnimatingIn(false);
-      timer = setTimeout(() => {
+      setIsClosing(false);
+      isClosingRef.current = false;
+    } else if (shouldRender && !isClosingRef.current) {
+      setIsClosing(true);
+      isClosingRef.current = true;
+      const timer = setTimeout(() => {
         setShouldRender(false);
+        setIsClosing(false);
+        isClosingRef.current = false;
         setErrorMessage(null);
-      }, 360);
+      }, 300);
+      return () => clearTimeout(timer);
     }
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+  }, [isOpen, shouldRender]);
 
   const handleClose = () => {
-    setIsAnimatingIn(false);
+    if (isClosingRef.current) return;
+    setIsClosing(true);
+    isClosingRef.current = true;
     setTimeout(() => {
       setShouldRender(false);
+      setIsClosing(false);
+      isClosingRef.current = false;
       setErrorMessage(null);
       onClose();
-    }, 340);
+    }, 280);
   };
 
   useEffect(() => {
@@ -195,7 +201,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
 
   return (
     <div 
-      className={`auth-modal-overlay ${isAnimatingIn ? 'active' : ''}`}
+      className={`auth-modal-overlay ${isClosing ? 'closing' : 'opening'}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           handleClose();
@@ -205,7 +211,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
-      <div className={`auth-modal-card ${isAnimatingIn ? 'visible' : ''}`}>
+      <div className={`auth-modal-card ${isClosing ? 'closing' : 'opening'}`}>
         {/* Subtle Decorative Geometric Lines */}
         <div className="auth-card-line line-tl" />
         <div className="auth-card-line line-ml" />

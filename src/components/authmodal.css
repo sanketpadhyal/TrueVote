@@ -12,31 +12,50 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(15, 23, 42, 0.36);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  opacity: 0;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.auth-modal-overlay.opening {
+  animation: iosOverlayFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.auth-modal-overlay.closing {
+  animation: iosOverlayFadeOut 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.auth-modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+@keyframes iosOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-/* Modal Card with TrueVote Frosted Glass Aesthetic & Blur-To-Normal Animation */
+@keyframes iosOverlayFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Modal Card with Authentic iOS Spring Pop Physics & Apple Frosted Glass */
 .auth-modal-card {
   position: relative;
   width: 100%;
   max-width: 420px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(36px) saturate(210%);
-  -webkit-backdrop-filter: blur(36px) saturate(210%);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(40px) saturate(210%);
+  -webkit-backdrop-filter: blur(40px) saturate(210%);
   border: 1.5px solid rgba(255, 255, 255, 0.95);
-  border-radius: 24px;
+  border-radius: 28px;
   box-shadow: 
-    0 25px 70px -15px rgba(15, 23, 42, 0.16),
+    0 32px 80px -16px rgba(15, 23, 42, 0.22),
     0 0 0 1px rgba(226, 232, 240, 0.8),
     0 10px 40px -10px rgba(29, 107, 243, 0.12);
   padding: 2.75rem 2.25rem 2.45rem;
@@ -45,22 +64,51 @@
   align-items: center;
   text-align: center;
   overflow: hidden;
-
-  /* Animated Entrance (Blur-to-Normal with scale) */
-  opacity: 0;
-  filter: blur(16px);
-  transform: scale(0.86) translateY(24px);
-  transition: 
-    opacity 0.44s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.44s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.44s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, filter, transform;
 }
 
-.auth-modal-card.visible {
-  opacity: 1;
-  filter: blur(0);
-  transform: scale(1) translateY(0);
+.auth-modal-card.opening {
+  animation: iosAlertSpringIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.auth-modal-card.closing {
+  animation: iosAlertSpringOut 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+/* Authentic iOS System Alert Spring Pop */
+@keyframes iosAlertSpringIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.78) translateY(18px);
+    filter: blur(14px);
+  }
+  62% {
+    opacity: 1;
+    transform: scale(1.026) translateY(-2px);
+    filter: blur(0px);
+  }
+  84% {
+    transform: scale(0.992) translateY(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes iosAlertSpringOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.86) translateY(14px);
+    filter: blur(8px);
+  }
 }
 
 /* Faint Decorative Accent Lines matching website aesthetic */
@@ -216,6 +264,12 @@
     0 8px 24px -4px rgba(29, 107, 243, 0.42),
     inset 0 1px 1px rgba(255, 255, 255, 0.35);
   z-index: 2;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-continue-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 14px -2px rgba(29, 107, 243, 0.35);
 }
 
 .auth-continue-btn.connecting {
