@@ -3080,6 +3080,11 @@ input:checked + .slider.round:before {
 }
 
 /* KPI Summary Cards */
+.analytics-kpi-single {
+  margin-bottom: 18px;
+  width: 100%;
+}
+
 .analytics-kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

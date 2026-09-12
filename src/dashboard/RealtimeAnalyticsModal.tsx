@@ -120,11 +120,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
   const maxAllowedVotes =
     event.totalAllowedVotes === 'unlimited' ? '∞ Unlimited' : event.totalAllowedVotes;
 
-  const isEventActive =
-    event.activationType === 'manual'
-      ? event.isActivated === true
-      : event.isActivated !== false;
-
   return createPortal(
     <div
       className={`analytics-modal-backdrop ${isClosing ? 'is-closing' : 'is-entering'}`}
@@ -171,16 +166,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
         <div className="analytics-event-heading">
           <div className="analytics-badge-row">
             <span className="analytics-voting-code">{event.votingNumber}</span>
-            <span
-              className={`analytics-status-pill ${
-                isEventActive ? 'pill-active' : 'pill-inactive'
-              }`}
-            >
-              {isEventActive ? '● Active (Polls Open)' : '○ Inactive (Polls Closed)'}
-            </span>
-            <span className="analytics-type-pill">
-              {event.activationType === 'manual' ? 'Manual' : 'Scheduled (IST)'}
-            </span>
           </div>
           <h2 id="analytics-modal-title" className="analytics-event-name">
             {event.name}
@@ -188,46 +173,13 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           {event.bio && <p className="analytics-event-bio">{event.bio}</p>}
         </div>
 
-        {/* KPI Summary Cards */}
-        <div className="analytics-kpi-grid">
+        {/* Total Ballots Cast Summary Card */}
+        <div className="analytics-kpi-single">
           <div className="analytics-kpi-card">
-            <span className="kpi-label">Ballots Cast</span>
+            <span className="kpi-label">Total Ballots Cast</span>
             <div className="kpi-value-row">
               <span className="kpi-primary-val">{totalVotesCast}</span>
               <span className="kpi-secondary-val">/ {maxAllowedVotes}</span>
-            </div>
-          </div>
-
-          <div className="analytics-kpi-card">
-            <span className="kpi-label">Current Leader</span>
-            <div className="kpi-value-row">
-              <span className="kpi-leader-val">
-                {leadingOption ? (
-                  <>
-                    <span className="crown-icon">🏆</span>
-                    <span className="leader-name">{leadingOption.label}</span>
-                  </>
-                ) : (
-                  <span className="no-votes-yet">No votes yet</span>
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="analytics-kpi-card">
-            <span className="kpi-label">Quorum</span>
-            <div className="kpi-value-row">
-              <span className="kpi-primary-val">
-                {event.totalAllowedVotes === 'unlimited'
-                  ? 'N/A'
-                  : `${Math.min(
-                      100,
-                      Math.round(
-                        (totalVotesCast / (event.totalAllowedVotes as number || 1)) * 100
-                      )
-                    )}%`}
-              </span>
-              <span className="kpi-secondary-val">turnout</span>
             </div>
           </div>
         </div>
