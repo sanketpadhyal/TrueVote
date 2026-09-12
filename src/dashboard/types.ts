@@ -21,9 +21,10 @@ export interface EventItem {
   endTime?: string;
   isActivated?: boolean;
   createdAt: string;
-  timezone: string; // Indian Standard Time (IST UTC+5:30)
+  timezone?: string;
   ipfsHash?: string;
   ipfsUrl?: string;
+  ipfsFileId?: string;
   shareableLink?: string;
 }
 

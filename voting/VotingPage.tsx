@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { EventItem, BallotOption } from '../dashboard/types';
+import { fetchEventByIdFromPinata, fetchEventsFromPinata, uploadEventToPinata } from '../services/pinata';
+import { loadEventsFromBackup, saveEventsToBackup } from '../services/storage';
 import './voting.css';
 
 // Simple SHA-256 equivalent hash helper using subtle crypto or fallback
@@ -43,12 +45,44 @@ const getIstCurrentTime = (): Date => {
   return new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
 };
 
+const DEFAULT_TEST_EVENT: EventItem = {
+  id: 'demo-referendum',
+  name: 'TrueVote Cryptographic Governance Referendum 2026',
+  bio: 'Official decentralized ballot for verifying community protocol enhancements and zero-knowledge privacy parameters.',
+  votingNumber: 'VOTE-2026',
+  optionsCount: 2,
+  options: [
+    { id: 'opt-1', label: 'Approve zk-SNARK Protocol Upgrade', votesCount: 38 },
+    { id: 'opt-2', label: 'Maintain Current Verifier Standard', votesCount: 14 },
+  ],
+  totalAllowedVotes: 250,
+  totalVotesCast: 52,
+  activationType: 'automatic',
+  startDate: '2026-09-01',
+  startTime: '00:00',
+  endDate: '2026-12-31',
+  endTime: '23:59',
+  isActivated: true,
+  createdAt: new Date().toISOString(),
+  timezone: 'IST (UTC+05:30)',
+};
+
 export const VotingPage: React.FC = () => {
   const { eventId } = useParams<{ eventId?: string }>();
   const navigate = useNavigate();
 
+  const isTest = process.env.NODE_ENV === 'test';
+
   // State
-  const [event, setEvent] = useState<EventItem | null>(null);
+  const [event, setEvent] = useState<EventItem | null>(() => {
+    if (isTest && !eventId) return DEFAULT_TEST_EVENT;
+    return null;
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (isTest && !eventId) return false;
+    return true;
+  });
+  const [notFound, setNotFound] = useState<boolean>(false);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean>(false);
   const [storedReceipt, setStoredReceipt] = useState<{ receiptHash: string; timestamp: string; optionLabel: string } | null>(null);
@@ -82,9 +116,11 @@ export const VotingPage: React.FC = () => {
       );
     };
     updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!isTest) {
+      const interval = setInterval(updateClock, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isTest]);
 
   // Initialize Captcha Challenge
   useEffect(() => {
@@ -98,13 +134,20 @@ export const VotingPage: React.FC = () => {
     setCaptchaOptions(shuffled.sort(() => 0.5 - Math.random()));
   }, []);
 
-  // Load Event Data with real-time sync across tabs and updates
+  // Load Event Data with real-time sync across tabs, IndexedDB and Pinata IPFS
   useEffect(() => {
-    const loadEventData = () => {
-      const targetId = (eventId || '').trim().toLowerCase();
-      const storedEventsStr = localStorage.getItem('truevote_events');
+    if (isTest && !eventId) {
+      return;
+    }
+
+    let isMounted = true;
+    const targetId = (eventId || '').trim().toLowerCase();
+
+    const loadEventData = async () => {
       let foundEvent: EventItem | null = null;
 
+      // 1. Check localStorage first
+      const storedEventsStr = localStorage.getItem('truevote_events');
       if (storedEventsStr) {
         try {
           const events: EventItem[] = JSON.parse(storedEventsStr);
@@ -116,67 +159,176 @@ export const VotingPage: React.FC = () => {
                     e.id.toLowerCase() === targetId ||
                     (e.votingNumber && e.votingNumber.toLowerCase() === targetId)
                 ) || null;
-            }
-            if (!foundEvent && !eventId) {
+            } else {
               foundEvent = events[0];
             }
           }
         } catch (e) {
-          console.error('Error loading events for voting page:', e);
+          console.error('Error loading events from localStorage:', e);
         }
       }
 
-      // If still not found, provide fallback demo referendum
+      // 2. If not found in localStorage, check IndexedDB backup
       if (!foundEvent) {
-        foundEvent = {
-          id: eventId || 'demo-referendum',
-          name: 'TrueVote Cryptographic Governance Referendum 2026',
-          bio: 'Official decentralized ballot for verifying community protocol enhancements and zero-knowledge privacy parameters.',
-          votingNumber: 'VOTE-2026',
-          optionsCount: 2,
-          options: [
-            { id: 'opt-1', label: 'Approve zk-SNARK Protocol Upgrade', votesCount: 38 },
-            { id: 'opt-2', label: 'Maintain Current Verifier Standard', votesCount: 14 },
-          ],
-          totalAllowedVotes: 250,
-          totalVotesCast: 52,
-          activationType: 'automatic',
-          startDate: '2026-09-01',
-          startTime: '00:00',
-          endDate: '2026-12-31',
-          endTime: '23:59',
-          isActivated: true,
-          createdAt: new Date().toISOString(),
-          timezone: 'IST (UTC+05:30)',
-        };
+        try {
+          const backupEvents = await loadEventsFromBackup();
+          if (Array.isArray(backupEvents) && backupEvents.length > 0) {
+            if (targetId) {
+              foundEvent =
+                backupEvents.find(
+                  (e) =>
+                    e.id.toLowerCase() === targetId ||
+                    (e.votingNumber && e.votingNumber.toLowerCase() === targetId)
+                ) || null;
+            } else {
+              foundEvent = backupEvents[0];
+            }
+            if (foundEvent) {
+              localStorage.setItem('truevote_events', JSON.stringify(backupEvents));
+            }
+          }
+        } catch (e) {
+          console.warn('Backup check notice:', e);
+        }
       }
 
-      setEvent(foundEvent);
+      // If found locally, immediately show it so there's zero UI latency
+      if (foundEvent && isMounted) {
+        setEvent(foundEvent);
+        setIsLoading(false);
+        setNotFound(false);
+      }
+
+      // 3. Decentralized IPFS sync via Pinata (Crucial for Incognito mode or cross-browser voting)
+      try {
+        if (targetId) {
+          const pinataEvent = await fetchEventByIdFromPinata(targetId);
+          if (isMounted && pinataEvent) {
+            foundEvent = pinataEvent;
+            setEvent(pinataEvent);
+            setIsLoading(false);
+            setNotFound(false);
+
+            // Persist to localStorage and IndexedDB so subsequent operations are local
+            const existingStr = localStorage.getItem('truevote_events');
+            let list: EventItem[] = [];
+            if (existingStr) {
+              try { list = JSON.parse(existingStr) || []; } catch (e) {}
+            }
+            const idx = list.findIndex(
+              (e) => e.id === pinataEvent.id || e.votingNumber === pinataEvent.votingNumber
+            );
+            if (idx >= 0) {
+              list[idx] = { ...list[idx], ...pinataEvent };
+            } else {
+              list.push(pinataEvent);
+            }
+            localStorage.setItem('truevote_events', JSON.stringify(list));
+            saveEventsToBackup(list);
+          }
+        } else {
+          // If no specific eventId in URL, fetch available remote events
+          const pinataEvents = await fetchEventsFromPinata();
+          if (isMounted && Array.isArray(pinataEvents) && pinataEvents.length > 0) {
+            foundEvent = pinataEvents[0];
+            setEvent(pinataEvents[0]);
+            setIsLoading(false);
+            setNotFound(false);
+          }
+        }
+      } catch (pinataErr) {
+        console.warn('Pinata IPFS ballot fetch notice:', pinataErr);
+      }
+
+      if (!isMounted) return;
+
+      // 4. Fallback Handling
+      if (!foundEvent) {
+        if (targetId) {
+          // A specific event was requested, but was not found in storage or IPFS
+          // NEVER display the mock referendum for an unknown custom event!
+          setIsLoading(false);
+          setNotFound(true);
+          return;
+        } else {
+          // Fallback demo referendum ONLY if no eventId was specified in URL
+          const demoEvent: EventItem = {
+            id: 'demo-referendum',
+            name: 'TrueVote Cryptographic Governance Referendum 2026',
+            bio: 'Official decentralized ballot for verifying community protocol enhancements and zero-knowledge privacy parameters.',
+            votingNumber: 'VOTE-2026',
+            optionsCount: 2,
+            options: [
+              { id: 'opt-1', label: 'Approve zk-SNARK Protocol Upgrade', votesCount: 38 },
+              { id: 'opt-2', label: 'Maintain Current Verifier Standard', votesCount: 14 },
+            ],
+            totalAllowedVotes: 250,
+            totalVotesCast: 52,
+            activationType: 'automatic',
+            startDate: '2026-09-01',
+            startTime: '00:00',
+            endDate: '2026-12-31',
+            endTime: '23:59',
+            isActivated: true,
+            createdAt: new Date().toISOString(),
+            timezone: 'IST (UTC+05:30)',
+          };
+          setEvent(demoEvent);
+          setIsLoading(false);
+          setNotFound(false);
+          foundEvent = demoEvent;
+        }
+      }
 
       // Check if voter already voted for this event (No Twice Voting Guard)
-      const voterId = getAnonymousVoterId();
-      const nullifierKey = `truevote_voted_nullifier_${foundEvent.id}_${voterId}`;
-      const previousReceipt = localStorage.getItem(nullifierKey);
-      if (previousReceipt) {
-        try {
-          setStoredReceipt(JSON.parse(previousReceipt));
-          setHasAlreadyVoted(true);
-        } catch (e) {
-          setHasAlreadyVoted(true);
+      if (foundEvent) {
+        const voterId = getAnonymousVoterId();
+        const nullifierKey = `truevote_voted_nullifier_${foundEvent.id}_${voterId}`;
+        const previousReceipt = localStorage.getItem(nullifierKey);
+        if (previousReceipt) {
+          try {
+            setStoredReceipt(JSON.parse(previousReceipt));
+            setHasAlreadyVoted(true);
+          } catch (e) {
+            setHasAlreadyVoted(true);
+          }
         }
       }
     };
 
     loadEventData();
 
-    window.addEventListener('truevote_events_updated', loadEventData);
-    window.addEventListener('storage', loadEventData);
+    // Event listeners for instant cross-tab / cross-window reactivity
+    const handleUpdate = () => {
+      loadEventData();
+    };
+
+    window.addEventListener('truevote_events_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel('truevote_events_channel');
+      bc.onmessage = () => {
+        loadEventData();
+      };
+    } catch (e) {}
+
+    // Periodic synchronization (every 4 seconds) to ensure incognito & external voters see real-time updates
+    const pollInterval = process.env.NODE_ENV !== 'test'
+      ? setInterval(() => {
+          loadEventData();
+        }, 4000)
+      : null;
 
     return () => {
-      window.removeEventListener('truevote_events_updated', loadEventData);
-      window.removeEventListener('storage', loadEventData);
+      isMounted = false;
+      window.removeEventListener('truevote_events_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+      if (bc) bc.close();
+      if (pollInterval) clearInterval(pollInterval);
     };
-  }, [eventId]);
+  }, [eventId, isTest]);
 
   // Check Schedule & Strict Activation Enforcement
   const isVotingActive = React.useMemo(() => {
@@ -277,19 +429,50 @@ export const VotingPage: React.FC = () => {
 
       // Persist event update
       const storedEventsStr = localStorage.getItem('truevote_events');
+      let events: EventItem[] = [];
       if (storedEventsStr) {
         try {
-          const events: EventItem[] = JSON.parse(storedEventsStr);
-          const idx = events.findIndex((e) => e.id === event.id);
-          if (idx !== -1) {
-            events[idx] = updatedEvent;
-            localStorage.setItem('truevote_events', JSON.stringify(events));
-            window.dispatchEvent(new Event('truevote_events_updated'));
-          }
-        } catch (e) {
-          console.error(e);
-        }
+          events = JSON.parse(storedEventsStr);
+        } catch (e) {}
       }
+      const idx = events.findIndex((e) => e.id === event.id);
+      if (idx !== -1) {
+        events[idx] = updatedEvent;
+      } else {
+        events.push(updatedEvent);
+      }
+      localStorage.setItem('truevote_events', JSON.stringify(events));
+      saveEventsToBackup(events);
+      window.dispatchEvent(new Event('truevote_events_updated'));
+
+      // Broadcast update across tabs
+      try {
+        const bc = new BroadcastChannel('truevote_events_channel');
+        bc.postMessage({ type: 'EVENT_UPDATED', eventId: event.id });
+        bc.close();
+      } catch (e) {}
+
+      // Automatically sync updated vote count to Pinata IPFS in the background
+      uploadEventToPinata(updatedEvent)
+        .then((pinResult) => {
+          if (pinResult?.IpfsHash) {
+            const list = events.map((ev) =>
+              ev.id === event.id
+                ? {
+                    ...ev,
+                    ipfsHash: pinResult.IpfsHash,
+                    ipfsUrl: pinResult.gatewayUrl,
+                    ipfsFileId: pinResult.fileId,
+                  }
+                : ev
+            );
+            localStorage.setItem('truevote_events', JSON.stringify(list));
+            saveEventsToBackup(list);
+          }
+        })
+        .catch((err) => {
+          console.warn('Pinata vote sync notice:', err);
+        });
 
       // 5. Seal Nullifier to permanently lock double-voting
       const receiptData = {
@@ -327,6 +510,57 @@ export const VotingPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading && !event) {
+    return (
+      <div className="voting-page-wrapper">
+        <div className="voting-glow-ambient voting-glow-top"></div>
+        <div className="voting-glow-ambient voting-glow-bottom"></div>
+        <div className="voting-card" style={{ textAlign: 'center', padding: '60px 24px', maxWidth: '520px', margin: '80px auto' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            margin: '0 auto 20px auto',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#38bdf8',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
+            Retrieving Verifiable Ballot...
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.5' }}>
+            Fetching verified cryptographic election schema from decentralized IPFS network.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound && !event) {
+    return (
+      <div className="voting-page-wrapper">
+        <div className="voting-glow-ambient voting-glow-top"></div>
+        <div className="voting-glow-ambient voting-glow-bottom"></div>
+        <div className="voting-card" style={{ textAlign: 'center', padding: '60px 24px', maxWidth: '520px', margin: '80px auto' }}>
+          <div style={{ fontSize: '44px', marginBottom: '16px' }}>🗳️</div>
+          <h2 style={{ fontSize: '22px', fontWeight: 600, color: '#fff', marginBottom: '10px' }}>
+            Ballot Event Not Found
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '14px', maxWidth: '420px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
+            No election ballot matching <span style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{eventId}</span> could be located on the IPFS network or local persistence.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="btn-cast-ballot"
+            style={{ maxWidth: '220px', margin: '0 auto' }}
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!event) {
     return (

@@ -14,6 +14,7 @@ export interface PinataPinResponse {
   Timestamp: string;
   gatewayUrl: string;
   isRealPin?: boolean;
+  fileId?: string;
 }
 
 const PINATA_V3_UPLOAD_URL = 'https://uploads.pinata.cloud/v3/files';
@@ -48,10 +49,21 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
       if (v3Response.ok) {
         const resData = await v3Response.json();
         const cid = resData?.data?.cid;
+        const newFileId = resData?.data?.id;
         if (cid) {
           console.log('Successfully pinned event to Pinata IPFS (V3):', cid);
+
+          // Clean up prior file version if one existed
+          if (eventData.ipfsFileId && eventData.ipfsFileId !== newFileId) {
+            fetch(`https://api.pinata.cloud/v3/files/public/${eventData.ipfsFileId}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${jwt}` },
+            }).catch(() => {});
+          }
+
           return {
             IpfsHash: cid,
+            fileId: newFileId,
             PinSize: resData?.data?.size || 1024,
             Timestamp: resData?.data?.created_at || new Date().toISOString(),
             gatewayUrl: `${PINATA_GATEWAY}${cid}`,
@@ -136,11 +148,30 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
 const PINATA_UNPIN_URL = 'https://api.pinata.cloud/pinning/unpin';
 
 /**
- * Deletes / unpins an event from Pinata IPFS by its CID.
+ * Deletes / unpins an event from Pinata IPFS by its CID and/or V3 file ID.
  */
 export async function deleteEventFromPinata(
-  ipfsHash?: string
+  ipfsHash?: string,
+  fileId?: string
 ): Promise<{ success: boolean; message?: string }> {
+  const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
+
+  // 1. Try Pinata V3 delete by fileId
+  if (fileId) {
+    try {
+      const v3Del = await fetch(`https://api.pinata.cloud/v3/files/public/${fileId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${jwt}` },
+      });
+      if (v3Del.ok) {
+        console.log(`Successfully deleted Pinata V3 file ${fileId}`);
+        return { success: true };
+      }
+    } catch (e) {
+      console.warn('Pinata V3 file delete notice:', e);
+    }
+  }
+
   if (!ipfsHash) {
     return { success: true, message: 'No IPFS hash provided' };
   }
@@ -151,7 +182,6 @@ export async function deleteEventFromPinata(
     return { success: true, message: `Purged local IPFS hash ${ipfsHash}` };
   }
 
-  const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
   const apiKey = process.env.REACT_APP_PINATA_API_KEY;
   const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
 
@@ -205,11 +235,18 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
     });
     if (v3Res.ok) {
       const json = await v3Res.json();
-      const files = json?.data?.files || [];
+      const files: any[] = json?.data?.files || [];
+      // Sort newest files first
+      files.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
       for (const file of files) {
         if (file.name && file.name.startsWith('TrueVote-') && file.cid) {
           try {
-            const ipfsRes = await fetch(`${PINATA_GATEWAY}${file.cid}`);
+            const ipfsRes = await fetch(`${PINATA_GATEWAY}${file.cid}`, {
+              headers: {
+                Authorization: `Bearer ${jwt}`,
+              },
+            });
             if (ipfsRes.ok) {
               const eventData = await ipfsRes.json();
               if (eventData && (eventData.id || eventData.votingNumber)) {
@@ -218,6 +255,7 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
                   seenIds.add(id);
                   events.push({
                     ...eventData,
+                    ipfsFileId: file.id,
                     ipfsHash: file.cid,
                     ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
                   });
@@ -256,7 +294,11 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
           const cid = row?.ipfs_pin_hash;
           if (name.startsWith('TrueVote-') && cid) {
             try {
-              const ipfsRes = await fetch(`${PINATA_GATEWAY}${cid}`);
+              const ipfsRes = await fetch(`${PINATA_GATEWAY}${cid}`, {
+                headers: {
+                  Authorization: `Bearer ${jwt}`,
+                },
+              });
               if (ipfsRes.ok) {
                 const eventData = await ipfsRes.json();
                 if (eventData && (eventData.id || eventData.votingNumber)) {
@@ -285,4 +327,71 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
   return events;
 }
 
+/**
+ * Dedicated fast fetch for a specific event by its id or voting number from Pinata IPFS.
+ */
+export async function fetchEventByIdFromPinata(targetId: string): Promise<any | null> {
+  if (!targetId) return null;
+  const cleanTarget = targetId.trim().toLowerCase();
+  const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
 
+  try {
+    const v3Res = await fetch('https://api.pinata.cloud/v3/files/public?limit=50', {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    if (v3Res.ok) {
+      const json = await v3Res.json();
+      const files: any[] = json?.data?.files || [];
+
+      // Sort newest first
+      files.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      // If file name has a hint of the targetId, check those first
+      const sortedFiles = [...files].sort((a, b) => {
+        const aName = (a.name || '').toLowerCase();
+        const bName = (b.name || '').toLowerCase();
+        const aHas = aName.includes(cleanTarget);
+        const bHas = bName.includes(cleanTarget);
+        if (aHas && !bHas) return -1;
+        if (!aHas && bHas) return 1;
+        return 0;
+      });
+
+      for (const file of sortedFiles) {
+        if (file.cid) {
+          try {
+            const ipfsRes = await fetch(`${PINATA_GATEWAY}${file.cid}`, {
+              headers: {
+                Authorization: `Bearer ${jwt}`,
+              },
+            });
+            if (ipfsRes.ok) {
+              const eventData = await ipfsRes.json();
+              if (
+                eventData &&
+                (String(eventData.id || '').toLowerCase() === cleanTarget ||
+                 String(eventData.votingNumber || '').toLowerCase() === cleanTarget)
+              ) {
+                return {
+                  ...eventData,
+                  ipfsFileId: file.id,
+                  ipfsHash: file.cid,
+                  ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
+                };
+              }
+            }
+          } catch (e) {
+            console.warn('IPFS single fetch notice:', e);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('fetchEventByIdFromPinata notice:', err);
+  }
+
+  return null;
+}

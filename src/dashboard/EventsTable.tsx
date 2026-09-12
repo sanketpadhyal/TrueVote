@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { EventItem } from './types';
 import RealtimeAnalyticsModal from './RealtimeAnalyticsModal';
 import PauseOrQuitModal from './PauseOrQuitModal';
-import { deleteEventFromPinata, fetchEventsFromPinata } from '../services/pinata';
+import { deleteEventFromPinata, fetchEventsFromPinata, uploadEventToPinata } from '../services/pinata';
 import { saveEventsToBackup, loadEventsFromBackup, removeEventFromBackup } from '../services/storage';
 
 const getStoredEvents = (): EventItem[] => {
@@ -107,16 +107,54 @@ export const EventsTable: React.FC = () => {
 
   const updateEventStatus = (id: string, updates: Partial<EventItem>) => {
     setEvents((prev) => {
-      const updated = prev.map((ev) =>
-        ev.id === id ? { ...ev, ...updates } : ev
-      );
+      let targetUpdatedEvent: EventItem | null = null;
+      const updated = prev.map((ev) => {
+        if (ev.id === id) {
+          targetUpdatedEvent = { ...ev, ...updates };
+          return targetUpdatedEvent;
+        }
+        return ev;
+      });
       try {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
         saveEventsToBackup(updated);
         window.dispatchEvent(new Event('truevote_events_updated'));
+        try {
+          const bc = new BroadcastChannel('truevote_events_channel');
+          bc.postMessage({ type: 'EVENT_UPDATED', eventId: id });
+          bc.close();
+        } catch (e) {}
       } catch (e) {
         console.error(e);
       }
+
+      // Automatically sync updated activation status to Pinata IPFS
+      if (targetUpdatedEvent) {
+        uploadEventToPinata(targetUpdatedEvent)
+          .then((pinResult) => {
+            if (pinResult?.IpfsHash) {
+              setEvents((curr) => {
+                const withPin = curr.map((ev) =>
+                  ev.id === id
+                    ? {
+                        ...ev,
+                        ipfsHash: pinResult.IpfsHash,
+                        ipfsUrl: pinResult.gatewayUrl,
+                        ipfsFileId: pinResult.fileId,
+                      }
+                    : ev
+                );
+                localStorage.setItem('truevote_events', JSON.stringify(withPin));
+                saveEventsToBackup(withPin);
+                return withPin;
+              });
+            }
+          })
+          .catch((err) => {
+            console.warn('Pinata activation sync notice:', err);
+          });
+      }
+
       return updated;
     });
   };
@@ -139,9 +177,7 @@ export const EventsTable: React.FC = () => {
   const handleDeleteEvent = async (eventToDelete: EventItem) => {
     // 1. Unpin / delete this specific vote schema from Pinata IPFS
     try {
-      if (eventToDelete.ipfsHash) {
-        await deleteEventFromPinata(eventToDelete.ipfsHash);
-      }
+      await deleteEventFromPinata(eventToDelete.ipfsHash, eventToDelete.ipfsFileId);
     } catch (err) {
       console.warn('Pinata delete error:', err);
     }
@@ -153,6 +189,11 @@ export const EventsTable: React.FC = () => {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
         removeEventFromBackup(eventToDelete.id);
         window.dispatchEvent(new Event('truevote_events_updated'));
+        try {
+          const bc = new BroadcastChannel('truevote_events_channel');
+          bc.postMessage({ type: 'EVENT_DELETED', eventId: eventToDelete.id });
+          bc.close();
+        } catch (e) {}
       } catch (e) {
         console.error('Error saving updated events to storage:', e);
       }

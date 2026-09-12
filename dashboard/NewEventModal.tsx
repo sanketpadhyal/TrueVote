@@ -250,6 +250,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       const pinResult = await uploadEventToPinata(eventPayload);
       eventPayload.ipfsHash = pinResult.IpfsHash;
       eventPayload.ipfsUrl = pinResult.gatewayUrl;
+      eventPayload.ipfsFileId = pinResult.fileId;
 
       // 2. Persist in localStorage
       const existingStr = localStorage.getItem('truevote_events');
@@ -267,8 +268,13 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       saveEventsToBackup(updatedEvents);
       clearDraft();
 
-      // Dispatch storage notification
+      // Dispatch storage and broadcast notification
       window.dispatchEvent(new Event('truevote_events_updated'));
+      try {
+        const bc = new BroadcastChannel('truevote_events_channel');
+        bc.postMessage({ type: 'EVENT_CREATED', eventId });
+        bc.close();
+      } catch (e) {}
 
       setCreatedEvent(eventPayload);
       onEventCreated(eventPayload);
