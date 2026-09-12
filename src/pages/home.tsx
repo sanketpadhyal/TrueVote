@@ -204,7 +204,7 @@ export const HomePage: React.FC = () => {
 
         {/* 3D PERSPECTIVE DASHBOARD SHOWCASE */}
         <div className="dashboard-perspective-wrapper blur-animate delay-4" id="features">
-          <div 
+          <div
             className="dashboard-shell-wrapper"
             style={{
               transform: `rotateX(${rotateX}deg) scale(${scale}) translateY(${translateY}px)`,
@@ -213,9 +213,9 @@ export const HomePage: React.FC = () => {
           >
             <div className="dashboard-outer-glow">
               <div className="dashboard-image-showcase glass-panel">
-                <img 
-                  src="/images/privacy_dashboard.webp" 
-                  alt="TrueVote ZKP-Based Anonymous Voting & Cryptographic Shield" 
+                <img
+                  src="/dashboard/images/ChatGPT Image Sep 12, 2026, 01_06_40 PM.webp"
+                  alt="TrueVote ZKP-Based Anonymous Voting & Cryptographic Shield"
                   className="privacy-hero-img"
                 />
               </div>

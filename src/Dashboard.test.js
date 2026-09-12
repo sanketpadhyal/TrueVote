@@ -1,10 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
+
+const renderWithRouter = (ui) => {
+  return render(<BrowserRouter>{ui}</BrowserRouter>);
+};
 
 describe('Dashboard Component', () => {
   test('renders dashboard titles, hero banner, and user greeting', () => {
-    render(<Dashboard />);
+    renderWithRouter(<Dashboard />);
     expect(screen.getByRole('heading', { level: 1, name: /Dashboard/i })).toBeInTheDocument();
     expect(screen.getByText(/Hi Agnes!/i)).toBeInTheDocument();
     expect(screen.getByText(/Current license status/i)).toBeInTheDocument();
@@ -12,11 +17,12 @@ describe('Dashboard Component', () => {
     expect(screen.getByText(/voting activity/i)).toBeInTheDocument();
   });
 
-  test('renders action buttons and events table', () => {
-    render(<Dashboard />);
+  test('renders action buttons, events table, and log out button', () => {
+    renderWithRouter(<Dashboard />);
     expect(screen.getByText(/new event/i)).toBeInTheDocument();
     expect(screen.getByText(/new participant/i)).toBeInTheDocument();
     expect(screen.getByText(/XI Meeting of the Community Krakow - Podgórze/i)).toBeInTheDocument();
     expect(screen.getByText(/Voting for the mayor of Chrzanów/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Log out/i })).toBeInTheDocument();
   });
 });

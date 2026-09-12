@@ -153,38 +153,56 @@
   box-shadow: 0 0 10px rgba(0, 229, 163, 0.6);
 }
 
-/* User Profile */
-.wyborek-user-profile {
+/* Sidebar Footer - Log Out Button */
+.wyborek-sidebar-footer {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: auto;
   padding-top: 16px;
-}
-
-.user-avatar-container {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.18);
-  margin-bottom: 6px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.user-avatar {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
-.user-name-text {
-  font-size: 11px;
+.logout-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+  border-radius: 8px;
+}
+
+.logout-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.logout-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+  transition: transform 0.2s ease;
+}
+
+.logout-btn:hover .logout-icon-wrap {
+  transform: translateX(2px);
+}
+
+.logout-label {
+  font-size: 10.5px;
   font-weight: 600;
-  color: #cad5e8;
   text-align: center;
   line-height: 1.25;
+  letter-spacing: 0.1px;
 }
 
 /* =========================================================
@@ -779,20 +797,20 @@
     border-radius: 3px 3px 0 0;
   }
 
-  .wyborek-user-profile {
+  .wyborek-sidebar-footer {
     margin-top: 0;
     padding-top: 0;
+    width: auto;
     flex-direction: row;
-    gap: 8px;
   }
 
-  .user-avatar-container {
-    width: 36px;
-    height: 36px;
-    margin-bottom: 0;
+  .logout-btn {
+    padding: 6px 10px;
+    flex-direction: row;
+    gap: 6px;
   }
 
-  .user-name-text {
+  .logout-label {
     display: none;
   }
 
