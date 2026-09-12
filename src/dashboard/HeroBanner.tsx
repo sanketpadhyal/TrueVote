@@ -15,7 +15,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       <div className="hero-banner-content">
         {userName && <h2 className="hero-banner-title">Hi {userName}!</h2>}
         <p className="hero-banner-desc">
-          Check how voting is carried out in your organization: „{organizationName}”!
+          Check how voting is carried out in your organization
         </p>
       </div>
       <div className="hero-banner-artwork">

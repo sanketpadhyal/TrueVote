@@ -26,7 +26,7 @@ export const Dashboard: React.FC = () => {
           </header>
 
           {/* Greeting Hero Banner */}
-          <HeroBanner organizationName="Wyborek" />
+          <HeroBanner />
 
           {/* Events Table */}
           <EventsTable />
