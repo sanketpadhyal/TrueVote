@@ -87,9 +87,13 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
         const savedDraft = localStorage.getItem('truevote_event_draft');
         if (savedDraft) {
           const draft = JSON.parse(savedDraft);
-          if (draft.options && Array.isArray(draft.options)) {
-            setOptions(draft.options);
-            setOptionsCount(draft.options.length);
+          if (draft.options && Array.isArray(draft.options) && draft.options.length >= 2) {
+            const validLen = Math.min(5, Math.max(2, draft.options.length));
+            setOptions(draft.options.slice(0, validLen));
+            setOptionsCount(validLen);
+          } else {
+            setOptions(['Option 1', 'Option 2']);
+            setOptionsCount(2);
           }
           if (draft.totalVotes) setTotalVotes(draft.totalVotes);
           if (draft.eventName) setEventName(draft.eventName);
@@ -104,10 +108,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       const timer = setTimeout(() => {
         setShouldRender(false);
         setIsClosing(false);
-        setStep(1);
-        setCreatedEvent(null);
-        setErrorMsg('');
-      }, 250);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -132,8 +133,17 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
-  // Save draft to localStorage whenever options or inputs change
-  const saveDraftLocally = (opts: string[], count: number) => {
+  // Clean local draft helper
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem('truevote_event_draft');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Save current step data to localStorage
+  const saveDraftLocally = (opts = options, count = optionsCount) => {
     try {
       const draft = {
         options: opts,
@@ -146,7 +156,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
         startTime,
         endDate,
         endTime,
-        lastSaved: new Date().toISOString(),
       };
       localStorage.setItem('truevote_event_draft', JSON.stringify(draft));
     } catch (e) {
@@ -154,19 +163,20 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     }
   };
 
-  // Step 1: Change options count
+  // Step 1: Change options count (choices 2 to 5)
   const handleOptionsCountSelect = (count: number) => {
-    setOptionsCount(count);
+    const validCount = Math.min(5, Math.max(2, count));
+    setOptionsCount(validCount);
     let newOptions = [...options];
-    if (count > newOptions.length) {
-      for (let i = newOptions.length + 1; i <= count; i++) {
+    if (validCount > newOptions.length) {
+      for (let i = newOptions.length + 1; i <= validCount; i++) {
         newOptions.push(`Option ${i}`);
       }
     } else {
-      newOptions = newOptions.slice(0, count);
+      newOptions = newOptions.slice(0, validCount);
     }
     setOptions(newOptions);
-    saveDraftLocally(newOptions, count);
+    saveDraftLocally(newOptions, validCount);
   };
 
   const handleOptionLabelChange = (index: number, val: string) => {
@@ -253,7 +263,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       }
       const updatedEvents = [eventPayload, ...currentEvents];
       localStorage.setItem('truevote_events', JSON.stringify(updatedEvents));
-      localStorage.removeItem('truevote_event_draft');
+      clearDraft();
 
       // Dispatch storage notification
       window.dispatchEvent(new Event('truevote_events_updated'));
@@ -364,9 +374,9 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
                 Select how many voting options or proposals will be presented on this ballot.
               </p>
 
-              {/* iOS Segmented Track */}
+              {/* iOS Segmented Track for 2 to 5 */}
               <div className="ios-segmented-track">
-                {[1, 2, 3, 4, 5].map((n) => (
+                {[2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
                     type="button"
