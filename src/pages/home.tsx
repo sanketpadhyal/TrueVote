@@ -85,19 +85,8 @@ export const HomePage: React.FC = () => {
       topElements.forEach((el) => el.classList.add('visible'));
     }, 50);
 
-    // Auto-popup dialogue box on first-time visit (sequenced after badge blur entrance)
-    let popupTimer: NodeJS.Timeout | null = null;
-    const hasSeenHackathon = sessionStorage.getItem('truevote_hackathon_dialog_seen');
-    if (!hasSeenHackathon) {
-      popupTimer = setTimeout(() => {
-        setIsAuthModalOpen(true);
-        sessionStorage.setItem('truevote_hackathon_dialog_seen', 'true');
-      }, 850);
-    }
-
     return () => {
       clearTimeout(heroTimer);
-      if (popupTimer) clearTimeout(popupTimer);
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('scroll', handleScroll);
       if ((window as any).lenis) {
@@ -145,21 +134,23 @@ export const HomePage: React.FC = () => {
             <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
           </div>
 
-          {/* Top Pill with Icon (Opens Wallet Modal) */}
+          {/* Top Pill with MetaMask Icon (Opens Wallet Modal) */}
           <div 
             className="trusted-pill blur-animate clickable-pill"
             onClick={() => setIsAuthModalOpen(true)}
             role="button"
             tabIndex={0}
-            title="Click to connect Web3 wallet"
+            title="Click to connect MetaMask"
           >
-            <div className="hackathon-icon-box">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
-              </svg>
+            <div className="hackathon-icon-box" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img 
+                src="/images/stacks/muskmask.webp" 
+                alt="MetaMask" 
+                style={{ width: 14, height: 14, objectFit: 'contain' }} 
+              />
             </div>
             <span className="trusted-text">
-              {connectedWallet ? `Wallet: ${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : 'Connect Web3 Wallet'}
+              {connectedWallet ? `Connected: ${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : 'Connect MetaMask'}
             </span>
           </div>
 
@@ -177,18 +168,14 @@ export const HomePage: React.FC = () => {
           <div className="hero-action-group blur-animate delay-3">
             <button 
               className="btn-primary-blue framer-flip-btn"
-              onClick={() => {
-                if (connectedWallet) {
-                  triggerToast(`⚡ Wallet connected (${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}): Preparing anonymous ballot token...`);
-                } else {
-                  setIsAuthModalOpen(true);
-                }
-              }}
+              onClick={() => setIsAuthModalOpen(true)}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-              </svg>
-              <FlipText>{connectedWallet ? `Connected: ${connectedWallet.slice(0, 6)}...` : 'Get Started'}</FlipText>
+              <img 
+                src="/images/stacks/muskmask.webp" 
+                alt="MetaMask" 
+                style={{ width: 19, height: 19, objectFit: 'contain', flexShrink: 0 }} 
+              />
+              <FlipText>{connectedWallet ? `Connected: ${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : 'Continue with MetaMask'}</FlipText>
             </button>
             <div className="credit-caption">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d6bf3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -7,14 +7,28 @@ export interface AuthModalProps {
   onConnect?: (address: string) => void;
 }
 
-// Safely locate MetaMask provider (supporting multiple Web3 wallets & EIP-6963)
-const getMetaMaskProvider = () => {
+// Safely locate genuine MetaMask provider (distinguishing from Phantom/Coinbase/Brave hijackers)
+const getRealMetaMaskProvider = () => {
   if (typeof window === 'undefined') return null;
   const eth = (window as any).ethereum;
   if (!eth) return null;
+
+  // Multi-wallet EIP-6963 / window.ethereum.providers array
   if (eth.providers && Array.isArray(eth.providers)) {
-    return eth.providers.find((p: any) => p.isMetaMask) || eth.providers[0];
+    // Specifically search for MetaMask that is NOT Phantom, Coinbase, Brave, or Trust
+    const realMetaMask = eth.providers.find(
+      (p: any) => p.isMetaMask && !p.isPhantom && !p.isBraveWallet && !p.isCoinbaseWallet && !p.isTrust
+    );
+    if (realMetaMask) return realMetaMask;
+    const fallbackMetaMask = eth.providers.find((p: any) => p.isMetaMask);
+    if (fallbackMetaMask) return fallbackMetaMask;
   }
+
+  // Single provider check
+  if (eth.isMetaMask) {
+    return eth;
+  }
+
   return eth;
 };
 
@@ -22,40 +36,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isAnimatingIn, setIsAnimatingIn] = useState(false);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'not_installed' | 'error'>('idle');
-  const [account, setAccount] = useState<string | null>(null);
+  const [account, setAccount] = useState<string | null>(() => {
+    return localStorage.getItem('truevote_connected_wallet') || null;
+  });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Check if wallet is already connected or cached
+  // Synchronize internal account state when localStorage or onConnect changes
   useEffect(() => {
-    const provider = getMetaMaskProvider();
-    if (provider) {
-      provider.request({ method: 'eth_accounts' })
-        .then((accounts: string[]) => {
-          if (accounts && accounts.length > 0) {
-            setAccount(accounts[0]);
-            setStatus('connected');
-            if (onConnect) onConnect(accounts[0]);
-          }
-        })
-        .catch(() => {});
-
-      const handleAccountsChanged = (accounts: string[]) => {
-        if (accounts && accounts.length > 0) {
-          setAccount(accounts[0]);
-          setStatus('connected');
-          if (onConnect) onConnect(accounts[0]);
-        } else {
-          setAccount(null);
-          setStatus('idle');
-        }
-      };
-
-      provider.on?.('accountsChanged', handleAccountsChanged);
-      return () => {
-        provider.removeListener?.('accountsChanged', handleAccountsChanged);
-      };
+    const saved = localStorage.getItem('truevote_connected_wallet');
+    if (saved) {
+      setAccount(saved);
+      setStatus('connected');
     }
-  }, [onConnect]);
+  }, []);
 
   // Manage mount lifecycle and smooth animated entrance
   useEffect(() => {
@@ -106,72 +99,89 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
-  // REAL MetaMask Wallet Access Connection
+  // REAL METAMASK WALLET CONNECTION HANDLER
   const handleConnectMetaMask = async () => {
     setStatus('connecting');
     setErrorMessage(null);
 
-    const provider = getMetaMaskProvider();
+    const provider = getRealMetaMaskProvider();
 
-    // 1. Real MetaMask Extension is Present in Browser
-    if (provider) {
+    // Check if on mobile device
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (!provider || (!provider.isMetaMask && !isMobileDevice)) {
+      if (isMobileDevice) {
+        // Redirect to MetaMask Mobile app directly
+        const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
+        window.open(`https://metamask.app.link/dapp/${cleanUrl}`, '_blank');
+        setStatus('idle');
+        return;
+      }
+      // MetaMask extension is not installed in desktop browser
+      setStatus('not_installed');
+      return;
+    }
+
+    try {
+      let accounts: string[] = [];
+
+      // Method 1: Request permissions to explicitly trigger the real MetaMask prompt UI
       try {
-        const accounts = await provider.request({
+        const permissions = await provider.request({
+          method: 'wallet_requestPermissions',
+          params: [{ eth_accounts: {} }]
+        });
+        const accountsPermission = permissions?.find?.((p: any) => p.parentCapability === 'eth_accounts');
+        if (accountsPermission?.caveats?.[0]?.value) {
+          accounts = accountsPermission.caveats[0].value;
+        }
+      } catch (permErr: any) {
+        // User explicitly cancelled / rejected the MetaMask popup
+        if (permErr?.code === 4001) {
+          setStatus('error');
+          setErrorMessage('Connection request was rejected in MetaMask.');
+          return;
+        }
+        // Fallback if wallet_requestPermissions is not supported by client
+        accounts = await provider.request({
           method: 'eth_requestAccounts'
         });
-
-        if (accounts && accounts.length > 0) {
-          const userAddr = accounts[0];
-          setAccount(userAddr);
-          setStatus('connected');
-          localStorage.setItem('truevote_connected_wallet', userAddr);
-          if (onConnect) onConnect(userAddr);
-          setTimeout(() => {
-            handleClose();
-          }, 1200);
-        } else {
-          setStatus('idle');
-        }
-      } catch (err: any) {
-        console.error('MetaMask connection error:', err);
-        setStatus('error');
-        if (err?.code === 4001) {
-          setErrorMessage('Connection request rejected in MetaMask.');
-        } else if (err?.code === -32002) {
-          setErrorMessage('MetaMask request already pending. Please click your extension icon.');
-        } else {
-          setErrorMessage(err?.message || 'Failed to connect to MetaMask');
-        }
       }
-      return;
-    }
 
-    // 2. Mobile Browser: Open MetaMask Mobile App via Deep Link
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobileDevice) {
-      const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
-      window.open(`https://metamask.app.link/dapp/${cleanUrl}`, '_blank');
-      setStatus('idle');
-      return;
-    }
+      // If accounts were not populated by permissions, request directly
+      if (!accounts || accounts.length === 0) {
+        accounts = await provider.request({
+          method: 'eth_requestAccounts'
+        });
+      }
 
-    // 3. Desktop without MetaMask Extension Installed
-    setStatus('not_installed');
+      if (accounts && accounts.length > 0) {
+        const userAddr = accounts[0];
+        setAccount(userAddr);
+        setStatus('connected');
+        localStorage.setItem('truevote_connected_wallet', userAddr);
+        if (onConnect) onConnect(userAddr);
+        setTimeout(() => {
+          handleClose();
+        }, 1200);
+      } else {
+        setStatus('idle');
+      }
+    } catch (err: any) {
+      console.error('Real MetaMask connection error:', err);
+      setStatus('error');
+      if (err?.code === 4001) {
+        setErrorMessage('Connection request was cancelled in MetaMask.');
+      } else if (err?.code === -32002) {
+        setErrorMessage('MetaMask is already open. Please check your browser extension to approve.');
+      } else {
+        setErrorMessage(err?.message || 'Could not connect to MetaMask. Please try again.');
+      }
+    }
   };
 
   const handleInstallMetaMask = () => {
     window.open('https://metamask.io/download/', '_blank');
-  };
-
-  const handleDemoConnect = () => {
-    const demoAddr = '0x71C8A9b70836262464731D7D28f4E28A3B29';
-    setAccount(demoAddr);
-    setStatus('connected');
-    localStorage.setItem('truevote_connected_wallet', demoAddr);
-    if (onConnect) onConnect(demoAddr);
-    setTimeout(() => {
-      handleClose();
-    }, 1000);
   };
 
   const handleDisconnect = () => {
@@ -233,28 +243,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
           Instant verification, effortless voting
         </p>
 
-        {/* State 1: Wallet Connected */}
-        {status === 'connected' ? (
+        {/* State 1: Already Connected */}
+        {status === 'connected' && account ? (
           <div className="auth-connected-container">
             <div className="auth-connected-pill">
               <span className="auth-pulse-dot" />
               <span className="auth-connected-text">
-                {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'Connected'}
+                Connected: {account.slice(0, 6)}...{account.slice(-4)}
               </span>
             </div>
+            <button 
+              className="auth-continue-btn" 
+              onClick={handleConnectMetaMask}
+              type="button"
+              style={{ marginTop: '0.45rem' }}
+            >
+              <img 
+                src="/images/stacks/muskmask.webp" 
+                alt="MetaMask" 
+                className="auth-btn-icon" 
+              />
+              <span>Switch or Reconnect MetaMask</span>
+            </button>
             <button className="auth-disconnect-btn" onClick={handleDisconnect} type="button">
-              Disconnect
+              Disconnect Wallet
             </button>
           </div>
         ) : status === 'not_installed' ? (
-          /* State 2: MetaMask Extension Not Installed */
+          /* State 2: MetaMask Extension is NOT installed in browser */
           <div className="auth-not-installed-box">
             <div className="auth-alert-badge">
               <img src="/images/stacks/muskmask.webp" alt="MetaMask" className="auth-alert-icon" />
-              <span>MetaMask not detected</span>
+              <span>MetaMask extension not found</span>
             </div>
             <p className="auth-alert-desc">
-              Please install MetaMask in your browser to enable secure Web3 voting access.
+              MetaMask is required to access your Web3 ballot. Please install the extension in your browser.
             </p>
             <button 
               className="auth-install-btn" 
@@ -262,18 +285,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
               type="button"
             >
               <img src="/images/stacks/muskmask.webp" alt="MetaMask" className="auth-btn-icon" />
-              <span>Install MetaMask Extension</span>
-            </button>
-            <button 
-              className="auth-demo-btn" 
-              onClick={handleDemoConnect}
-              type="button"
-            >
-              Continue in Demo Mode
+              <span>Install MetaMask</span>
             </button>
           </div>
         ) : (
-          /* State 3: Normal / Connecting / Error Button */
+          /* State 3: Connect with MetaMask Button */
           <button 
             className={`auth-continue-btn ${status === 'connecting' ? 'connecting' : ''}`}
             onClick={handleConnectMetaMask}
