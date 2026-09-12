@@ -73,6 +73,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
         setIsClosing(false);
         setStep(1);
         setCreatedEvent(null);
+        setErrorMsg('');
       }, 250);
       return () => clearTimeout(timer);
     }
@@ -164,7 +165,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
   const handleSubmit = async () => {
     setErrorMsg('');
     if (!eventName.trim()) {
-      setErrorMsg('Please provide a valid voting event title.');
+      setErrorMsg('Please enter an event title before proceeding.');
       setStep(3);
       return;
     }
@@ -269,421 +270,456 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
           </svg>
         </button>
 
-        {/* Step Progression Indicators */}
-        {step <= 4 && (
-          <div className="new-event-steps-indicator">
-            {[1, 2, 3, 4].map((s) => (
-              <div
-                key={s}
-                className={`step-dot ${step === s ? 'step-active' : step > s ? 'step-done' : ''}`}
-                onClick={() => {
-                  if (s < step) setStep(s);
-                }}
-              >
-                <span className="step-num">{s}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {errorMsg && (
-          <div className="new-event-error-alert">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {/* STEP 1: How many things to vote on (1, 2, 3, 4, 5) */}
-        {step === 1 && (
-          <div className="new-event-step-content">
-            <div className="new-event-illustration">
-              <svg width="120" height="90" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="30" y="20" width="100" height="85" rx="14" fill="#EEF4FF" stroke="#3B82F6" strokeWidth="2.5" />
-                <rect x="46" y="38" width="18" height="18" rx="5" fill="#2563EB" />
-                <path d="M51 47L54 50L59 44" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="72" y="43" width="46" height="8" rx="4" fill="#93C5FD" />
-                <rect x="46" y="68" width="18" height="18" rx="5" fill="#DBEAFE" stroke="#93C5FD" strokeWidth="2" />
-                <rect x="72" y="73" width="38" height="8" rx="4" fill="#CBD5E1" />
-                <circle cx="124" cy="24" r="16" fill="#2563EB" />
-                <path d="M120 24H128M124 20V28" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </div>
-
-            <h2 className="new-event-title">How many choices to vote on?</h2>
-            <p className="new-event-subtitle">
-              Select how many voting options or candidate proposals will be presented on this ballot.
-            </p>
-
-            <div className="option-count-selector">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  className={`option-count-btn ${optionsCount === n ? 'active' : ''}`}
-                  onClick={() => handleOptionsCountSelect(n)}
+        {/* Modal Header: Step Indicator & Smooth Error Accordion */}
+        <div className="new-event-modal-header">
+          {step <= 4 && (
+            <div className="new-event-steps-indicator">
+              {[1, 2, 3, 4].map((s) => (
+                <div
+                  key={s}
+                  className={`step-dot ${step === s ? 'step-active' : step > s ? 'step-done' : ''}`}
+                  onClick={() => {
+                    if (s < step) {
+                      setErrorMsg('');
+                      setStep(s);
+                    }
+                  }}
                 >
-                  {n}
-                </button>
-              ))}
-            </div>
-
-            <div className="options-input-list">
-              {options.map((opt, idx) => (
-                <div key={idx} className="option-input-row">
-                  <span className="option-badge-index">#{idx + 1}</span>
-                  <input
-                    type="text"
-                    className="new-event-text-input"
-                    value={opt}
-                    onChange={(e) => handleOptionLabelChange(idx, e.target.value)}
-                    placeholder={`Name for Option ${idx + 1}`}
-                  />
+                  <span className="step-num">{s}</span>
                 </div>
               ))}
             </div>
+          )}
 
-            <div className="new-event-actions">
-              <button
-                type="button"
-                className="btn-blue-pill"
-                onClick={() => {
-                  saveDraftLocally(options, optionsCount);
-                  setStep(2);
-                }}
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                  <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+          {/* Smooth Animated Error Banner Container */}
+          <div className={`new-event-error-container ${errorMsg ? 'has-error' : ''}`}>
+            {errorMsg && (
+              <div className="new-event-error-alert">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <span>Continue</span>
-              </button>
-            </div>
+                <span>{errorMsg}</span>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
-        {/* STEP 2: Total Votes Capacity (50 to Unlimited) */}
-        {step === 2 && (
-          <div className="new-event-step-content">
-            <div className="new-event-illustration">
-              <svg width="120" height="90" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="80" cy="55" r="42" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2.5" />
-                <path d="M80 32V56L96 66" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="42" y="86" width="76" height="24" rx="8" fill="#2563EB" />
-                <text x="80" y="103" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" fontFamily="sans-serif">50 — ∞</text>
-              </svg>
-            </div>
+        {/* Stable Scrollable Step Body */}
+        <div className="new-event-step-body" key={step}>
+          {/* STEP 1: How many things to vote on (1, 2, 3, 4, 5) */}
+          {step === 1 && (
+            <div className="new-event-step-inner">
+              <div className="new-event-illustration">
+                <svg width="110" height="82" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="30" y="20" width="100" height="85" rx="14" fill="#EEF4FF" stroke="#3B82F6" strokeWidth="2.5" />
+                  <rect x="46" y="38" width="18" height="18" rx="5" fill="#2563EB" />
+                  <path d="M51 47L54 50L59 44" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <rect x="72" y="43" width="46" height="8" rx="4" fill="#93C5FD" />
+                  <rect x="46" y="68" width="18" height="18" rx="5" fill="#DBEAFE" stroke="#93C5FD" strokeWidth="2" />
+                  <rect x="72" y="73" width="38" height="8" rx="4" fill="#CBD5E1" />
+                  <circle cx="124" cy="24" r="16" fill="#2563EB" />
+                  <path d="M120 24H128M124 20V28" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
 
-            <h2 className="new-event-title">Total Votes Requested</h2>
-            <p className="new-event-subtitle">
-              Set the maximum number of ballots that can be cast (minimum 50 votes) or select unlimited.
-            </p>
+              <h2 className="new-event-title">How many choices to vote on?</h2>
+              <p className="new-event-subtitle">
+                Select how many voting options or proposals will be presented on this ballot.
+              </p>
 
-            <div className="votes-presets-grid">
-              {[50, 100, 250, 500, 1000].map((num) => (
+              {/* iOS Segmented Track */}
+              <div className="ios-segmented-track">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={`ios-segment-btn ${optionsCount === n ? 'active' : ''}`}
+                    onClick={() => handleOptionsCountSelect(n)}
+                  >
+                    <span>{n}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Compact Options Input List */}
+              <div className="options-input-list">
+                {options.map((opt, idx) => (
+                  <div key={idx} className="option-input-row">
+                    <span className="option-badge-index">#{idx + 1}</span>
+                    <input
+                      type="text"
+                      className="new-event-text-input"
+                      value={opt}
+                      onChange={(e) => handleOptionLabelChange(idx, e.target.value)}
+                      placeholder={`Name for Option ${idx + 1}`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="new-event-actions-row">
                 <button
-                  key={num}
                   type="button"
-                  className={`votes-preset-chip ${totalVotes === num ? 'active' : ''}`}
-                  onClick={() => handleTotalVotesSelect(num)}
+                  className="btn-blue-pill"
+                  onClick={() => {
+                    setErrorMsg('');
+                    saveDraftLocally(options, optionsCount);
+                    setStep(2);
+                  }}
                 >
-                  {num} Votes
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                  </svg>
+                  <span>Continue</span>
                 </button>
-              ))}
-              <button
-                type="button"
-                className={`votes-preset-chip unlimited-chip ${totalVotes === 'unlimited' ? 'active' : ''}`}
-                onClick={() => handleTotalVotesSelect('unlimited')}
-              >
-                ∞ Unlimited
-              </button>
+              </div>
             </div>
+          )}
 
-            {totalVotes !== 'unlimited' && (
-              <div className="custom-votes-wrap">
-                <label className="input-field-label">Custom Quorum / Max Ballots (Min: 50)</label>
+          {/* STEP 2: Total Votes Capacity (50 to Unlimited) */}
+          {step === 2 && (
+            <div className="new-event-step-inner">
+              <div className="new-event-illustration">
+                <svg width="110" height="82" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="80" cy="55" r="40" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2.5" />
+                  <path d="M80 34V56L95 65" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  <rect x="44" y="86" width="72" height="22" rx="8" fill="#2563EB" />
+                  <text x="80" y="102" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="sans-serif">50 — ∞</text>
+                </svg>
+              </div>
+
+              <h2 className="new-event-title">Total Votes Requested</h2>
+              <p className="new-event-subtitle">
+                Set the voter quorum capacity (minimum 50 votes) or allow unlimited participation.
+              </p>
+
+              {/* iOS Glassmorphic Presets Grid */}
+              <div className="votes-presets-grid">
+                {[50, 100, 250, 500, 1000].map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    className={`votes-preset-chip ${totalVotes === num ? 'active' : ''}`}
+                    onClick={() => handleTotalVotesSelect(num)}
+                  >
+                    {num} Votes
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={`votes-preset-chip unlimited-chip ${totalVotes === 'unlimited' ? 'active' : ''}`}
+                  onClick={() => handleTotalVotesSelect('unlimited')}
+                >
+                  ∞ Unlimited
+                </button>
+              </div>
+
+              {totalVotes !== 'unlimited' && (
+                <div className="custom-votes-wrap">
+                  <label className="input-field-label">Custom Quorum / Max Ballots (Min: 50)</label>
+                  <input
+                    type="number"
+                    min="50"
+                    className="new-event-text-input"
+                    value={customVotesInput}
+                    onChange={(e) => handleCustomVotesChange(e.target.value)}
+                    placeholder="e.g. 500"
+                  />
+                </div>
+              )}
+
+              <div className="new-event-actions-row">
+                <button
+                  type="button"
+                  className="btn-logout-cancel"
+                  onClick={() => {
+                    setErrorMsg('');
+                    setStep(1);
+                  }}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="btn-blue-pill"
+                  onClick={() => {
+                    if (totalVotes !== 'unlimited' && totalVotes < 50) {
+                      setErrorMsg('Total votes must be at least 50 or set to Unlimited.');
+                      return;
+                    }
+                    setErrorMsg('');
+                    setStep(3);
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                  </svg>
+                  <span>Continue</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Vote Title & Bio */}
+          {step === 3 && (
+            <div className="new-event-step-inner">
+              <div className="new-event-illustration">
+                <svg width="110" height="82" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M80 18L124 38V66C124 94 80 108 80 108C80 108 36 94 36 66V38L80 18Z" fill="#EEF4FF" stroke="#3B82F6" strokeWidth="2.5" />
+                  <path d="M70 60L78 68L94 50" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="80" cy="62" r="28" stroke="#93C5FD" strokeDasharray="3 3" />
+                </svg>
+              </div>
+
+              <h2 className="new-event-title">Vote Title & Description</h2>
+              <p className="new-event-subtitle">
+                Provide a clear title and public bio explaining what voters are deciding.
+              </p>
+
+              <div className="form-group-field">
+                <label className="input-field-label">Election / Event Title *</label>
                 <input
-                  type="number"
-                  min="50"
+                  type="text"
                   className="new-event-text-input"
-                  value={customVotesInput}
-                  onChange={(e) => handleCustomVotesChange(e.target.value)}
-                  placeholder="e.g. 500"
+                  placeholder="e.g. Student Council President Election 2026"
+                  value={eventName}
+                  onChange={(e) => {
+                    setEventName(e.target.value);
+                    if (errorMsg) setErrorMsg('');
+                  }}
                 />
               </div>
-            )}
 
-            <div className="new-event-actions-row">
-              <button type="button" className="btn-logout-cancel" onClick={() => setStep(1)}>
-                Back
-              </button>
-              <button
-                type="button"
-                className="btn-blue-pill"
-                onClick={() => {
-                  if (totalVotes !== 'unlimited' && totalVotes < 50) {
-                    setErrorMsg('Total votes must be at least 50 or set to Unlimited.');
-                    return;
-                  }
-                  setErrorMsg('');
-                  setStep(3);
-                }}
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                  <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-                </svg>
-                <span>Continue</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3: Vote Title & Bio */}
-        {step === 3 && (
-          <div className="new-event-step-content">
-            <div className="new-event-illustration">
-              <svg width="120" height="90" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M80 18L124 38V66C124 94 80 108 80 108C80 108 36 94 36 66V38L80 18Z" fill="#EEF4FF" stroke="#3B82F6" strokeWidth="2.5" />
-                <path d="M70 60L78 68L94 50" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="80" cy="62" r="28" stroke="#93C5FD" strokeDasharray="3 3" />
-              </svg>
-            </div>
-
-            <h2 className="new-event-title">Vote Title & Description</h2>
-            <p className="new-event-subtitle">
-              Provide a clear title and public bio explaining what voters are deciding in this ballot.
-            </p>
-
-            <div className="form-group-field">
-              <label className="input-field-label">Election / Event Title *</label>
-              <input
-                type="text"
-                className="new-event-text-input"
-                placeholder="e.g. Student Council President Election 2026"
-                value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group-field">
-              <label className="input-field-label">Vote Bio / Public Summary</label>
-              <textarea
-                className="new-event-textarea"
-                rows={3}
-                placeholder="Explain the goals, candidate qualifications, or proposal details..."
-                value={eventBio}
-                onChange={(e) => setEventBio(e.target.value)}
-              />
-            </div>
-
-            <div className="new-event-actions-row">
-              <button type="button" className="btn-logout-cancel" onClick={() => setStep(2)}>
-                Back
-              </button>
-              <button
-                type="button"
-                className="btn-blue-pill"
-                onClick={() => {
-                  if (!eventName.trim()) {
-                    setErrorMsg('Please enter an event title before proceeding.');
-                    return;
-                  }
-                  setErrorMsg('');
-                  setStep(4);
-                }}
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                  <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-                </svg>
-                <span>Schedule & Activation</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 4: Activation & Indian Standard Time Schedule */}
-        {step === 4 && (
-          <div className="new-event-step-content">
-            <div className="new-event-illustration">
-              <svg width="120" height="90" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="35" y="24" width="90" height="76" rx="14" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2.5" />
-                <rect x="35" y="24" width="90" height="22" rx="14" fill="#2563EB" />
-                <line x1="55" y1="16" x2="55" y2="28" stroke="#1D4ED8" strokeWidth="3" strokeLinecap="round" />
-                <line x1="105" y1="16" x2="105" y2="28" stroke="#1D4ED8" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="80" cy="68" r="16" fill="white" stroke="#3B82F6" strokeWidth="2" />
-                <path d="M80 58V68L87 72" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
-
-            <h2 className="new-event-title">Activation & Schedule</h2>
-            <div className="ist-badge-indicator">
-              <span className="flag-icon">🇮🇳</span> Indian Standard Time (IST, UTC+05:30)
-            </div>
-
-            <div className="activation-type-toggle">
-              <button
-                type="button"
-                className={`activation-pill ${activationType === 'automatic' ? 'active' : ''}`}
-                onClick={() => setActivationType('automatic')}
-              >
-                <span>Automatic (Scheduled)</span>
-              </button>
-              <button
-                type="button"
-                className={`activation-pill ${activationType === 'manual' ? 'active' : ''}`}
-                onClick={() => setActivationType('manual')}
-              >
-                <span>Manual (Admin Toggle)</span>
-              </button>
-            </div>
-
-            {activationType === 'automatic' ? (
-              <div className="schedule-dates-grid">
-                <div className="date-field-col">
-                  <label className="input-field-label">Start Date & Time (IST)</label>
-                  <input
-                    type="date"
-                    className="new-event-date-input"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                  <input
-                    type="time"
-                    className="new-event-time-input"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                  />
-                </div>
-
-                <div className="date-field-col">
-                  <label className="input-field-label">End Date & Time (IST)</label>
-                  <input
-                    type="date"
-                    className="new-event-date-input"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
-                  <input
-                    type="time"
-                    className="new-event-time-input"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                  />
-                </div>
+              <div className="form-group-field">
+                <label className="input-field-label">Vote Bio / Public Summary</label>
+                <textarea
+                  className="new-event-textarea"
+                  rows={2}
+                  placeholder="Explain the goals, candidate qualifications, or proposal details..."
+                  value={eventBio}
+                  onChange={(e) => setEventBio(e.target.value)}
+                />
               </div>
-            ) : (
-              <div className="manual-activation-note">
-                <p>
-                  In <strong>Manual mode</strong>, you activate and close this voting event on demand from the dashboard whenever you are ready.
-                </p>
+
+              <div className="new-event-actions-row">
+                <button
+                  type="button"
+                  className="btn-logout-cancel"
+                  onClick={() => {
+                    setErrorMsg('');
+                    setStep(2);
+                  }}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="btn-blue-pill"
+                  onClick={() => {
+                    if (!eventName.trim()) {
+                      setErrorMsg('Please enter an event title before proceeding.');
+                      return;
+                    }
+                    setErrorMsg('');
+                    setStep(4);
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                  </svg>
+                  <span>Schedule & Activation</span>
+                </button>
               </div>
-            )}
-
-            <div className="new-event-actions-row">
-              <button
-                type="button"
-                className="btn-logout-cancel"
-                onClick={() => setStep(3)}
-                disabled={isSubmitting}
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                className="btn-blue-pill"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="spinner-border-sm"></span>
-                    <span>Pinning to IPFS...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                      <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-                    </svg>
-                    <span>Publish Event & Generate Link</span>
-                  </>
-                )}
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* STEP 5: Success & Generated Shareable Voting Link */}
-        {step === 5 && createdEvent && (
-          <div className="new-event-step-content success-view">
-            <div className="new-event-illustration">
-              <svg width="130" height="95" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="80" cy="60" r="48" fill="#ECFDF5" stroke="#10B981" strokeWidth="2.5" />
-                <path d="M58 60L73 75L104 44" stroke="#059669" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="125" cy="28" r="14" fill="#2563EB" />
-                <path d="M120 28L123 31L130 24" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+          {/* STEP 4: Activation & Indian Standard Time Schedule */}
+          {step === 4 && (
+            <div className="new-event-step-inner">
+              <div className="new-event-illustration">
+                <svg width="110" height="82" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="35" y="24" width="90" height="76" rx="14" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2.5" />
+                  <rect x="35" y="24" width="90" height="22" rx="14" fill="#2563EB" />
+                  <line x1="55" y1="16" x2="55" y2="28" stroke="#1D4ED8" strokeWidth="3" strokeLinecap="round" />
+                  <line x1="105" y1="16" x2="105" y2="28" stroke="#1D4ED8" strokeWidth="3" strokeLinecap="round" />
+                  <circle cx="80" cy="68" r="16" fill="white" stroke="#3B82F6" strokeWidth="2" />
+                  <path d="M80 58V68L87 72" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+
+              <h2 className="new-event-title">Activation & Schedule</h2>
+              <div className="ist-badge-indicator">
+                <span className="flag-icon">🇮🇳</span> Indian Standard Time (IST, UTC+05:30)
+              </div>
+
+              <div className="activation-type-toggle">
+                <button
+                  type="button"
+                  className={`activation-pill ${activationType === 'automatic' ? 'active' : ''}`}
+                  onClick={() => setActivationType('automatic')}
+                >
+                  <span>Automatic (Scheduled)</span>
+                </button>
+                <button
+                  type="button"
+                  className={`activation-pill ${activationType === 'manual' ? 'active' : ''}`}
+                  onClick={() => setActivationType('manual')}
+                >
+                  <span>Manual (Admin Toggle)</span>
+                </button>
+              </div>
+
+              {activationType === 'automatic' ? (
+                <div className="schedule-dates-grid">
+                  <div className="date-field-col">
+                    <label className="input-field-label">Start Date & Time (IST)</label>
+                    <input
+                      type="date"
+                      className="new-event-date-input"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <input
+                      type="time"
+                      className="new-event-time-input"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="date-field-col">
+                    <label className="input-field-label">End Date & Time (IST)</label>
+                    <input
+                      type="date"
+                      className="new-event-date-input"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                    <input
+                      type="time"
+                      className="new-event-time-input"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="manual-activation-note">
+                  <p>
+                    In <strong>Manual mode</strong>, you activate and close this voting event on demand from the dashboard whenever you are ready.
+                  </p>
+                </div>
+              )}
+
+              <div className="new-event-actions-row">
+                <button
+                  type="button"
+                  className="btn-logout-cancel"
+                  onClick={() => {
+                    setErrorMsg('');
+                    setStep(3);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="btn-blue-pill"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="spinner-border-sm"></span>
+                      <span>Pinning to IPFS...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                        <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                      </svg>
+                      <span>Publish & Generate Link</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
+          )}
 
-            <h2 className="new-event-title">Voting Event Published!</h2>
-            <p className="new-event-subtitle">
-              Your ballot schema has been pinned to decentralized IPFS storage via Pinata. Share this official voting link with voters:
-            </p>
+          {/* STEP 5: Success & Generated Shareable Voting Link */}
+          {step === 5 && createdEvent && (
+            <div className="new-event-step-inner success-view">
+              <div className="new-event-illustration">
+                <svg width="115" height="85" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="80" cy="60" r="46" fill="#ECFDF5" stroke="#10B981" strokeWidth="2.5" />
+                  <path d="M58 60L73 75L104 44" stroke="#059669" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="125" cy="28" r="14" fill="#2563EB" />
+                  <path d="M120 28L123 31L130 24" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
 
-            <div className="shareable-link-box">
-              <input
-                type="text"
-                readOnly
-                className="shareable-link-input"
-                value={createdEvent.shareableLink || `${window.location.origin}/voting/${createdEvent.id}`}
-              />
-              <button
-                type="button"
-                className="btn-copy-link"
-                onClick={copyToClipboard}
-              >
-                {copiedLink ? 'Copied!' : 'Copy Link'}
-              </button>
-            </div>
+              <h2 className="new-event-title">Voting Event Published!</h2>
+              <p className="new-event-subtitle">
+                Your ballot schema has been pinned to decentralized IPFS storage via Pinata. Share this official voting link with voters:
+              </p>
 
-            {createdEvent.ipfsHash && (
-              <div className="ipfs-proof-badge">
-                <span className="ipfs-label">IPFS CID:</span>
+              <div className="shareable-link-box">
+                <input
+                  type="text"
+                  readOnly
+                  className="shareable-link-input"
+                  value={createdEvent.shareableLink || `${window.location.origin}/voting/${createdEvent.id}`}
+                />
+                <button
+                  type="button"
+                  className="btn-copy-link"
+                  onClick={copyToClipboard}
+                >
+                  {copiedLink ? 'Copied!' : 'Copy Link'}
+                </button>
+              </div>
+
+              {createdEvent.ipfsHash && (
+                <div className="ipfs-proof-badge">
+                  <span className="ipfs-label">IPFS CID:</span>
+                  <a
+                    href={createdEvent.ipfsUrl || `https://gateway.pinata.cloud/ipfs/${createdEvent.ipfsHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ipfs-hash-link"
+                  >
+                    {createdEvent.ipfsHash.substring(0, 18)}...
+                  </a>
+                </div>
+              )}
+
+              <div className="new-event-actions-row success-actions">
                 <a
-                  href={createdEvent.ipfsUrl || `https://gateway.pinata.cloud/ipfs/${createdEvent.ipfsHash}`}
+                  href={createdEvent.shareableLink || `/voting/${createdEvent.id}`}
+                  className="btn-blue-pill"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ipfs-hash-link"
                 >
-                  {createdEvent.ipfsHash.substring(0, 18)}...
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                  </svg>
+                  <span>Open Voting Page</span>
                 </a>
+
+                <button
+                  type="button"
+                  className="btn-logout-cancel"
+                  onClick={handleDismiss}
+                >
+                  Done
+                </button>
               </div>
-            )}
-
-            <div className="new-event-actions-row success-actions">
-              <a
-                href={createdEvent.shareableLink || `/voting/${createdEvent.id}`}
-                className="btn-blue-pill"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-                  <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
-                </svg>
-                <span>Open Voting Page</span>
-              </a>
-
-              <button
-                type="button"
-                className="btn-logout-cancel"
-                onClick={handleDismiss}
-              >
-                Done
-              </button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
