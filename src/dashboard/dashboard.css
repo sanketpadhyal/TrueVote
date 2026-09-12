@@ -45,6 +45,26 @@
   height: 100vh;
   z-index: 40;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.wyborek-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.wyborek-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wyborek-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.wyborek-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 163, 0.4);
 }
 
 .wyborek-logo-wrap {
@@ -225,6 +245,26 @@
   height: 100vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.wyborek-main-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wyborek-main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wyborek-main-content::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.wyborek-main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
 }
 
 .main-content-card {
@@ -585,6 +625,26 @@
   height: 100vh;
   overflow-y: auto;
   border-left: 1px solid var(--dash-border);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.wyborek-stats-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wyborek-stats-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wyborek-stats-panel::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.wyborek-stats-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.55);
 }
 
 .stats-section-title {
@@ -649,15 +709,25 @@
   overflow-y: auto;
   max-height: calc(100vh - 280px);
   padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
 }
 
 .activity-list::-webkit-scrollbar {
   width: 4px;
 }
 
+.activity-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .activity-list::-webkit-scrollbar-thumb {
-  background-color: #e2e8f0;
-  border-radius: 4px;
+  background-color: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+.activity-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.55);
 }
 
 .activity-item {
