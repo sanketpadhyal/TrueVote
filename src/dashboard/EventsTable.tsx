@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { EventItem } from './types';
 import RealtimeAnalyticsModal from './RealtimeAnalyticsModal';
 import PauseOrQuitModal from './PauseOrQuitModal';
-import { deleteEventFromPinata } from '../services/pinata';
+import { deleteEventFromPinata, fetchEventsFromPinata } from '../services/pinata';
+import { saveEventsToBackup, loadEventsFromBackup, removeEventFromBackup } from '../services/storage';
 
 const getStoredEvents = (): EventItem[] => {
   if (typeof window === 'undefined') return [];
@@ -24,12 +25,81 @@ export const EventsTable: React.FC = () => {
   const [selectedPauseQuitEvent, setSelectedPauseQuitEvent] = useState<EventItem | null>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
+
     const handleStorageUpdate = () => {
-      setEvents(getStoredEvents());
+      const stored = getStoredEvents();
+      setEvents(stored);
+      if (stored.length > 0) {
+        saveEventsToBackup(stored);
+      }
     };
+
     window.addEventListener('truevote_events_updated', handleStorageUpdate);
     window.addEventListener('storage', handleStorageUpdate);
+
+    // Initial restoration & Pinata sync
+    const syncExistingEvents = async () => {
+      if (process.env.NODE_ENV === 'test') {
+        return;
+      }
+      const current = getStoredEvents();
+      if (current.length > 0) {
+        saveEventsToBackup(current);
+      } else {
+        // If localStorage was cleared, check IndexedDB backup first
+        const idbEvents = await loadEventsFromBackup();
+        if (isMounted && idbEvents && idbEvents.length > 0) {
+          console.log('Restored events from persistent storage backup:', idbEvents.length);
+          setEvents(idbEvents);
+          try {
+            localStorage.setItem('truevote_events', JSON.stringify(idbEvents));
+            window.dispatchEvent(new Event('truevote_events_updated'));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+
+      // Sync from Pinata IPFS
+      try {
+        const pinataEvents = await fetchEventsFromPinata();
+        if (isMounted && pinataEvents && pinataEvents.length > 0) {
+          console.log('Fetched events from Pinata IPFS:', pinataEvents.length);
+          setEvents((prev) => {
+            const map = new Map<string, EventItem>();
+            for (const ev of prev) {
+              map.set(ev.id, ev);
+              map.set(ev.votingNumber, ev);
+            }
+            let added = false;
+            for (const pEv of pinataEvents) {
+              if (!map.has(pEv.id) && !map.has(pEv.votingNumber)) {
+                map.set(pEv.id, pEv);
+                added = true;
+              }
+            }
+            if (!added) return prev;
+            const merged = Array.from(new Set(map.values()));
+            try {
+              localStorage.setItem('truevote_events', JSON.stringify(merged));
+              saveEventsToBackup(merged);
+              window.dispatchEvent(new Event('truevote_events_updated'));
+            } catch (e) {
+              console.error(e);
+            }
+            return merged;
+          });
+        }
+      } catch (pinataErr) {
+        console.warn('Pinata auto-sync notice:', pinataErr);
+      }
+    };
+
+    syncExistingEvents();
+
     return () => {
+      isMounted = false;
       window.removeEventListener('truevote_events_updated', handleStorageUpdate);
       window.removeEventListener('storage', handleStorageUpdate);
     };
@@ -42,6 +112,7 @@ export const EventsTable: React.FC = () => {
       );
       try {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
+        saveEventsToBackup(updated);
         window.dispatchEvent(new Event('truevote_events_updated'));
       } catch (e) {
         console.error(e);
@@ -75,11 +146,12 @@ export const EventsTable: React.FC = () => {
       console.warn('Pinata delete error:', err);
     }
 
-    // 2. Remove vote from local storage and update state
+    // 2. Remove vote from local storage, backup storage, and update state
     setEvents((prev) => {
       const updated = prev.filter((ev) => ev.id !== eventToDelete.id);
       try {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
+        removeEventFromBackup(eventToDelete.id);
         window.dispatchEvent(new Event('truevote_events_updated'));
       } catch (e) {
         console.error('Error saving updated events to storage:', e);

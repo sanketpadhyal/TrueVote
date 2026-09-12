@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EventItem, BallotOption } from './types';
 import { uploadEventToPinata } from '../services/pinata';
+import { saveEventsToBackup } from '../services/storage';
 
 interface NewEventModalProps {
   isOpen: boolean;
@@ -263,6 +264,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       }
       const updatedEvents = [eventPayload, ...currentEvents];
       localStorage.setItem('truevote_events', JSON.stringify(updatedEvents));
+      saveEventsToBackup(updatedEvents);
       clearDraft();
 
       // Dispatch storage notification

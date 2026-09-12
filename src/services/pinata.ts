@@ -186,3 +186,103 @@ export async function deleteEventFromPinata(
   }
 }
 
+/**
+ * Synchronizes and fetches existing election event files from Pinata IPFS.
+ */
+export async function fetchEventsFromPinata(): Promise<any[]> {
+  const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
+  const apiKey = process.env.REACT_APP_PINATA_API_KEY;
+  const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
+  const events: any[] = [];
+  const seenIds = new Set<string>();
+
+  // 1. Try Pinata V3 Files API
+  try {
+    const v3Res = await fetch('https://api.pinata.cloud/v3/files/public?limit=100', {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    if (v3Res.ok) {
+      const json = await v3Res.json();
+      const files = json?.data?.files || [];
+      for (const file of files) {
+        if (file.name && file.name.startsWith('TrueVote-') && file.cid) {
+          try {
+            const ipfsRes = await fetch(`${PINATA_GATEWAY}${file.cid}`);
+            if (ipfsRes.ok) {
+              const eventData = await ipfsRes.json();
+              if (eventData && (eventData.id || eventData.votingNumber)) {
+                const id = String(eventData.id || eventData.votingNumber);
+                if (!seenIds.has(id)) {
+                  seenIds.add(id);
+                  events.push({
+                    ...eventData,
+                    ipfsHash: file.cid,
+                    ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
+                  });
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Error fetching IPFS file content:', e);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Pinata V3 sync failed:', err);
+  }
+
+  // 2. Try Pinata V1 PinList API fallback
+  if (events.length === 0) {
+    try {
+      const headers: Record<string, string> = {};
+      if (apiKey && secretKey) {
+        headers['pinata_api_key'] = apiKey;
+        headers['pinata_secret_api_key'] = secretKey;
+      } else if (jwt) {
+        headers['Authorization'] = `Bearer ${jwt}`;
+      }
+
+      const v1Res = await fetch('https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=100', {
+        headers,
+      });
+      if (v1Res.ok) {
+        const json = await v1Res.json();
+        const rows = json?.rows || [];
+        for (const row of rows) {
+          const name = row?.metadata?.name || '';
+          const cid = row?.ipfs_pin_hash;
+          if (name.startsWith('TrueVote-') && cid) {
+            try {
+              const ipfsRes = await fetch(`${PINATA_GATEWAY}${cid}`);
+              if (ipfsRes.ok) {
+                const eventData = await ipfsRes.json();
+                if (eventData && (eventData.id || eventData.votingNumber)) {
+                  const id = String(eventData.id || eventData.votingNumber);
+                  if (!seenIds.has(id)) {
+                    seenIds.add(id);
+                    events.push({
+                      ...eventData,
+                      ipfsHash: cid,
+                      ipfsUrl: `${PINATA_GATEWAY}${cid}`,
+                    });
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn('Error fetching V1 pinned IPFS content:', e);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Pinata V1 pinList sync failed:', err);
+    }
+  }
+
+  return events;
+}
+
+
