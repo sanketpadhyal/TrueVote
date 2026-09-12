@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { EventItem } from './types';
 
 interface PauseOrQuitModalProps {
@@ -50,9 +51,9 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
-  if (!shouldRender || !event) return null;
+  if (!shouldRender || !event || typeof document === 'undefined') return null;
 
-  return (
+  return createPortal(
     <div
       className={`action-sheet-backdrop ${isClosing ? 'is-closing' : 'is-entering'}`}
       onClick={handleDismiss}
@@ -114,81 +115,62 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
           </p>
         </div>
 
-        {/* Option Choices */}
-        <div className="action-sheet-options">
-          {/* Pause Action */}
+        {/* Action Buttons Row Styled Like Screenshot 3 */}
+        <div className="action-sheet-actions-row">
+          {/* Pause Action Button with Cube Icon & Amber Halo */}
           <button
             type="button"
-            className="action-choice-btn btn-choice-pause"
+            className="btn-action-pause"
             onClick={() => {
               onPause(event.id);
               handleDismiss();
             }}
           >
-            <div className="choice-icon-badge badge-pause">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <rect x="6" y="4" width="4" height="16" rx="1.5" />
-                <rect x="14" y="4" width="4" height="16" rx="1.5" />
-              </svg>
-            </div>
-            <div className="choice-text-wrap">
-              <strong className="choice-title">Pause Voting (Temporary)</strong>
-              <span className="choice-sub">
-                Temporarily disable ballots. You can reactivate anytime with one click.
-              </span>
-            </div>
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style={{ flexShrink: 0 }}
+            >
+              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+            </svg>
+            <span>Pause Voting</span>
           </button>
 
-          {/* Quit / End Action */}
+          {/* Quit / End Action Button with Cube Icon & Red Halo */}
           <button
             type="button"
-            className="action-choice-btn btn-choice-quit"
+            className="btn-action-quit"
             onClick={() => {
               onQuit(event.id);
               handleDismiss();
             }}
           >
-            <div className="choice-icon-badge badge-quit">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" />
-              </svg>
-            </div>
-            <div className="choice-text-wrap">
-              <strong className="choice-title">Quit & End Event (Permanent)</strong>
-              <span className="choice-sub">
-                Permanently conclude polls. Tally results and lock further ballots.
-              </span>
-            </div>
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style={{ flexShrink: 0 }}
+            >
+              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+            </svg>
+            <span>Quit Event</span>
           </button>
-        </div>
 
-        {/* Cancel Button */}
-        <div className="action-sheet-footer">
+          {/* Cancel Button */}
           <button
             type="button"
-            className="btn-cancel-sheet"
+            className="btn-action-cancel"
             onClick={handleDismiss}
           >
-            Keep Active (Cancel)
+            Cancel
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

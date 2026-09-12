@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { EventItem } from './types';
 
 interface RealtimeAnalyticsModalProps {
@@ -64,7 +65,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
       const timer = setTimeout(() => {
         setShouldRender(false);
         setIsClosing(false);
-      }, 250);
+      }, 240);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -73,7 +74,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
     setIsClosing(true);
     setTimeout(() => {
       onClose();
-    }, 240);
+    }, 220);
   };
 
   useEffect(() => {
@@ -98,7 +99,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
     }
   };
 
-  if (!shouldRender || !event) return null;
+  if (!shouldRender || !event || typeof document === 'undefined') return null;
 
   // Calculate live statistics
   const totalVotesCast =
@@ -124,7 +125,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
       ? event.isActivated === true
       : event.isActivated !== false;
 
-  return (
+  return createPortal(
     <div
       className={`analytics-modal-backdrop ${isClosing ? 'is-closing' : 'is-entering'}`}
       onClick={handleDismiss}
@@ -136,36 +137,37 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
         className={`analytics-modal-card ${isClosing ? 'card-closing' : 'card-entering'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* iOS Header */}
+        {/* Close Button */}
+        <button
+          type="button"
+          className="analytics-close-btn"
+          onClick={handleDismiss}
+          aria-label="Close analytics modal"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
+        {/* Top Header Tag */}
         <div className="analytics-modal-header">
           <div className="analytics-live-tag">
             <span className="pulsing-live-dot"></span>
             <span>Real-time Live Analytics</span>
           </div>
-
-          <button
-            type="button"
-            className="analytics-close-btn"
-            onClick={handleDismiss}
-            aria-label="Close analytics modal"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
         </div>
 
-        {/* Event Title & Metadata Bar */}
+        {/* Event Title & Metadata */}
         <div className="analytics-event-heading">
           <div className="analytics-badge-row">
             <span className="analytics-voting-code">{event.votingNumber}</span>
@@ -177,7 +179,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
               {isEventActive ? '● Active (Polls Open)' : '○ Inactive (Polls Closed)'}
             </span>
             <span className="analytics-type-pill">
-              {event.activationType === 'manual' ? 'Manual Activation' : 'Scheduled (IST)'}
+              {event.activationType === 'manual' ? 'Manual' : 'Scheduled (IST)'}
             </span>
           </div>
           <h2 id="analytics-modal-title" className="analytics-event-name">
@@ -189,7 +191,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
         {/* KPI Summary Cards */}
         <div className="analytics-kpi-grid">
           <div className="analytics-kpi-card">
-            <span className="kpi-label">Total Ballots Cast</span>
+            <span className="kpi-label">Ballots Cast</span>
             <div className="kpi-value-row">
               <span className="kpi-primary-val">{totalVotesCast}</span>
               <span className="kpi-secondary-val">/ {maxAllowedVotes}</span>
@@ -206,14 +208,14 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
                     <span className="leader-name">{leadingOption.label}</span>
                   </>
                 ) : (
-                  <span className="no-votes-yet">No votes recorded yet</span>
+                  <span className="no-votes-yet">No votes yet</span>
                 )}
               </span>
             </div>
           </div>
 
           <div className="analytics-kpi-card">
-            <span className="kpi-label">Quorum Progress</span>
+            <span className="kpi-label">Quorum</span>
             <div className="kpi-value-row">
               <span className="kpi-primary-val">
                 {event.totalAllowedVotes === 'unlimited'
@@ -233,10 +235,8 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
         {/* Real-time Interactive Vote Distribution Graphs */}
         <div className="analytics-graph-section">
           <div className="graph-section-header">
-            <h3 className="graph-section-title">Live Ballot Distribution & Graph</h3>
-            <span className="graph-section-meta">
-              Auto-refreshes in real-time as votes are sealed
-            </span>
+            <h3 className="graph-section-title">Live Vote Distribution</h3>
+            <span className="graph-section-meta">Auto-updating live</span>
           </div>
 
           <div className="analytics-options-bars">
@@ -288,42 +288,53 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           </div>
         </div>
 
-        {/* Shareable Link & Action Controls */}
-        <div className="analytics-footer">
-          <div className="analytics-link-box">
-            <span className="link-label">Public Voting URL:</span>
-            <code className="link-url-text">
-              {event.shareableLink || `${window.location.origin}/voting/${event.id}`}
-            </code>
-            <button
-              type="button"
-              className={`btn-copy-analytics ${copiedLink ? 'copied' : ''}`}
-              onClick={handleCopyLink}
-            >
-              {copiedLink ? 'Copied ✓' : 'Copy Link'}
-            </button>
-          </div>
+        {/* Shareable Link Box */}
+        <div className="analytics-link-box">
+          <span className="link-label">Ballot URL:</span>
+          <code className="link-url-text">
+            {event.shareableLink || `${window.location.origin}/voting/${event.id}`}
+          </code>
+          <button
+            type="button"
+            className={`btn-copy-analytics ${copiedLink ? 'copied' : ''}`}
+            onClick={handleCopyLink}
+          >
+            {copiedLink ? 'Copied ✓' : 'Copy'}
+          </button>
+        </div>
 
-          <div className="analytics-footer-actions">
-            <a
-              href={`/voting/${event.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-open-ballot"
+        {/* Footer Actions with Buttons Styled Like Screenshot 3 */}
+        <div className="analytics-modal-actions-row">
+          <button
+            type="button"
+            className="btn-analytics-done"
+            onClick={handleDismiss}
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style={{ flexShrink: 0 }}
             >
-              Open Voting Ballot ↗
-            </a>
-            <button
-              type="button"
-              className="btn-done-analytics"
-              onClick={handleDismiss}
-            >
-              Done
-            </button>
-          </div>
+              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+            </svg>
+            <span>Done</span>
+          </button>
+
+          <a
+            href={`/voting/${event.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-action-cancel"
+            style={{ textDecoration: 'none' }}
+          >
+            Open Ballot ↗
+          </a>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
