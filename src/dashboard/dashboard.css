@@ -1999,6 +1999,63 @@ input:checked + .slider.round:before {
 /* =========================================================
    8. Logout Confirmation Popup Panel
    ========================================================= */
+@keyframes iosBackdropIn {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+}
+
+@keyframes iosBackdropOut {
+  0% {
+    opacity: 1;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  100% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+}
+
+@keyframes iosModalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(24px);
+    filter: blur(8px);
+  }
+  68% {
+    opacity: 1;
+    transform: scale(1.025) translateY(-2px);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes iosModalPopOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.88) translateY(16px);
+    filter: blur(6px);
+  }
+}
+
 .logout-modal-backdrop {
   position: fixed;
   top: 0;
@@ -2006,19 +2063,27 @@ input:checked + .slider.round:before {
   right: 0;
   bottom: 0;
   background: rgba(7, 11, 40, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 20px;
-  animation: tabBlurIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, backdrop-filter;
+}
+
+.logout-modal-backdrop.is-entering {
+  animation: iosBackdropIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.logout-modal-backdrop.is-closing {
+  animation: iosBackdropOut 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .logout-modal-card {
-  background: #ffffff;
-  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
   padding: 34px 28px 30px 28px;
   max-width: 420px;
   width: 100%;
@@ -2027,8 +2092,19 @@ input:checked + .slider.round:before {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 24px 60px rgba(7, 11, 40, 0.25);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 28px 65px rgba(7, 11, 40, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  will-change: transform, opacity, filter;
+}
+
+.logout-modal-card.card-entering {
+  animation: iosModalPopIn 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
+}
+
+.logout-modal-card.card-closing {
+  animation: iosModalPopOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .logout-modal-close-btn {

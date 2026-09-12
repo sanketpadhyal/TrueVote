@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import logoutImg from './images/logout-account-illustration-svg-download-png-4707120.webp';
 
 interface LogoutModalProps {
@@ -12,28 +12,59 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
   onClose,
   onConfirmLogout,
 }) => {
+  const [shouldRender, setShouldRender] = useState(isOpen);
+  const [isClosing, setIsClosing] = useState(false);
+
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleDismiss = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 240);
+  };
+
+  useEffect(() => {
+    if (!shouldRender) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleDismiss();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRender]);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="logout-modal-backdrop" onClick={onClose}>
-      <div className="logout-modal-card" onClick={(e) => e.stopPropagation()}>
+    <div
+      className={`logout-modal-backdrop ${isClosing ? 'is-closing' : 'is-entering'}`}
+      onClick={handleDismiss}
+    >
+      <div
+        className={`logout-modal-card ${isClosing ? 'card-closing' : 'card-entering'}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           className="logout-modal-close-btn"
-          onClick={onClose}
+          onClick={handleDismiss}
           aria-label="Close modal"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -70,7 +101,7 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           <button
             type="button"
             className="btn-logout-cancel"
-            onClick={onClose}
+            onClick={handleDismiss}
           >
             Cancel
           </button>
