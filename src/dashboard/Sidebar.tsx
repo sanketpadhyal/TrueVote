@@ -19,6 +19,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const handleBrandClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.reload();
+  };
+
   const menuItems = [
     {
       id: 'dashboard',
@@ -88,7 +93,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside className="wyborek-sidebar">
       <div className="wyborek-logo-wrap">
-        <a href="/" className="wyborek-brand" title="TrueVote">
+        <button
+          type="button"
+          onClick={handleBrandClick}
+          className="wyborek-brand"
+          title="TrueVote"
+        >
           <img
             src="/images/logo.png"
             alt="TrueVote Logo"
@@ -97,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="brand-text sidebar-brand-text">
             True<span className="brand-accent">Vote</span>
           </span>
-        </a>
+        </button>
       </div>
 
       <nav className="wyborek-nav">
