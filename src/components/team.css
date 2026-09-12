@@ -91,8 +91,8 @@
 }
 
 .team-avatar-box {
-  width: 84px;
-  height: 84px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   padding: 3px;
   background: linear-gradient(135deg, #1d6bf3 0%, #38bdf8 100%);
@@ -100,22 +100,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 8px 24px -4px rgba(29, 107, 243, 0.28);
 }
 
-.team-avatar-gradient {
+.team-avatar-img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.grad-1 {
-  background: #0f172a;
+  object-fit: cover;
+  display: block;
 }
 
 .team-name {
