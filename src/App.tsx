@@ -15,6 +15,7 @@ function App() {
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/:tab" element={<DashboardPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </BrowserRouter>

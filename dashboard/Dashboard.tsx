@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import HeroBanner from './HeroBanner';
 import EventsTable from './EventsTable';
@@ -12,8 +13,36 @@ import LogoutModal from './LogoutModal';
 import './dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams<{ tab?: string }>();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
+
+  // Derive active tab from URL route: /dashboard/:tab or pathname
+  const getActiveTab = (): string => {
+    if (params.tab) {
+      const t = params.tab.toLowerCase();
+      if (['events', 'participants', 'team', 'settings'].includes(t)) {
+        return t;
+      }
+    }
+    const path = location.pathname.toLowerCase();
+    if (path.includes('/dashboard/events')) return 'events';
+    if (path.includes('/dashboard/participants')) return 'participants';
+    if (path.includes('/dashboard/team')) return 'team';
+    if (path.includes('/dashboard/settings')) return 'settings';
+    return 'dashboard';
+  };
+
+  const activeTab = getActiveTab();
+
+  const handleTabChange = (newTab: string) => {
+    if (newTab === 'dashboard') {
+      navigate('/dashboard');
+    } else {
+      navigate(`/dashboard/${newTab}`);
+    }
+  };
 
   const handleNewEvent = () => {
     alert('Create new voting event modal / action triggered!');
@@ -62,7 +91,7 @@ export const Dashboard: React.FC = () => {
       {/* 1. Left Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onLogout={() => setIsLogoutModalOpen(true)}
       />
 

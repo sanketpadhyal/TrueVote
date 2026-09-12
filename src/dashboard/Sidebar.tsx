@@ -21,7 +21,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleBrandClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.location.reload();
+    if (onTabChange) {
+      onTabChange('dashboard');
+    } else {
+      window.location.href = '/dashboard';
+    }
   };
 
   const menuItems = [
