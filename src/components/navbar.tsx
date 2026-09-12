@@ -68,6 +68,15 @@ export const Navbar: React.FC = () => {
       return;
     }
 
+    if (target === 'dashboard') {
+      if (location.pathname === '/dashboard') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        navigate('/dashboard');
+      }
+      return;
+    }
+
     if (location.pathname === '/') {
       const element = document.getElementById(target);
       if (!element) return;
@@ -116,6 +125,7 @@ export const Navbar: React.FC = () => {
             <li><a href="#how-it-works" className="navbar-link" onClick={(e) => handleNavClick(e, 'how-it-works')}>How It Works</a></li>
             <li><a href="#security" className="navbar-link" onClick={(e) => handleNavClick(e, 'security')}>Security</a></li>
             <li><a href="/faq" className={`navbar-link ${location.pathname === '/faq' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'faq')}>FAQ</a></li>
+            <li><a href="/dashboard" className={`navbar-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'dashboard')}>Dashboard</a></li>
           </ul>
 
           {/* Action CTA */}
@@ -161,6 +171,7 @@ export const Navbar: React.FC = () => {
             <a href="#how-it-works" className="mobile-nav-link" onClick={(e) => handleNavClick(e, 'how-it-works')}>How It Works</a>
             <a href="#security" className="mobile-nav-link" onClick={(e) => handleNavClick(e, 'security')}>Security</a>
             <a href="/faq" className={`mobile-nav-link ${location.pathname === '/faq' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'faq')}>FAQ</a>
+            <a href="/dashboard" className={`mobile-nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'dashboard')}>Dashboard</a>
             <button 
               className={`btn-hyper-blue framer-flip-btn mobile-team-cta ${location.pathname === '/team' ? 'active' : ''}`} 
               onClick={(e) => handleNavClick(e, 'team')}

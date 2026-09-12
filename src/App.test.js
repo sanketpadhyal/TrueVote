@@ -28,5 +28,8 @@ describe('TrueVote Application', () => {
 
     const teamLinks = screen.getAllByText(/About Team/i);
     expect(teamLinks.length).toBeGreaterThan(0);
+
+    const dashboardLinks = screen.getAllByText(/Dashboard/i);
+    expect(dashboardLinks.length).toBeGreaterThan(0);
   });
 });

@@ -4,6 +4,7 @@ import ScrollToTop from './components/scrolltotop';
 import HomePage from './pages/home';
 import FaqPage from './components/faq';
 import TeamPage from './components/team';
+import DashboardPage from './pages/dashboard';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
