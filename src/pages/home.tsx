@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Lenis from 'lenis';
 import Navbar from '../components/navbar';
 import { FlipText } from '../components/universalbuttonshover';
@@ -9,6 +10,7 @@ import '../styles/animations.css';
 import './home.css';
 
 export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -16,6 +18,26 @@ export const HomePage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
+
+  // If user is already logged in with connected wallet, directly send them to dashboard
+  useEffect(() => {
+    const wallet = localStorage.getItem('truevote_connected_wallet');
+    if (wallet) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate]);
+
+  // If directed with ?login=true or open-auth-modal event, automatically trigger auth modal
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('login') === 'true') {
+      setIsAuthModalOpen(true);
+    }
+
+    const handleOpenAuth = () => setIsAuthModalOpen(true);
+    window.addEventListener('open-auth-modal', handleOpenAuth);
+    return () => window.removeEventListener('open-auth-modal', handleOpenAuth);
+  }, []);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -504,6 +526,11 @@ export const HomePage: React.FC = () => {
         onConnect={(addr) => {
           setConnectedWallet(addr);
           triggerToast(`🦊 MetaMask connected: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
+          if (addr) {
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 600);
+          }
         }}
       />
     </div>

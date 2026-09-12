@@ -8,13 +8,22 @@ import EventsTab from './EventsTab';
 import ParticipantsTab from './ParticipantsTab';
 import TeamTab from './TeamTab';
 import SettingsTab from './SettingsTab';
+import LogoutModal from './LogoutModal';
 import './dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
 
   const handleNewEvent = () => {
     alert('Create new voting event modal / action triggered!');
+  };
+
+  const handleConfirmLogout = () => {
+    localStorage.removeItem('truevote_connected_wallet');
+    sessionStorage.clear();
+    setIsLogoutModalOpen(false);
+    window.location.href = '/';
   };
 
   const renderActiveTabContent = () => {
@@ -51,7 +60,11 @@ export const Dashboard: React.FC = () => {
   return (
     <div className={`wyborek-dashboard-root tab-active-${activeTab}`}>
       {/* 1. Left Sidebar */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onLogout={() => setIsLogoutModalOpen(true)}
+      />
 
       {/* 2. Main Center Content Container */}
       <main className="wyborek-main-content">
@@ -62,6 +75,13 @@ export const Dashboard: React.FC = () => {
 
       {/* 3. Right Stats Panel */}
       <StatsPanel />
+
+      {/* 4. Logout Confirmation Popup Panel */}
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirmLogout={handleConfirmLogout}
+      />
     </div>
   );
 };

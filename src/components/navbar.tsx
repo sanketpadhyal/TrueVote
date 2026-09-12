@@ -69,10 +69,19 @@ export const Navbar: React.FC = () => {
     }
 
     if (target === 'dashboard') {
-      if (location.pathname === '/dashboard') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      const wallet = localStorage.getItem('truevote_connected_wallet');
+      if (!wallet) {
+        if (location.pathname === '/') {
+          window.dispatchEvent(new CustomEvent('open-auth-modal'));
+        } else {
+          navigate('/?login=true');
+        }
       } else {
-        navigate('/dashboard');
+        if (location.pathname === '/dashboard') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          navigate('/dashboard');
+        }
       }
       return;
     }

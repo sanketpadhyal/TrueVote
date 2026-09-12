@@ -9,3 +9,4 @@ export { EventsTab } from './EventsTab';
 export { ParticipantsTab } from './ParticipantsTab';
 export { TeamTab } from './TeamTab';
 export { SettingsTab } from './SettingsTab';
+export { LogoutModal } from './LogoutModal';
