@@ -100,7 +100,7 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
       {/* Search & Filter Toolbar */}
       <div className="tab-toolbar">
         <div className="tab-search-wrap">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="tab-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -118,7 +118,7 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
             <button
               key={key}
               type="button"
-              className={`tab-filter-pill ${filter === key ? 'active' : ''}`}
+              className={`filter-pill ${filter === key ? 'active' : ''}`}
               onClick={() => setFilter(key)}
             >
               {key.charAt(0).toUpperCase() + key.slice(1)}
