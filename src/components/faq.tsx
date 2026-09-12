@@ -99,7 +99,9 @@ export const FaqPage: React.FC = () => {
     return () => {
       clearTimeout(animTimer);
       cancelAnimationFrame(rafId);
-      lenis.destroy();
+      if (typeof (window as any).lenis?.destroy === 'function') {
+        (window as any).lenis.destroy();
+      }
       (window as any).lenis = null;
     };
   }, []);

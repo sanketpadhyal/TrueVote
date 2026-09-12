@@ -106,10 +106,10 @@ export const HomePage: React.FC = () => {
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('scroll', handleScroll);
-      if ((window as any).lenis) {
+      if (typeof (window as any).lenis?.destroy === 'function') {
         (window as any).lenis.destroy();
-        (window as any).lenis = null;
       }
+      (window as any).lenis = null;
     };
   }, []);
 

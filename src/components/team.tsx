@@ -38,7 +38,9 @@ export const TeamPage: React.FC = () => {
     return () => {
       clearTimeout(animTimer);
       cancelAnimationFrame(rafId);
-      lenis.destroy();
+      if (typeof (window as any).lenis?.destroy === 'function') {
+        (window as any).lenis.destroy();
+      }
       (window as any).lenis = null;
     };
   }, []);
@@ -87,15 +89,6 @@ export const TeamPage: React.FC = () => {
             <p className="team-bio">
               Specializing in EVM smart contract state architecture, meta-transaction relayer engines, and decentralized consensus design. Dedicated to engineering cryptographic systems where integrity is mathematically enforced rather than administratively granted.
             </p>
-
-            {/* Specialization Tags */}
-            <div className="team-specializations">
-              <span className="team-spec-tag">Groth16 zk-SNARKs</span>
-              <span className="team-spec-tag">Circom Circuits</span>
-              <span className="team-spec-tag">EIP-712 Relayers</span>
-              <span className="team-spec-tag">Solidity EVM</span>
-              <span className="team-spec-tag">Pinata IPFS</span>
-            </div>
 
             {/* Social Links - Strictly NO hover movement or hover scale */}
             <div className="team-links">
