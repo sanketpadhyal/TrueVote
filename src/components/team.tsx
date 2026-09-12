@@ -67,14 +67,6 @@ export const TeamPage: React.FC = () => {
         {/* Builder Profile Showcase */}
         <section className="team-builder-section blur-animate delay-3">
           <div className="team-card-prominent">
-            <div className="team-avatar-box">
-              <img 
-                src="/images/profile.jpg" 
-                alt="Sanket Padhyal - Core Protocol Architect" 
-                className="team-avatar-img"
-              />
-            </div>
-
             <h2 className="team-name">Sanket Padhyal</h2>
             <span className="team-role">Core Protocol Architect</span>
 
