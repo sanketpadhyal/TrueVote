@@ -73,3 +73,57 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
     };
   }
 }
+
+const PINATA_UNPIN_URL = 'https://api.pinata.cloud/pinning/unpin';
+
+/**
+ * Deletes / unpins an event from Pinata IPFS by its CID.
+ */
+export async function deleteEventFromPinata(
+  ipfsHash?: string
+): Promise<{ success: boolean; message?: string }> {
+  if (!ipfsHash) {
+    return { success: true, message: 'No IPFS hash provided' };
+  }
+
+  // Handle deterministic offline/fallback pseudo-hashes gracefully
+  if (ipfsHash.startsWith('QmTrueVote')) {
+    console.log(`Purged local fallback IPFS hash: ${ipfsHash}`);
+    return { success: true, message: `Purged local IPFS hash ${ipfsHash}` };
+  }
+
+  const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
+  const apiKey = process.env.REACT_APP_PINATA_API_KEY;
+  const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (apiKey && secretKey) {
+    headers['pinata_api_key'] = apiKey;
+    headers['pinata_secret_api_key'] = secretKey;
+  } else if (jwt) {
+    headers['Authorization'] = `Bearer ${jwt}`;
+  }
+
+  try {
+    const response = await fetch(`${PINATA_UNPIN_URL}/${ipfsHash}`, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (response.ok) {
+      console.log(`Successfully deleted/unpinned ${ipfsHash} from Pinata IPFS`);
+      return { success: true };
+    }
+
+    const errText = await response.text();
+    console.warn(`Pinata unpin notice (${response.status}):`, errText);
+    return { success: false, message: errText };
+  } catch (err) {
+    console.error('Failed to unpin from Pinata IPFS:', err);
+    return { success: false, message: String(err) };
+  }
+}
+

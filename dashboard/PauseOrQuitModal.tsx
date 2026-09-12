@@ -7,7 +7,8 @@ interface PauseOrQuitModalProps {
   onClose: () => void;
   event: EventItem | null;
   onPause: (eventId: string) => void;
-  onQuit: (eventId: string) => void;
+  onDelete?: (event: EventItem) => Promise<void> | void;
+  onQuit?: (eventId: string) => void;
 }
 
 export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
@@ -15,10 +16,12 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
   onClose,
   event,
   onPause,
+  onDelete,
   onQuit,
 }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isClosing, setIsClosing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -50,6 +53,23 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
+
+  const handleDeleteClick = async () => {
+    if (!event) return;
+    setIsDeleting(true);
+    try {
+      if (onDelete) {
+        await onDelete(event);
+      } else if (onQuit) {
+        onQuit(event.id);
+      }
+    } catch (err) {
+      console.error('Error deleting event:', err);
+    } finally {
+      setIsDeleting(false);
+      handleDismiss();
+    }
+  };
 
   if (!shouldRender || !event || typeof document === 'undefined') return null;
 
@@ -138,14 +158,12 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
             <span>Pause Voting</span>
           </button>
 
-          {/* Quit / End Action Button with Cube Icon & Red Halo */}
+          {/* Delete This Vote Action Button with Cube Icon & Red Halo */}
           <button
             type="button"
-            className="btn-action-quit"
-            onClick={() => {
-              onQuit(event.id);
-              handleDismiss();
-            }}
+            className="btn-action-quit btn-action-delete"
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
           >
             <svg
               width="17"
@@ -156,7 +174,7 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
             >
               <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
             </svg>
-            <span>Quit Event</span>
+            <span>{isDeleting ? 'Deleting...' : 'Delete This Vote'}</span>
           </button>
 
           {/* Cancel Button */}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EventItem } from './types';
 import RealtimeAnalyticsModal from './RealtimeAnalyticsModal';
 import PauseOrQuitModal from './PauseOrQuitModal';
+import { deleteEventFromPinata } from '../services/pinata';
 
 const getStoredEvents = (): EventItem[] => {
   if (typeof window === 'undefined') return [];
@@ -64,8 +65,41 @@ export const EventsTable: React.FC = () => {
     setSelectedPauseQuitEvent(null);
   };
 
-  const handleQuitEvent = (id: string) => {
-    updateEventStatus(id, { isActivated: false });
+  const handleDeleteEvent = async (eventToDelete: EventItem) => {
+    // 1. Unpin / delete this specific vote schema from Pinata IPFS
+    try {
+      if (eventToDelete.ipfsHash) {
+        await deleteEventFromPinata(eventToDelete.ipfsHash);
+      }
+    } catch (err) {
+      console.warn('Pinata delete error:', err);
+    }
+
+    // 2. Remove vote from local storage and update state
+    setEvents((prev) => {
+      const updated = prev.filter((ev) => ev.id !== eventToDelete.id);
+      try {
+        localStorage.setItem('truevote_events', JSON.stringify(updated));
+        window.dispatchEvent(new Event('truevote_events_updated'));
+      } catch (e) {
+        console.error('Error saving updated events to storage:', e);
+      }
+      return updated;
+    });
+
+    // 3. Clear any cached vote status flags for this event
+    try {
+      localStorage.removeItem(`truevote_voted_${eventToDelete.id}`);
+      localStorage.removeItem(`truevote_voted_${eventToDelete.votingNumber}`);
+    } catch (e) {
+      // ignore
+    }
+
+    // 4. Close active analytics modal if it was open for this event
+    if (selectedAnalyticsEventId === eventToDelete.id) {
+      setSelectedAnalyticsEventId(null);
+    }
+
     setSelectedPauseQuitEvent(null);
   };
 
@@ -204,13 +238,13 @@ export const EventsTable: React.FC = () => {
         eventId={selectedAnalyticsEventId}
       />
 
-      {/* iOS Action Sheet: Pause or Quit Confirmation */}
+      {/* iOS Action Sheet: Pause or Delete Confirmation */}
       <PauseOrQuitModal
         isOpen={Boolean(selectedPauseQuitEvent)}
         onClose={() => setSelectedPauseQuitEvent(null)}
         event={selectedPauseQuitEvent}
         onPause={handlePauseEvent}
-        onQuit={handleQuitEvent}
+        onDelete={handleDeleteEvent}
       />
     </div>
   );

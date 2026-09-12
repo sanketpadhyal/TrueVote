@@ -3397,8 +3397,9 @@ input:checked + .slider.round:before {
   box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.22) !important;
 }
 
-/* Red Quit Button Matching Screenshot 3 */
-.btn-action-quit {
+/* Red Delete / Quit Button Matching Screenshot 3 */
+.btn-action-quit,
+.btn-action-delete {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3421,11 +3422,20 @@ input:checked + .slider.round:before {
 
 .btn-action-quit:hover,
 .btn-action-quit:focus,
-.btn-action-quit:active {
+.btn-action-quit:active,
+.btn-action-delete:hover,
+.btn-action-delete:focus,
+.btn-action-delete:active {
   background: #ef4444 !important;
   color: #ffffff !important;
   transform: none !important;
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.22) !important;
+}
+
+.btn-action-quit:disabled,
+.btn-action-delete:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
 }
 
 /* Secondary Cancel Button Matching Screenshot 3 */
