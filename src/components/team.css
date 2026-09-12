@@ -1,0 +1,343 @@
+/* ==========================================================================
+   TEAM / THE BUILDERS PAGE STYLES
+   ========================================================================== */
+.team-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-page, #fafbfc);
+  color: var(--text-heading, #0f172a);
+}
+
+.team-page-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 8rem 1.5rem 5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Hero */
+.team-hero-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.team-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 0.38rem 0.95rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--brand-blue, #1d6bf3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.team-main-title {
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  color: #0f172a;
+  margin-bottom: 1.25rem;
+}
+
+.team-main-sub {
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--text-sub, #64748b);
+  max-width: 620px;
+  margin-bottom: 2rem;
+  font-weight: 450;
+}
+
+/* Builder Profile Showcase */
+.team-builder-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5rem;
+}
+
+.team-card-prominent {
+  max-width: 520px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border-card, #e8edf4);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.04);
+}
+
+.team-avatar-box {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, #1d6bf3 0%, #38bdf8 100%);
+  margin-bottom: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-avatar-gradient {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.grad-1 {
+  background: #0f172a;
+}
+
+.team-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-heading, #0f172a);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.team-role {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--brand-blue, #1d6bf3);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.team-bio {
+  font-size: 0.94rem;
+  line-height: 1.62;
+  color: var(--text-sub, #64748b);
+  font-weight: 450;
+  margin-bottom: 1.6rem;
+}
+
+.team-specializations {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.team-spec-tag {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+}
+
+.team-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* STRICTLY NO HOVER ANIMATION / SCALING (As requested by user) */
+.team-link {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  text-decoration: none;
+  /* Completely static - no hover transform, transition, or color shift */
+}
+
+/* Principles Section */
+.team-principles-section {
+  width: 100%;
+  margin-bottom: 5rem;
+}
+
+.principles-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.principles-sub-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand-blue, #1d6bf3);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.principles-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #0f172a;
+}
+
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.principle-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 2rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.principle-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 20px -4px rgba(15, 23, 42, 0.04);
+}
+
+.principle-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: var(--brand-blue, #1d6bf3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.principle-card-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.6rem;
+}
+
+.principle-card-desc {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-sub, #64748b);
+  margin: 0;
+}
+
+/* CTA Banner */
+.team-cta-banner {
+  width: 100%;
+}
+
+.team-cta-box {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 22px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-cta-box h3 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.team-cta-box p {
+  font-size: 0.98rem;
+  color: #94a3b8;
+  max-width: 580px;
+  line-height: 1.6;
+  margin-bottom: 1.8rem;
+}
+
+.team-cta-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.team-cta-btn-primary {
+  background: var(--brand-blue, #1d6bf3);
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.team-cta-btn-primary:hover {
+  background: #1557d4;
+}
+
+.team-cta-btn-secondary {
+  color: #f1f5f9;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.8rem 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.team-cta-btn-secondary:hover {
+  color: #38bdf8;
+}
+
+@media (max-width: 768px) {
+  .team-page-main {
+    padding: 6.5rem 1.25rem 3.5rem 1.25rem;
+  }
+  .principles-grid {
+    grid-template-columns: 1fr;
+  }
+  .team-card-prominent {
+    padding: 2.2rem 1.5rem;
+  }
+  .team-cta-box {
+    padding: 2.2rem 1.5rem;
+  }
+  .team-cta-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .team-cta-btn-primary, .team-cta-btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+}

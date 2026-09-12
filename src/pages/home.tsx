@@ -4,6 +4,7 @@ import Navbar from '../components/navbar';
 import { FlipText } from '../components/universalbuttonshover';
 import DialogueBox from '../components/box/dialoguebox';
 import AuthModal from '../components/authmodal';
+import Footer from '../components/footer';
 import '../styles/animations.css';
 import './home.css';
 
@@ -15,12 +16,6 @@ export const HomePage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
-
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-
-  const toggleFaq = (index: number) => {
-    setOpenFaqIndex((prev) => (prev === index ? null : index));
-  };
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -47,6 +42,24 @@ export const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
+    document.title = 'TrueVote | Decentralized Anonymous Voting Protocol';
+
+    // Handle hash scroll on mount
+    if (window.location.hash) {
+      const targetId = window.location.hash.replace('#', '');
+      setTimeout(() => {
+        scrollTo(targetId);
+      }, 150);
+    }
+
+    const handleHashChange = () => {
+      if (window.location.hash) {
+        const targetId = window.location.hash.replace('#', '');
+        scrollTo(targetId);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+
     // Check initial window width for mobile mode
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -90,6 +103,7 @@ export const HomePage: React.FC = () => {
 
     return () => {
       clearTimeout(heroTimer);
+      window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('scroll', handleScroll);
       if ((window as any).lenis) {
@@ -477,171 +491,8 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ==========================================================================
-          FAQ SECTION
-          ========================================================================== */}
-      <section className="faq-section" id="faq">
-        <div className="section-pill-badge">
-          FAQ
-        </div>
-
-        <h2 className="section-title">
-          Frequently Asked <br />
-          <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Questions</span>
-        </h2>
-
-        <p className="section-sub">
-          Everything you need to know about TrueVote's zero-knowledge voting protocol and privacy safeguards.
-        </p>
-
-        <div className="faq-accordion-list">
-          {[
-            {
-              q: 'Do voters need cryptocurrency or an Ethereum wallet?',
-              a: 'No. TrueVote is designed for maximum accessibility. We utilize EIP-712 meta-transactions and dedicated gas relayers so voters can cast verifiable ballots directly from any modern web browser without paying gas fees or installing MetaMask.'
-            },
-            {
-              q: 'How does Zero-Knowledge protect my vote privacy?',
-              a: 'Zero-Knowledge proofs (zk-SNARKs) allow our cryptographic circuits to mathematically prove that you are an authorized, registered voter on the electoral roll without ever disclosing who you are, your credentials, or which candidate you selected.'
-            },
-            {
-              q: 'Can election administrators or organizers tamper with results?',
-              a: 'No. Every cast ballot is cryptographically committed on the Ethereum blockchain and pinned to decentralized IPFS storage. Once an election is launched, the smart contract deterministically computes tallies, making post-facto modification or deletion impossible.'
-            },
-            {
-              q: 'How does TrueVote prevent double-voting if ballots are anonymous?',
-              a: 'TrueVote generates a unique mathematical "nullifier" hash for each voter during proof creation. When a vote is cast, this nullifier is recorded in the smart contract. Any subsequent attempt to vote generates the identical nullifier and is immediately rejected, preserving voter anonymity while guaranteeing one vote per person.'
-            },
-            {
-              q: 'Can independent auditors verify the final election outcome?',
-              a: 'Yes. All ballot commitments, verification keys, and IPFS CIDs are completely transparent. Anyone in the world can run an independent audit node to mathematically verify that every vote tallied corresponds to a valid proof without decrypting individual voter ballots.'
-            }
-          ].map((item, idx) => (
-            <div 
-              key={idx} 
-              className={`faq-item ${openFaqIndex === idx ? 'open' : ''}`}
-              onClick={() => toggleFaq(idx)}
-            >
-              <button className="faq-question" type="button">
-                <span>{item.q}</span>
-                <svg className={`faq-chevron ${openFaqIndex === idx ? 'rotated' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              {openFaqIndex === idx && (
-                <div className="faq-answer">
-                  <p>{item.a}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ==========================================================================
-          TEAM SECTION
-          ========================================================================== */}
-      <section className="team-section" id="team">
-        <div className="section-pill-badge">
-          The Builders
-        </div>
-
-        <h2 className="section-title">
-          Pioneering the Future of <br />
-          <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Verifiable Democracy</span>
-        </h2>
-
-        <p className="section-sub">
-          Engineers and researchers committed to advancing transparent, trustless, and censorship-resistant governance infrastructure.
-        </p>
-
-        <div className="team-grid">
-          <div className="team-card">
-            <div className="team-avatar-box">
-              <div className="team-avatar-gradient grad-1">
-                <span>SP</span>
-              </div>
-            </div>
-            <h3 className="team-name">Sanket Padhyal</h3>
-            <span className="team-role">Core Protocol Architect</span>
-            <p className="team-bio">
-              Specializing in EVM smart contract state architecture, meta-transaction relayer engines, and decentralized consensus design.
-            </p>
-            <div className="team-links">
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="team-link" title="GitHub">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="team-link" title="Twitter / X">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==========================================================================
-          FOOTER
-          ========================================================================== */}
-      <footer className="footer-section">
-        <div className="footer-inner">
-          <div className="footer-top">
-            <div className="footer-brand-col">
-              <div className="footer-brand-title">
-                <img src="/images/logo.png" alt="TrueVote" className="navbar-logo-img" style={{ width: 30, height: 30 }} />
-                <span>True<span className="brand-accent">Vote</span></span>
-              </div>
-              <p className="footer-brand-tagline">
-                Democracy Reimagined on Ethereum. Cryptographically verifiable, gasless, and privacy-preserving voting powered by zk-SNARKs and Pinata IPFS.
-              </p>
-              <div className="footer-status-pill">
-                <span className="status-dot"></span>
-                <span>Sepolia Testnet Active · IPFS Synced</span>
-              </div>
-            </div>
-
-            <div className="footer-links-grid">
-              <div className="footer-link-col">
-                <h5 className="footer-link-heading">Navigation</h5>
-                <a href="#features" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('features'); }}>Features</a>
-                <a href="#benefits" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('benefits'); }}>Benefits</a>
-                <a href="#how-it-works" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('how-it-works'); }}>How It Works</a>
-                <a href="#security" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('security'); }}>Security</a>
-                <a href="#faq" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('faq'); }}>FAQ</a>
-              </div>
-
-              <div className="footer-link-col">
-                <h5 className="footer-link-heading">Technology</h5>
-                <span className="footer-link-static">Circom zk-SNARKs</span>
-                <span className="footer-link-static">Pinata IPFS Gateway</span>
-                <span className="footer-link-static">EIP-712 Relayers</span>
-                <span className="footer-link-static">Ethereum Sepolia</span>
-              </div>
-
-              <div className="footer-link-col">
-                <h5 className="footer-link-heading">About</h5>
-                <a href="#team" className="footer-link" onClick={(e) => { e.preventDefault(); scrollTo('team'); }}>About Team</a>
-                <span className="footer-link-static" onClick={() => setIsHackathonModalOpen(true)} style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}>Hackathon Details</span>
-                <span className="footer-link-static">Open Source MVP</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="footer-bottom">
-            <p className="footer-copyright">
-              © {new Date().getFullYear()} TrueVote. Built for decentralized, tamper-proof governance.
-            </p>
-            <div className="footer-bottom-badges">
-              <span className="footer-badge-tag">Zero-Knowledge</span>
-              <span className="footer-badge-tag">Decentralized IPFS</span>
-              <span className="footer-badge-tag">100% Verifiable</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Shared Reusable Footer */}
+      <Footer onOpenHackathon={() => setIsHackathonModalOpen(true)} />
       {toastMessage && (
         <div className="vote-toast glass-panel-dark">
           <span>{toastMessage}</span>
