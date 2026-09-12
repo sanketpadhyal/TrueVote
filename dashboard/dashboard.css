@@ -2231,11 +2231,9 @@ input:checked + .slider.round:before {
 .new-event-modal-card {
   background: rgba(255, 255, 255, 0.96);
   border-radius: 28px;
-  padding: 28px 24px 22px 24px;
+  padding: 28px 24px 24px 24px;
   max-width: 480px;
   width: 100%;
-  height: 615px;
-  max-height: 92vh;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -2245,9 +2243,17 @@ input:checked + .slider.round:before {
   border: 1px solid rgba(226, 232, 240, 0.9);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  will-change: transform, opacity, filter;
+  will-change: height, transform, opacity, filter;
   overflow: hidden;
-  transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  max-height: 92vh;
+}
+
+.new-event-modal-inner-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .new-event-modal-card.card-entering {
@@ -2272,7 +2278,7 @@ input:checked + .slider.round:before {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .step-dot {
@@ -2288,7 +2294,11 @@ input:checked + .slider.round:before {
   font-weight: 700;
   color: #64748b;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-dot:active {
+  transform: scale(0.92);
 }
 
 .step-dot.step-active {
@@ -2309,9 +2319,9 @@ input:checked + .slider.round:before {
   max-height: 0;
   opacity: 0;
   transform: translateY(-8px);
-  transition: max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.25s ease,
-              transform 0.25s ease,
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.28s ease,
+              transform 0.28s ease,
               margin 0.3s ease;
   overflow: hidden;
   width: 100%;
@@ -2336,25 +2346,30 @@ input:checked + .slider.round:before {
   padding: 8px 12px;
   border-radius: 10px;
   width: 100%;
+  animation: iosAlertShake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-/* Stable Scrollable Step Body */
+@keyframes iosAlertShake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+/* Fluid Step Body */
 .new-event-step-body {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding: 2px 6px 6px 6px;
-  animation: iosStepSlideIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  padding: 0 4px;
+  animation: iosStepSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes iosStepSlideIn {
   0% {
     opacity: 0;
-    transform: translateY(8px) scale(0.99);
+    transform: translateY(10px) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -2367,7 +2382,6 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100%;
 }
 
 .new-event-illustration {
@@ -2432,47 +2446,51 @@ input:checked + .slider.round:before {
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
-/* Compact Scrollable Options Input List */
+/* Compact Options Input List with fluid animations */
 .options-input-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   max-width: 380px;
-  max-height: 160px;
-  overflow-y: auto;
-  padding-right: 4px;
-  margin-bottom: 14px;
-}
-
-.options-input-list::-webkit-scrollbar {
-  width: 5px;
-}
-.options-input-list::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+  margin-bottom: 6px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .option-input-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
+  animation: iosRowEntrance 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes iosRowEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .option-badge-index {
   background: #eff6ff;
   color: #2563eb;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 5px 9px;
+  padding: 6px 10px;
   border-radius: 8px;
   white-space: nowrap;
+  transition: transform 0.2s ease;
 }
 
 .new-event-text-input {
   width: 100%;
-  padding: 9px 13px;
+  padding: 10px 14px;
   border-radius: 12px;
   border: 1.5px solid #e2e8f0;
   background: #ffffff;
@@ -2480,17 +2498,17 @@ input:checked + .slider.round:before {
   color: #0f172a;
   outline: none;
   font-family: inherit;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .new-event-text-input:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 .new-event-textarea {
   width: 100%;
-  padding: 9px 13px;
+  padding: 10px 14px;
   border-radius: 12px;
   border: 1.5px solid #e2e8f0;
   background: #ffffff;
@@ -2499,11 +2517,12 @@ input:checked + .slider.round:before {
   outline: none;
   font-family: inherit;
   resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .new-event-textarea:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 .form-group-field {
@@ -2512,14 +2531,15 @@ input:checked + .slider.round:before {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  animation: iosRowEntrance 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .input-field-label {
   font-size: 12px;
   font-weight: 700;
   color: #475569;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 /* Apple-Grade Total Votes Presets */
@@ -2530,6 +2550,7 @@ input:checked + .slider.round:before {
   width: 100%;
   max-width: 380px;
   margin-bottom: 16px;
+  animation: iosRowEntrance 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .votes-preset-chip {
@@ -2552,6 +2573,10 @@ input:checked + .slider.round:before {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+.votes-preset-chip:active {
+  transform: scale(0.95);
+}
+
 .votes-preset-chip.active {
   background: #2563eb !important;
   color: #ffffff !important;
@@ -2564,6 +2589,7 @@ input:checked + .slider.round:before {
   max-width: 380px;
   margin-bottom: 16px;
   text-align: left;
+  animation: iosRowEntrance 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* IST Indicator & Schedule */
@@ -2579,6 +2605,7 @@ input:checked + .slider.round:before {
   border-radius: 20px;
   border: 1px solid #bbf7d0;
   margin-bottom: 14px;
+  animation: iosRowEntrance 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .activation-type-toggle {
@@ -2590,6 +2617,7 @@ input:checked + .slider.round:before {
   padding: 4px;
   gap: 4px;
   margin-bottom: 14px;
+  animation: iosRowEntrance 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .activation-pill {
@@ -2603,7 +2631,11 @@ input:checked + .slider.round:before {
   font-weight: 700;
   cursor: pointer;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.activation-pill:active {
+  transform: scale(0.96);
 }
 
 .activation-pill.active {
@@ -2619,6 +2651,7 @@ input:checked + .slider.round:before {
   width: 100%;
   max-width: 380px;
   margin-bottom: 16px;
+  animation: iosRowEntrance 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .date-field-col {
@@ -2631,7 +2664,7 @@ input:checked + .slider.round:before {
 .new-event-date-input,
 .new-event-time-input {
   width: 100%;
-  padding: 7px 10px;
+  padding: 8px 12px;
   border-radius: 10px;
   border: 1.5px solid #e2e8f0;
   background: #ffffff;
@@ -2639,6 +2672,13 @@ input:checked + .slider.round:before {
   color: #0f172a;
   outline: none;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.new-event-date-input:focus,
+.new-event-time-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 .manual-activation-note {
@@ -2652,9 +2692,10 @@ input:checked + .slider.round:before {
   margin-bottom: 16px;
   max-width: 380px;
   width: 100%;
+  animation: iosRowEntrance 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Actions Row - sticks cleanly to bottom of step */
+/* Actions Row - snugly follows content without giant gap */
 .new-event-actions-row {
   display: flex;
   align-items: center;
@@ -2662,15 +2703,15 @@ input:checked + .slider.round:before {
   gap: 12px;
   width: 100%;
   max-width: 380px;
-  margin-top: auto;
-  padding-top: 10px;
+  margin-top: 18px;
+  padding-top: 4px;
 }
 
 .new-event-actions-row.success-actions {
   justify-content: center;
 }
 
-/* Blue Pill Button Theme matching Screenshot with glow halo */
+/* Blue Pill Button Theme with subtle active press */
 .btn-blue-pill {
   display: inline-flex;
   align-items: center;
@@ -2680,7 +2721,7 @@ input:checked + .slider.round:before {
   color: #ffffff !important;
   font-size: 14px;
   font-weight: 700;
-  padding: 10px 22px;
+  padding: 11px 24px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.22) !important;
@@ -2688,17 +2729,22 @@ input:checked + .slider.round:before {
   outline: none;
   font-family: inherit;
   text-decoration: none;
-  transition: none !important;
-  transform: none !important;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease !important;
 }
 
-.btn-blue-pill:hover,
-.btn-blue-pill:focus,
-.btn-blue-pill:active {
+.btn-blue-pill:hover {
   background: #2563eb !important;
   color: #ffffff !important;
-  transform: none !important;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.22) !important;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.28) !important;
+}
+
+.btn-blue-pill:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-blue-pill:focus {
+  background: #2563eb !important;
+  color: #ffffff !important;
 }
 
 /* Success View & Link Box */

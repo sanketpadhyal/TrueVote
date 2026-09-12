@@ -44,6 +44,39 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
+  // Smooth Dynamic Height Measurement
+  const innerContentRef = React.useRef(null);
+  const [dynamicHeight, setDynamicHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!innerContentRef.current) return;
+
+    const measure = () => {
+      const el = innerContentRef.current as HTMLElement | null;
+      if (el) {
+        const naturalH = el.offsetHeight;
+        setDynamicHeight(naturalH + 52); // Natural height + 28px top + 24px bottom padding
+      }
+    };
+
+    const rAF = requestAnimationFrame(measure);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => {
+        measure();
+      });
+      if (innerContentRef.current) {
+        ro.observe(innerContentRef.current);
+      }
+    }
+
+    return () => {
+      cancelAnimationFrame(rAF);
+      if (ro) ro.disconnect();
+    };
+  }, [step, optionsCount, options.length, errorMsg, activationType, totalVotes]);
+
   // Handle open/close animation lifecycle
   useEffect(() => {
     if (isOpen) {
@@ -255,8 +288,10 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     >
       <div
         className={`new-event-modal-card ${isClosing ? 'card-closing' : 'card-entering'}`}
+        style={dynamicHeight ? { height: `${dynamicHeight}px` } : undefined}
         onClick={(e) => e.stopPropagation()}
       >
+        <div ref={innerContentRef} className="new-event-modal-inner-wrapper">
         {/* Modal Close Button */}
         <button
           type="button"
@@ -719,6 +754,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>
