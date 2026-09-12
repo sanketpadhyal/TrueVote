@@ -78,6 +78,10 @@ export const HomePage: React.FC = () => {
       });
       (window as any).lenis = lenis;
 
+      if (!window.location.hash) {
+        lenis.scrollTo(0, { immediate: true });
+      }
+
       const raf = (time: number) => {
         lenis?.raf(time);
         requestAnimationFrame(raf);
@@ -224,10 +228,6 @@ export const HomePage: React.FC = () => {
           BENEFITS SECTION (Matching Screenshot 3)
           ========================================================================== */}
       <section className="benefits-section" id="benefits">
-        <div className="benefits-pill-badge">
-          Benefits
-        </div>
-
         <h2 className="benefits-title">
           Benefits That Truly <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Matter To You</span>
@@ -331,10 +331,6 @@ export const HomePage: React.FC = () => {
           HOW IT WORKS SECTION
           ========================================================================== */}
       <section className="workflow-section" id="how-it-works">
-        <div className="section-pill-badge">
-          Protocol Lifecycle
-        </div>
-
         <h2 className="section-title">
           How TrueVote Works <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>In 4 Simple Steps</span>
@@ -418,10 +414,6 @@ export const HomePage: React.FC = () => {
           SECURITY & ARCHITECTURE SECTION
           ========================================================================== */}
       <section className="security-section" id="security">
-        <div className="section-pill-badge">
-          Cryptographic Assurance
-        </div>
-
         <h2 className="section-title">
           Mathematical Truth & <br />
           <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Trustless Security</span>
