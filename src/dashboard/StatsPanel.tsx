@@ -1,5 +1,5 @@
-import React from 'react';
-import { ActivityItem, LicenseStatus } from './types';
+import React, { useState, useEffect } from 'react';
+import { ActivityItem, LicenseStatus, EventItem } from './types';
 
 interface StatsPanelProps {
   licenseStatus?: LicenseStatus;
@@ -12,12 +12,20 @@ const getStoredVotesUsed = (): number => {
     const stored = localStorage.getItem('truevote_votes_used');
     if (stored !== null) {
       const num = Number(stored);
-      if (!isNaN(num)) return num;
+      if (!isNaN(num) && num > 0) return num;
     }
     const licenseStored = localStorage.getItem('truevote_license_status');
     if (licenseStored) {
       const parsed = JSON.parse(licenseStored);
-      if (typeof parsed.usedVotes === 'number') return parsed.usedVotes;
+      if (typeof parsed.usedVotes === 'number' && parsed.usedVotes > 0) return parsed.usedVotes;
+    }
+    // Check total votes cast across all stored events
+    const eventsStr = localStorage.getItem('truevote_events');
+    if (eventsStr) {
+      const parsed: EventItem[] = JSON.parse(eventsStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
+      }
     }
   } catch (e) {
     console.error('Error reading votes used:', e);
@@ -31,7 +39,21 @@ const getStoredActivities = (): ActivityItem[] => {
     const stored = localStorage.getItem('truevote_activities');
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    // Synthesize activity feed from stored events if activities were cleared
+    const eventsStr = localStorage.getItem('truevote_events');
+    if (eventsStr) {
+      const parsed: EventItem[] = JSON.parse(eventsStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.slice(0, 5).map((e) => ({
+          id: `act-${e.id}`,
+          userName: `Admin (${(e.creatorWallet || 'Web3').substring(0, 6)}...${(e.creatorWallet || 'wallet').slice(-4)})`,
+          votingNumber: e.votingNumber,
+          date: 'Synced from IPFS',
+          type: 'announcement',
+        }));
+      }
     }
   } catch (e) {
     console.error('Error reading truevote_activities:', e);
@@ -43,8 +65,25 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
   licenseStatus,
   activities,
 }) => {
-  const votesUsed = licenseStatus?.usedVotes ?? getStoredVotesUsed();
-  const currentActivities = activities !== undefined ? activities : getStoredActivities();
+  const [votesUsed, setVotesUsed] = useState<number>(() => licenseStatus?.usedVotes ?? getStoredVotesUsed());
+  const [currentActivities, setCurrentActivities] = useState<ActivityItem[]>(() =>
+    activities !== undefined ? activities : getStoredActivities()
+  );
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setVotesUsed(licenseStatus?.usedVotes ?? getStoredVotesUsed());
+      setCurrentActivities(activities !== undefined ? activities : getStoredActivities());
+    };
+
+    window.addEventListener('truevote_events_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    return () => {
+      window.removeEventListener('truevote_events_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, [licenseStatus, activities]);
 
   return (
     <aside className="wyborek-stats-panel">

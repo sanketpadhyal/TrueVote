@@ -26,6 +26,10 @@ export interface EventItem {
   ipfsUrl?: string;
   ipfsFileId?: string;
   shareableLink?: string;
+  creatorWallet?: string;
+  creatorSignature?: string;
+  signatureManifest?: string;
+  signedAt?: string;
 }
 
 export interface ActivityItem {
