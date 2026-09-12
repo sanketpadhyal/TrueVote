@@ -6,6 +6,17 @@ interface StatsPanelProps {
   activities?: ActivityItem[];
 }
 
+const formatRelativeTime = (item: ActivityItem): string => {
+  if (item.timestamp) {
+    const diffSec = Math.floor((Date.now() - item.timestamp) / 1000);
+    if (diffSec < 45) return 'Just now';
+    if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+    return `${Math.floor(diffSec / 86400)}d ago`;
+  }
+  return item.date || 'Just now';
+};
+
 const getStoredVotesUsed = (): number => {
   if (typeof window === 'undefined') return 0;
   try {
@@ -33,30 +44,120 @@ const getStoredVotesUsed = (): number => {
   return 0;
 };
 
-const getStoredActivities = (): ActivityItem[] => {
+export const getStoredActivities = (): ActivityItem[] => {
   if (typeof window === 'undefined') return [];
   try {
+    const allActivities: ActivityItem[] = [];
+    const seenIds = new Set<string>();
+
+    // 1. Read directly stored activities from localStorage
     const stored = localStorage.getItem('truevote_activities');
     if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      try {
+        const parsed: ActivityItem[] = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          for (let i = 0; i < parsed.length; i++) {
+            const a = parsed[i];
+            if (a && a.id && !seenIds.has(a.id)) {
+              seenIds.add(a.id);
+              allActivities.push(a);
+            }
+          }
+        }
+      } catch (e) {}
     }
-    // Synthesize activity feed from stored events if activities were cleared
+
+    // 2. Read truevote_events to incorporate recentVotes & cast votes
     const eventsStr = localStorage.getItem('truevote_events');
     if (eventsStr) {
-      const parsed: EventItem[] = JSON.parse(eventsStr);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.slice(0, 5).map((e) => ({
-          id: `act-${e.id}`,
-          userName: `Admin (${(e.creatorWallet || 'Web3').substring(0, 6)}...${(e.creatorWallet || 'wallet').slice(-4)})`,
-          votingNumber: e.votingNumber,
-          date: 'Synced from IPFS',
-          type: 'announcement',
-        }));
-      }
+      try {
+        const events: (EventItem & { recentVotes?: ActivityItem[] })[] = JSON.parse(eventsStr);
+        if (Array.isArray(events)) {
+          for (let i = 0; i < events.length; i++) {
+            const ev = events[i];
+
+            // A. Include embedded recentVotes
+            if (Array.isArray(ev.recentVotes)) {
+              for (let j = 0; j < ev.recentVotes.length; j++) {
+                const rv = ev.recentVotes[j];
+                if (rv && rv.id && !seenIds.has(rv.id)) {
+                  seenIds.add(rv.id);
+                  allActivities.push(rv);
+                }
+              }
+            }
+
+            // B. Ensure ballots match totalVotesCast
+            const castCount = Number(ev.totalVotesCast) || 0;
+            let existingBallots = 0;
+            for (let k = 0; k < allActivities.length; k++) {
+              if (allActivities[k].type === 'ballot' && allActivities[k].votingNumber === ev.votingNumber) {
+                existingBallots++;
+              }
+            }
+
+            if (castCount > existingBallots) {
+              const diff = castCount - existingBallots;
+              for (let d = 0; d < diff; d++) {
+                const syntheticId = `act-vote-${ev.id}-${d}`;
+                if (!seenIds.has(syntheticId)) {
+                  seenIds.add(syntheticId);
+                  const shortHash = (ev.id + d)
+                    .split('')
+                    .reduce((acc, c) => acc + c.charCodeAt(0), 0)
+                    .toString(16)
+                    .padStart(4, '0')
+                    .slice(-4);
+                  allActivities.push({
+                    id: syntheticId,
+                    userName: `Anonymous Voter (#${shortHash})`,
+                    votingNumber: ev.votingNumber,
+                    date: 'Just now',
+                    timestamp: Date.now() - d * 120000,
+                    type: 'ballot',
+                  });
+                }
+              }
+            }
+
+            // C. Admin creation item
+            const adminId = `act-admin-${ev.id}`;
+            if (!seenIds.has(adminId)) {
+              seenIds.add(adminId);
+              const walletStr = ev.creatorWallet || '0xf026';
+              const shortWallet =
+                walletStr.length > 10
+                  ? `${walletStr.substring(0, 6)}...${walletStr.slice(-4)}`
+                  : walletStr;
+              allActivities.push({
+                id: adminId,
+                userName: `Admin (${shortWallet})`,
+                votingNumber: ev.votingNumber,
+                date: 'Synced from IPFS',
+                type: 'announcement',
+              });
+            }
+          }
+        }
+      } catch (e) {}
     }
+
+    // Sort: ballots first, newest timestamp first
+    allActivities.sort((a, b) => {
+      const timeA = a.timestamp || (a.type === 'ballot' ? 2 : 1);
+      const timeB = b.timestamp || (b.type === 'ballot' ? 2 : 1);
+      return Number(timeB) - Number(timeA);
+    });
+
+    if (allActivities.length > 0) {
+      try {
+        localStorage.setItem('truevote_activities', JSON.stringify(allActivities.slice(0, 50)));
+      } catch (e) {}
+    }
+
+    return allActivities.slice(0, 30);
   } catch (e) {
-    console.error('Error reading truevote_activities:', e);
+    console.error('Error reading activities:', e);
   }
   return [];
 };
@@ -79,9 +180,28 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
     window.addEventListener('truevote_events_updated', handleUpdate);
     window.addEventListener('storage', handleUpdate);
 
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel('truevote_events_channel');
+      bc.onmessage = () => {
+        handleUpdate();
+      };
+    } catch (e) {}
+
+    // Dynamic timer to keep timestamps ("Just now", "2m ago") and activities fresh
+    const timer = setInterval(() => {
+      handleUpdate();
+    }, 10000);
+
     return () => {
+      clearInterval(timer);
       window.removeEventListener('truevote_events_updated', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
+      if (bc) {
+        try {
+          bc.close();
+        } catch (e) {}
+      }
     };
   }, [licenseStatus, activities]);
 
@@ -107,7 +227,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
               <div key={item.id} className="activity-item">
                 <div className="activity-icon-container">
                   {item.type === 'announcement' ? (
-                    // Megaphone icon
+                    // Megaphone / Admin announcement icon
                     <svg
                       className="activity-icon megaphone"
                       width="20"
@@ -122,7 +242,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
                       <path d="M3 11l19-9-9 19-2-8-8-2z" />
                     </svg>
                   ) : (
-                    // Ballot / Envelope icon
+                    // Ballot / Envelope vote cast icon
                     <svg
                       className="activity-icon ballot"
                       width="20"
@@ -141,11 +261,13 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
                 </div>
                 <div className="activity-details">
                   <div className="activity-user-row">
-                    <span className="activity-user-name">{item.userName}</span>
+                    <span className="activity-user-name" title={item.userName}>
+                      {item.userName}
+                    </span>
                     <span className="activity-dot">•</span>
                     <span className="activity-voting-no">{item.votingNumber}</span>
                   </div>
-                  <div className="activity-timestamp">{item.date}</div>
+                  <div className="activity-timestamp">{formatRelativeTime(item)}</div>
                 </div>
               </div>
             ))

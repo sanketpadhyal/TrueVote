@@ -30,6 +30,7 @@ export interface EventItem {
   creatorSignature?: string;
   signatureManifest?: string;
   signedAt?: string;
+  recentVotes?: ActivityItem[];
 }
 
 export interface ActivityItem {
@@ -37,6 +38,7 @@ export interface ActivityItem {
   userName: string;
   votingNumber: string;
   date: string;
+  timestamp?: number;
   type: 'announcement' | 'ballot';
 }
 

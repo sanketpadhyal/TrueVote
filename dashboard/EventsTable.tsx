@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EventItem } from './types';
 import RealtimeAnalyticsModal from './RealtimeAnalyticsModal';
 import PauseOrQuitModal from './PauseOrQuitModal';
+import { getStoredActivities } from './StatsPanel';
 import { deleteEventFromPinata, fetchEventsFromPinata, uploadEventToPinata } from '../services/pinata';
 import { saveEventsToBackup, loadEventsFromBackup, removeEventFromBackup } from '../services/storage';
 
@@ -59,7 +60,28 @@ export const EventsTable: React.FC = () => {
             }
           });
           if (foundKey) {
-            map.set(foundKey, { ...map.get(foundKey), ...pEv });
+            const existing = map.get(foundKey);
+            const mergedTotalVotes = Math.max(existing?.totalVotesCast || 0, pEv.totalVotesCast || 0);
+            const mergedRecentVotes = [
+              ...((pEv as any).recentVotes || []),
+              ...((existing as any)?.recentVotes || []),
+            ];
+            const voteMap = new Map<string, any>();
+            for (let vIdx = 0; vIdx < mergedRecentVotes.length; vIdx++) {
+              const rVote = mergedRecentVotes[vIdx];
+              if (rVote && rVote.id && !voteMap.has(rVote.id)) {
+                voteMap.set(rVote.id, rVote);
+              }
+            }
+            const dedupedRecentVotes: any[] = [];
+            voteMap.forEach((v) => dedupedRecentVotes.push(v));
+
+            map.set(foundKey, {
+              ...existing,
+              ...pEv,
+              totalVotesCast: mergedTotalVotes,
+              recentVotes: dedupedRecentVotes,
+            });
           } else {
             map.set(pEv.id, pEv);
           }
@@ -79,18 +101,8 @@ export const EventsTable: React.FC = () => {
           const totalUsed = combined.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
           localStorage.setItem('truevote_votes_used', String(totalUsed));
 
-          // Restore synthesized activities
-          const existingActs = JSON.parse(localStorage.getItem('truevote_activities') || '[]');
-          if (existingActs.length === 0) {
-            const restoredActs = combined.slice(0, 5).map((e) => ({
-              id: `act-${e.id}`,
-              userName: `Admin (${(e.creatorWallet || 'Web3').substring(0, 6)}...${(e.creatorWallet || 'wallet').slice(-4)})`,
-              votingNumber: e.votingNumber,
-              date: 'Synced from IPFS',
-              type: 'announcement',
-            }));
-            localStorage.setItem('truevote_activities', JSON.stringify(restoredActs));
-          }
+          // Ensure activities (latest votes and announcements) are kept in sync
+          getStoredActivities();
 
           window.dispatchEvent(new Event('truevote_events_updated'));
         } catch (e) {
@@ -114,12 +126,31 @@ export const EventsTable: React.FC = () => {
     window.addEventListener('truevote_events_updated', handleStorageUpdate);
     window.addEventListener('storage', handleStorageUpdate);
 
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel('truevote_events_channel');
+      bc.onmessage = () => {
+        handleStorageUpdate();
+      };
+    } catch (e) {}
+
     // Initial restoration from IPFS
     syncExistingEvents();
 
+    // Background auto-sync every 12 seconds to keep latest votes live from IPFS
+    const intervalId = setInterval(() => {
+      syncExistingEvents();
+    }, 12000);
+
     return () => {
+      clearInterval(intervalId);
       window.removeEventListener('truevote_events_updated', handleStorageUpdate);
       window.removeEventListener('storage', handleStorageUpdate);
+      if (bc) {
+        try {
+          bc.close();
+        } catch (e) {}
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

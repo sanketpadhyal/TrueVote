@@ -432,10 +432,26 @@ export const VotingPage: React.FC = () => {
       );
       const updatedTotalCast = (event.totalVotesCast || 0) + 1;
 
+      // Activity entry for this ballot
+      const now = Date.now();
+      const voterShortTag = receiptHash.substring(2, 6);
+      const newActivity = {
+        id: `act-${now}-${Math.random().toString(36).substring(2, 6)}`,
+        userName: `Anonymous Voter (#${voterShortTag})`,
+        votingNumber: event.votingNumber,
+        date: 'Just now',
+        timestamp: now,
+        type: 'ballot' as const,
+      };
+
+      const existingRecent = (event as any).recentVotes || [];
+      const updatedRecentVotes = [newActivity, ...existingRecent].slice(0, 50);
+
       const updatedEvent: EventItem = {
         ...event,
         options: updatedOptions,
         totalVotesCast: updatedTotalCast,
+        recentVotes: updatedRecentVotes,
       };
 
       // Persist event update
@@ -454,12 +470,29 @@ export const VotingPage: React.FC = () => {
       }
       localStorage.setItem('truevote_events', JSON.stringify(events));
       saveEventsToBackup(events);
+
+      // Record anonymous activity log
+      try {
+        const actStr = localStorage.getItem('truevote_activities') || '[]';
+        const activities = JSON.parse(actStr);
+        const filtered = activities.filter((a: any) => a.id !== newActivity.id);
+        const updatedActivities = [newActivity, ...filtered].slice(0, 50);
+        localStorage.setItem('truevote_activities', JSON.stringify(updatedActivities));
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Update total votes used counter in storage
+      const totalUsed = events.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
+      localStorage.setItem('truevote_votes_used', String(totalUsed));
+
+      // Notify components in current window
       window.dispatchEvent(new Event('truevote_events_updated'));
 
-      // Broadcast update across tabs
+      // Broadcast update across all open tabs
       try {
         const bc = new BroadcastChannel('truevote_events_channel');
-        bc.postMessage({ type: 'EVENT_UPDATED', eventId: event.id });
+        bc.postMessage({ type: 'EVENT_UPDATED', eventId: event.id, activity: newActivity });
         bc.close();
       } catch (e) {}
 
@@ -479,6 +512,7 @@ export const VotingPage: React.FC = () => {
             );
             localStorage.setItem('truevote_events', JSON.stringify(list));
             saveEventsToBackup(list);
+            window.dispatchEvent(new Event('truevote_events_updated'));
           }
         })
         .catch((err) => {
@@ -493,22 +527,6 @@ export const VotingPage: React.FC = () => {
         eventId: event.id,
       };
       localStorage.setItem(nullifierKey, JSON.stringify(receiptData));
-
-      // 6. Record anonymous activity log
-      try {
-        const actStr = localStorage.getItem('truevote_activities') || '[]';
-        const activities = JSON.parse(actStr);
-        activities.unshift({
-          id: `act-${Date.now()}`,
-          userName: `Anonymous Voter (#${receiptHash.substring(2, 6)})`,
-          votingNumber: event.votingNumber,
-          date: 'Just now',
-          type: 'ballot',
-        });
-        localStorage.setItem('truevote_activities', JSON.stringify(activities.slice(0, 20)));
-      } catch (e) {
-        console.error(e);
-      }
 
       setEvent(updatedEvent);
       setLatestReceipt({ receiptHash, timestamp });
