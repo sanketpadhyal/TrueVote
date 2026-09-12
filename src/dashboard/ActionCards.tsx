@@ -23,6 +23,12 @@ export const ActionCards: React.FC<ActionCardsProps> = ({
             }}
           />
         </div>
+        <div className="action-card-content">
+          <h3 className="action-card-title">Create Voting Event</h3>
+          <p className="action-card-subtitle">
+            Set up anonymous ballots stored securely on Pinata IPFS
+          </p>
+        </div>
         <div className="action-card-button-wrap">
           <button
             type="button"
