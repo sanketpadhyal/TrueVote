@@ -69,8 +69,11 @@
 
 .wyborek-logo-wrap {
   margin-bottom: 24px;
-  padding: 0 6px;
+  padding: 0;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wyborek-brand {
@@ -83,9 +86,11 @@
   background: none;
   border: none;
   padding: 0;
+  margin: 0;
   cursor: pointer;
   user-select: none;
   font-family: inherit;
+  width: 100%;
 }
 
 .sidebar-logo-img {
@@ -927,6 +932,7 @@
   .wyborek-brand {
     flex-direction: row;
     gap: 8px;
+    width: auto;
   }
 
   .sidebar-logo-img {
