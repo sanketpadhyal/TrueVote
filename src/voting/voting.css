@@ -313,14 +313,50 @@
   color: #dc2626;
 }
 
-.voting-privacy-pill {
-  background: #f5f3ff;
-  border: 1px solid #ddd6fe;
-  color: #7c3aed;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 10px;
+.voting-leading-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 11px;
   border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.08);
+}
+
+.voting-leading-pill.pill-tied {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+.voting-leading-pill.pill-neutral {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+.leading-fire {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.leading-name {
+  color: #92400e;
+  font-weight: 800;
+}
+
+.pill-tied .leading-name,
+.pill-neutral .leading-name {
+  color: inherit;
+}
+
+.leading-count {
+  font-weight: 700;
+  opacity: 0.85;
 }
 
 .voting-event-title {
@@ -1053,8 +1089,9 @@
   }
 
   .voting-event-num-pill,
-  .voting-status-pill {
-    font-size: 11px;
+  .voting-status-pill,
+  .voting-leading-pill {
+    font-size: 10.5px;
     padding: 2.5px 8px;
   }
 

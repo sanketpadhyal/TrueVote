@@ -778,6 +778,17 @@ export const VotingPage: React.FC = () => {
   const totalVotesCast = event.totalVotesCast || event.options.reduce((sum, o) => sum + (o.votesCount || 0), 0);
   const maxVotesDisplay = event.totalAllowedVotes === 'unlimited' ? '∞ Unlimited' : event.totalAllowedVotes;
 
+  // Real-time Leading Option Calculation
+  const sortedOptions = [...(event.options || [])].sort(
+    (a, b) => (b.votesCount || 0) - (a.votesCount || 0)
+  );
+  const topOption = sortedOptions[0] || null;
+  const isTied =
+    sortedOptions.length > 1 &&
+    (topOption?.votesCount || 0) > 0 &&
+    sortedOptions[0]?.votesCount === sortedOptions[1]?.votesCount;
+  const hasAnyVotes = (topOption?.votesCount || 0) > 0;
+
   return (
     <div className="voting-page-wrapper">
       {/* Background Subtle Gradient Glows - Contained to prevent scroll overflow */}
@@ -844,6 +855,31 @@ export const VotingPage: React.FC = () => {
               <span className={`voting-status-pill ${isVotingActive ? 'pill-active' : 'pill-closed'}`}>
                 {isVotingActive ? 'Polls Open' : 'Voting Inactive'}
               </span>
+              {hasAnyVotes && !isTied && topOption && (
+                <span className="voting-leading-pill" title={`Leader: ${topOption.label} (${topOption.votesCount || 0} votes)`}>
+                  <span className="leading-fire">🔥</span>
+                  <span className="leading-label">Leading:</span>
+                  <strong className="leading-name">
+                    {topOption.label.length > 20 ? `${topOption.label.slice(0, 18)}...` : topOption.label}
+                  </strong>
+                  <span className="leading-count">({topOption.votesCount || 0})</span>
+                </span>
+              )}
+              {hasAnyVotes && isTied && (
+                <span className="voting-leading-pill pill-tied" title="Tied votes among top choices">
+                  <span className="leading-fire">⚖️</span>
+                  <span className="leading-label">Leading:</span>
+                  <strong className="leading-name">Tied</strong>
+                  <span className="leading-count">({topOption?.votesCount || 0})</span>
+                </span>
+              )}
+              {!hasAnyVotes && (
+                <span className="voting-leading-pill pill-neutral" title="No votes cast yet">
+                  <span className="leading-fire">📊</span>
+                  <span className="leading-label">Leading:</span>
+                  <strong className="leading-name">No votes yet</strong>
+                </span>
+              )}
             </div>
 
             <h1 className="voting-event-title">{event.name}</h1>
