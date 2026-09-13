@@ -5,6 +5,7 @@ import PauseOrQuitModal from './PauseOrQuitModal';
 import { getStoredActivities } from './StatsPanel';
 import { deleteEventFromPinata, fetchEventsFromPinata, uploadEventToPinata } from '../services/pinata';
 import { saveEventsToBackup, loadEventsFromBackup, removeEventFromBackup } from '../services/storage';
+import { informSuccess, informInfo, informError } from '../components/universal-informer';
 
 const getStoredEvents = (): EventItem[] => {
   if (typeof window === 'undefined') return [];
@@ -208,8 +209,23 @@ export const EventsTable: React.FC = () => {
             return withPin;
           });
         }
+
+        if (updates.isActivated !== undefined) {
+          if (updates.isActivated) {
+            informSuccess(
+              `"${targetUpdatedEvent.name || 'Voting Event'}" is now live and accepting ballots.`,
+              'Voting Event Activated'
+            );
+          } else {
+            informInfo(
+              `"${targetUpdatedEvent.name || 'Voting Event'}" has been paused.`,
+              'Voting Event Paused'
+            );
+          }
+        }
       } catch (err) {
         console.warn('Pinata activation sync notice:', err);
+        informError('Could not sync status with IPFS. Changes saved locally.', 'IPFS Sync Notice');
       } finally {
         setActivatingEventIds((prev) => {
           const next = new Set(prev);
