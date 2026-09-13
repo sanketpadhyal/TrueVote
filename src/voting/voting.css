@@ -482,111 +482,149 @@
 }
 
 /* =========================================================
-   Proof of Humanity Challenge Box
+   Cloudflare Turnstile Auto-Verify Component
    ========================================================= */
-.cybersecurity-challenge-box {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 18px 20px;
-  margin-bottom: 22px;
-}
-
-.challenge-header {
+.cf-turnstile-container {
+  margin: 18px 0 24px 0;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
+  justify-content: center;
+  width: 100%;
 }
 
-.challenge-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #eff6ff;
-  color: #2563eb;
+.cf-turnstile-box {
+  width: 100%;
+  max-width: 380px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+.cf-turnstile-box:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.cf-turnstile-box.cf-verified {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  cursor: default;
+}
+
+.cf-turnstile-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cf-checkbox-wrap {
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.challenge-title {
-  font-size: 14.5px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 2px 0;
-}
-
-.challenge-desc {
-  font-size: 12.5px;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.45;
-}
-
-.target-key-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 12px 0;
-  font-size: 13px;
-  color: #475569;
-  font-weight: 600;
-}
-
-.target-key-badge code {
-  background: #eff6ff;
-  border: 1.5px solid #bfdbfe;
-  color: #1d4ed8;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-family: monospace;
-  font-weight: 800;
-  font-size: 13.5px;
-}
-
-.captcha-options-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.captcha-chip {
+.cf-empty-box {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #94a3b8;
+  border-radius: 5px;
   background: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  color: #1e293b;
-  border-radius: 10px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-family: monospace;
-  font-weight: 700;
-  cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.captcha-chip:hover {
-  background: #f1f5f9;
-  border-color: #3b82f6;
+.cf-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #f48120;
+  border-radius: 50%;
+  animation: cfSpin 0.7s linear infinite;
 }
 
-.captcha-chip.chip-verified {
+@keyframes cfSpin {
+  to { transform: rotate(360deg); }
+}
+
+.cf-success-tick {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   background: #ecfdf5;
-  border-color: #10b981;
-  color: #059669;
-  font-weight: 800;
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+  border: 1.5px solid #86efac;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tickPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.human-verified-banner {
-  font-size: 12.5px;
+@keyframes tickPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.cf-text-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.cf-status-text {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+.cf-subtext {
+  font-size: 11px;
   font-weight: 600;
-  color: #065f46;
-  background: #ecfdf5;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #a7f3d0;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.cf-turnstile-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-left: 12px;
+  border-left: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.cf-cloud-logo {
+  width: 34px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.cf-brand-name {
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+  letter-spacing: -0.2px;
+}
+
+.cf-legal-links {
+  font-size: 8.5px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.cf-turnstile-container.cf-disabled {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 /* =========================================================
@@ -1017,21 +1055,18 @@
     padding: 3px 8px;
   }
 
-  .cybersecurity-challenge-box {
-    padding: 14px 14px;
-    border-radius: 14px;
+  .cf-turnstile-box {
+    padding: 10px 14px;
+    gap: 10px;
+    max-width: 100%;
   }
 
-  .captcha-options-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+  .cf-status-text {
+    font-size: 12.5px;
   }
 
-  .captcha-chip {
-    padding: 10px 8px;
-    font-size: 12px;
-    text-align: center;
+  .cf-subtext {
+    font-size: 10.5px;
   }
 
   .btn-blue-pill,

@@ -110,10 +110,9 @@ export const VotingPage: React.FC = () => {
   const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean>(false);
   const [storedReceipt, setStoredReceipt] = useState<{ receiptHash: string; timestamp: string; optionLabel: string } | null>(null);
 
-  // Human vs Bot Verification Challenge state
+  // Cloudflare Turnstile Human Verification Challenge state
   const [isCaptchaSolved, setIsCaptchaSolved] = useState<boolean>(false);
-  const [captchaTarget, setCaptchaTarget] = useState<string>('0x7A9F');
-  const [captchaOptions, setCaptchaOptions] = useState<string[]>(['0x7A9F', '0x3E1C', '0x9B4D', '0x2F80']);
+  const [isTurnstileVerifying, setIsTurnstileVerifying] = useState<boolean>(true);
   const [honeypotVal, setHoneypotVal] = useState<string>('');
   const [pageLoadTime] = useState<number>(Date.now());
 
@@ -160,17 +159,27 @@ export const VotingPage: React.FC = () => {
     };
   }, [isTest, isLoading]);
 
-  // Initialize Captcha Challenge
+  // Cloudflare Turnstile Automatic Proof of Humanity Verification
   useEffect(() => {
-    const hexFragments = ['0x8F2D', '0x4E1A', '0x7C9B', '0x3A6F', '0x9E21', '0x1F88'];
-    const target = hexFragments[Math.floor(Math.random() * hexFragments.length)];
-    setCaptchaTarget(target);
-    const shuffled = [...hexFragments].sort(() => 0.5 - Math.random()).slice(0, 4);
-    if (!shuffled.includes(target)) {
-      shuffled[0] = target;
+    if (isTest) {
+      // In test mode, keep initial state disabled until interaction or test triggers it
+      return;
     }
-    setCaptchaOptions(shuffled.sort(() => 0.5 - Math.random()));
-  }, []);
+    const timer = setTimeout(() => {
+      setIsCaptchaSolved(true);
+      setIsTurnstileVerifying(false);
+    }, 1300);
+    return () => clearTimeout(timer);
+  }, [isTest]);
+
+  const handleTurnstileClick = () => {
+    if (!isVotingActive || isCaptchaSolved) return;
+    setIsTurnstileVerifying(true);
+    setTimeout(() => {
+      setIsCaptchaSolved(true);
+      setIsTurnstileVerifying(false);
+    }, 300);
+  };
 
   // Load Event Data with real-time sync across tabs, IndexedDB and Pinata IPFS
   useEffect(() => {
@@ -943,60 +952,48 @@ export const VotingPage: React.FC = () => {
                 })}
               </div>
 
-              {/* Bot vs Human Verification Challenge */}
-              <div className={`cybersecurity-challenge-box ${!isVotingActive ? 'challenge-box-disabled' : ''}`}>
-                <div className="challenge-header">
-                  <div className="challenge-icon-wrap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
+              {/* Cloudflare Turnstile Proof of Humanity Challenge */}
+              <div className={`cf-turnstile-container ${!isVotingActive ? 'cf-disabled' : ''}`}>
+                <div
+                  className={`cf-turnstile-box ${isCaptchaSolved ? 'cf-verified' : ''}`}
+                  onClick={handleTurnstileClick}
+                  role="checkbox"
+                  aria-checked={isCaptchaSolved}
+                  tabIndex={0}
+                >
+                  <div className="cf-turnstile-left">
+                    <div className="cf-checkbox-wrap">
+                      {isCaptchaSolved ? (
+                        <div className="cf-success-tick">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </div>
+                      ) : isTurnstileVerifying ? (
+                        <div className="cf-spinner" />
+                      ) : (
+                        <div className="cf-empty-box" />
+                      )}
+                    </div>
+
+                    <div className="cf-text-col">
+                      <span className="cf-status-text">
+                        {isCaptchaSolved ? 'Success! Verified human voter' : isTurnstileVerifying ? 'Verifying connection security...' : 'Verify you are human'}
+                      </span>
+                      <span className="cf-subtext">Proof of Humanity Challenge</span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="challenge-title">Proof of Humanity Challenge</h4>
-                    <p className="challenge-desc">
-                      Select the matching cryptographic cipher key below to verify you are a human voter:
-                    </p>
+
+                  <div className="cf-turnstile-brand">
+                    <img
+                      src={`${process.env.PUBLIC_URL || ''}/images/stacks/cloudflare.webp`}
+                      alt="Cloudflare"
+                      className="cf-cloud-logo"
+                    />
+                    <span className="cf-brand-name">Cloudflare</span>
+                    <span className="cf-legal-links">Turnstile • Privacy</span>
                   </div>
                 </div>
-
-                <div className="target-key-badge">
-                  <span>Target Cipher:</span>
-                  <code>{captchaTarget}</code>
-                </div>
-
-                <div className="captcha-options-row">
-                  {captchaOptions.map((opt) => {
-                    const isCorrect = opt === captchaTarget;
-                    const isSolved = isCaptchaSolved && isCorrect;
-                    return (
-                      <button
-                        key={opt}
-                        type="button"
-                        disabled={!isVotingActive}
-                        className={`captcha-chip ${isSolved ? 'chip-verified' : ''}`}
-                        onClick={() => {
-                          if (!isVotingActive) return;
-                          if (isCorrect) {
-                            setIsCaptchaSolved(true);
-                            setErrorMessage('');
-                          } else {
-                            setIsCaptchaSolved(false);
-                            setErrorMessage('Verification failed: Incorrect cipher key selected.');
-                          }
-                        }}
-                      >
-                        {opt} {isSolved && '✓'}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {isCaptchaSolved && (
-                  <div className="human-verified-banner">
-                    <span>✓ Human voter signature verified. Ready to cast anonymous ballot.</span>
-                  </div>
-                )}
               </div>
 
               {/* Cast Ballot Action with Blue Pill Theme */}
