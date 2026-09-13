@@ -5,7 +5,6 @@ import { fetchEventByIdFromPinata, fetchEventsFromPinata, uploadEventToPinata } 
 import { loadEventsFromBackup, saveEventsToBackup } from '../services/storage';
 import './voting.css';
 
-// Simple SHA-256 equivalent hash helper using subtle crypto or fallback
 async function sha256(message: string): Promise<string> {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
     try {
@@ -17,7 +16,7 @@ async function sha256(message: string): Promise<string> {
       console.error(e);
     }
   }
-  // Deterministic fallback
+
   let hash = 0;
   for (let i = 0; i < message.length; i++) {
     const char = message.charCodeAt(i);
@@ -27,7 +26,6 @@ async function sha256(message: string): Promise<string> {
   return Math.abs(hash).toString(16).padStart(16, '0');
 }
 
-// Generate device / session pseudo-fingerprint for anonymous nullifier
 const getAnonymousVoterId = (): string => {
   if (typeof window === 'undefined') return 'anon-voter-fallback';
   let voterId = localStorage.getItem('truevote_voter_seed');
@@ -38,14 +36,12 @@ const getAnonymousVoterId = (): string => {
   return voterId;
 };
 
-// Robust Anti-Double Voting Guard check across local storage, session storage, and wallet
 export const checkHasAlreadyVoted = (idOrNum: string): { voted: boolean; receipt: any } => {
   if (typeof window === 'undefined' || !idOrNum) return { voted: false, receipt: null };
   const cleanId = idOrNum.trim().toLowerCase();
   const voterId = getAnonymousVoterId();
   const walletAddr = (localStorage.getItem('truevote_wallet_connected_addr') || '').toLowerCase();
 
-  // 1. Centralized registry check
   try {
     const regStr = localStorage.getItem('truevote_voted_events_registry');
     if (regStr) {
@@ -59,7 +55,6 @@ export const checkHasAlreadyVoted = (idOrNum: string): { voted: boolean; receipt
     }
   } catch (e) {}
 
-  // 2. Direct nullifier keys
   const candidateKeys = [
     `truevote_voted_nullifier_${cleanId}_${voterId}`,
     `truevote_voted_nullifier_${idOrNum}_${voterId}`,
@@ -84,7 +79,6 @@ export const checkHasAlreadyVoted = (idOrNum: string): { voted: boolean; receipt
     }
   }
 
-  // 3. sessionStorage fallback
   try {
     const sess = sessionStorage.getItem(`truevote_voted_${cleanId}`);
     if (sess) {
@@ -99,7 +93,6 @@ export const checkHasAlreadyVoted = (idOrNum: string): { voted: boolean; receipt
   return { voted: false, receipt: null };
 };
 
-// Permanently record committed nullifier receipt to forbid any subsequent voting
 export const recordVotedNullifier = (
   evId: string,
   votingNum: string | undefined,
@@ -109,7 +102,6 @@ export const recordVotedNullifier = (
   const voterId = getAnonymousVoterId();
   const walletAddr = (localStorage.getItem('truevote_wallet_connected_addr') || '').toLowerCase();
 
-  // Save in central registry
   try {
     const regStr = localStorage.getItem('truevote_voted_events_registry');
     const reg = regStr ? JSON.parse(regStr) : {};
@@ -153,7 +145,6 @@ export const recordVotedNullifier = (
   });
 };
 
-// Play cheerful PhonePe / UPI style confirmation chime using Web Audio API
 const playSuccessChime = () => {
   if (typeof window === 'undefined') return;
   try {
@@ -165,7 +156,7 @@ const playSuccessChime = () => {
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
     osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(1046.5, now); // C6
+    osc1.frequency.setValueAtTime(1046.5, now);
     gain1.gain.setValueAtTime(0.14, now);
     gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
     osc1.connect(gain1);
@@ -176,7 +167,7 @@ const playSuccessChime = () => {
     const osc2 = ctx.createOscillator();
     const gain2 = ctx.createGain();
     osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(1567.98, now + 0.11); // G6
+    osc2.frequency.setValueAtTime(1567.98, now + 0.11);
     gain2.gain.setValueAtTime(0.14, now + 0.11);
     gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
     osc2.connect(gain2);
@@ -184,11 +175,10 @@ const playSuccessChime = () => {
     osc2.start(now + 0.11);
     osc2.stop(now + 0.52);
   } catch (e) {
-    // AudioContext safely ignored if restricted
+
   }
 };
 
-// Convert Date to Indian Standard Time (IST UTC+05:30)
 const getIstCurrentTime = (): Date => {
   const now = new Date();
   const istOffset = 5.5 * 60 * 60 * 1000;
@@ -217,7 +207,6 @@ const DEFAULT_TEST_EVENT: EventItem = {
   timezone: 'IST (UTC+05:30)',
 };
 
-// Generate a deterministic, realistic Ethereum-formatted wallet address for the voter session
 export const getDeterministicVoterWallet = (voterSeed: string, eventId: string = ''): string => {
   let hash1 = 5381;
   let hash2 = 52711;
@@ -241,7 +230,6 @@ export const VotingPage: React.FC = () => {
 
   const isTest = process.env.NODE_ENV === 'test';
 
-  // State
   const [event, setEvent] = useState<EventItem | null>(() => {
     if (isTest && !eventId) return DEFAULT_TEST_EVENT;
     return null;
@@ -260,7 +248,6 @@ export const VotingPage: React.FC = () => {
   const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean>(false);
   const [storedReceipt, setStoredReceipt] = useState<{ receiptHash: string; timestamp: string; optionLabel: string } | null>(null);
 
-  // Cloudflare Turnstile & Headless Bot Heuristics state
   const [isCaptchaSolved, setIsCaptchaSolved] = useState<boolean>(false);
   const [isTurnstileVerifying, setIsTurnstileVerifying] = useState<boolean>(true);
   const [turnstileBotDetected, setTurnstileBotDetected] = useState<boolean>(false);
@@ -269,13 +256,11 @@ export const VotingPage: React.FC = () => {
   const [pageLoadTime] = useState<number>(Date.now());
   const humanInteractionCount = React.useRef(0);
 
-  // Casting state
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [voteSuccess, setVoteSuccess] = useState<boolean>(false);
   const [latestReceipt, setLatestReceipt] = useState<{ receiptHash: string; timestamp: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // Real-time IST Clock
   const [currentTimeIst, setCurrentTimeIst] = useState<string>('');
 
   useEffect(() => {
@@ -297,7 +282,6 @@ export const VotingPage: React.FC = () => {
     }
   }, [isTest]);
 
-  // Phased step-by-step loading progression (slowly slowly connecting wallet and decrypting)
   useEffect(() => {
     if (isTest || !isLoading) return;
 
@@ -312,7 +296,6 @@ export const VotingPage: React.FC = () => {
     };
   }, [isTest, isLoading]);
 
-  // Track genuine human entropy (cursor movement, touch tap, keypress, scroll)
   useEffect(() => {
     const handleHumanAction = () => {
       humanInteractionCount.current += 1;
@@ -333,13 +316,11 @@ export const VotingPage: React.FC = () => {
     };
   }, []);
 
-  // Cloudflare Turnstile Verification Engine with Headless Bot Heuristics
   useEffect(() => {
     if (isTest) {
       return;
     }
 
-    // 1. Headless Browser & Automated Webdriver Checks (Puppeteer, Selenium, Playwright)
     const isWebDriver = typeof navigator !== 'undefined' && Boolean(navigator.webdriver);
     const win = window as any;
     const isHeadlessAnomalies =
@@ -360,14 +341,13 @@ export const VotingPage: React.FC = () => {
       return;
     }
 
-    // 2. Automated evaluation sequence: wait for human entropy or user presence
     const timer = setTimeout(() => {
-      // If genuine human entropy was recorded, verify automatically
+
       if (humanInteractionCount.current >= 1) {
         setIsCaptchaSolved(true);
         setIsTurnstileVerifying(false);
       } else {
-        // Stop spinning and wait for user to click/interact
+
         setIsTurnstileVerifying(false);
       }
     }, 1400);
@@ -378,7 +358,6 @@ export const VotingPage: React.FC = () => {
   const handleTurnstileClick = () => {
     if (!isVotingActive || isCaptchaSolved) return;
 
-    // Check automated runner on click
     if (typeof navigator !== 'undefined' && Boolean(navigator.webdriver) && !isTest) {
       setTurnstileBotDetected(true);
       setTurnstileBotReason('Automated webdriver runner detected (navigator.webdriver)');
@@ -396,7 +375,6 @@ export const VotingPage: React.FC = () => {
     }, 400);
   };
 
-  // Load Event Data with real-time sync across tabs, IndexedDB and Pinata IPFS
   useEffect(() => {
     if (isTest && !eventId) {
       return;
@@ -408,7 +386,6 @@ export const VotingPage: React.FC = () => {
     const loadEventData = async () => {
       let foundEvent: EventItem | null = null;
 
-      // 0. Immediate Fast-Path Anti-Double-Voting Guard
       if (targetId) {
         const initialStatus = checkHasAlreadyVoted(targetId);
         if (initialStatus.voted) {
@@ -417,7 +394,6 @@ export const VotingPage: React.FC = () => {
         }
       }
 
-      // 1. Check localStorage first
       const storedEventsStr = localStorage.getItem('truevote_events');
       if (storedEventsStr) {
         try {
@@ -439,7 +415,6 @@ export const VotingPage: React.FC = () => {
         }
       }
 
-      // 2. If not found in localStorage, check IndexedDB backup
       if (!foundEvent) {
         try {
           const backupEvents = await loadEventsFromBackup();
@@ -463,7 +438,6 @@ export const VotingPage: React.FC = () => {
         }
       }
 
-      // If found locally, immediately guard against double-voting before rendering
       if (foundEvent && isMounted) {
         const checkLocal =
           checkHasAlreadyVoted(foundEvent.id) ||
@@ -477,7 +451,6 @@ export const VotingPage: React.FC = () => {
         setNotFound(false);
       }
 
-      // 3. Decentralized IPFS sync via Pinata (Crucial for Incognito mode or cross-browser voting)
       try {
         if (targetId) {
           let pinataEvent = await fetchEventByIdFromPinata(targetId);
@@ -505,7 +478,6 @@ export const VotingPage: React.FC = () => {
             setIsLoading(false);
             setNotFound(false);
 
-            // Persist to localStorage and IndexedDB so subsequent operations are local
             const existingStr = localStorage.getItem('truevote_events');
             let list: EventItem[] = [];
             if (existingStr) {
@@ -523,7 +495,7 @@ export const VotingPage: React.FC = () => {
             saveEventsToBackup(list);
           }
         } else {
-          // If no specific eventId in URL, fetch available remote events
+
           const pinataEvents = await fetchEventsFromPinata();
           if (isMounted && Array.isArray(pinataEvents) && pinataEvents.length > 0) {
             foundEvent = pinataEvents[0];
@@ -545,16 +517,14 @@ export const VotingPage: React.FC = () => {
 
       if (!isMounted) return;
 
-      // 4. Fallback Handling
       if (!foundEvent) {
         if (targetId) {
-          // A specific event was requested, but was not found in storage or IPFS
-          // NEVER display the mock referendum for an unknown custom event!
+
           setIsLoading(false);
           setNotFound(true);
           return;
         } else {
-          // Fallback demo referendum ONLY if no eventId was specified in URL
+
           const demoEvent: EventItem = {
             id: 'demo-referendum',
             name: 'TrueVote Cryptographic Governance Referendum 2026',
@@ -590,7 +560,6 @@ export const VotingPage: React.FC = () => {
         }
       }
 
-      // Check if voter already voted for this event (Comprehensive Multi-Key Guard)
       if (foundEvent) {
         const checkFinal =
           checkHasAlreadyVoted(foundEvent.id) ||
@@ -605,7 +574,6 @@ export const VotingPage: React.FC = () => {
 
     loadEventData();
 
-    // Event listeners for instant cross-tab / cross-window reactivity
     const handleUpdate = () => {
       loadEventData();
     };
@@ -621,7 +589,6 @@ export const VotingPage: React.FC = () => {
       };
     } catch (e) {}
 
-    // Periodic synchronization (every 4 seconds) to ensure incognito & external voters see real-time updates
     const pollInterval = process.env.NODE_ENV !== 'test'
       ? setInterval(() => {
           loadEventData();
@@ -637,21 +604,18 @@ export const VotingPage: React.FC = () => {
     };
   }, [eventId, isTest]);
 
-  // Check Schedule & Strict Activation Enforcement
   const isVotingActive = React.useMemo(() => {
     if (!event) return false;
 
-    // Explicit deactivation override
     if (event.isActivated === false) {
       return false;
     }
 
     if (event.activationType === 'manual') {
-      // Manual events MUST be explicitly activated by admin (isActivated === true)
+
       return event.isActivated === true;
     }
 
-    // Automatic activation: verify against Indian Standard Time (IST) window
     if (event.startDate && event.endDate) {
       const nowIst = getIstCurrentTime();
       const startDateTime = new Date(`${event.startDate}T${event.startTime || '00:00'}:00`);
@@ -665,7 +629,6 @@ export const VotingPage: React.FC = () => {
     return event.isActivated === true;
   }, [event]);
 
-  // Cast Ballot Handler
   const handleCastBallot = async () => {
     setErrorMessage('');
 
@@ -678,7 +641,6 @@ export const VotingPage: React.FC = () => {
       return;
     }
 
-    // 1. Anti-Bot Verification Checks
     if (honeypotVal.trim() !== '') {
       setErrorMessage('Security Exception: Bot behavior detected (honeypot trap triggered).');
       return;
@@ -712,7 +674,6 @@ export const VotingPage: React.FC = () => {
 
     if (!event) return;
 
-    // 2. Double-voting check
     const voteCheck =
       checkHasAlreadyVoted(event.id) ||
       (event.votingNumber ? checkHasAlreadyVoted(event.votingNumber) : { voted: false, receipt: null }) ||
@@ -727,7 +688,7 @@ export const VotingPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // 3. Generate Cryptographic Nullifier & Anonymous Receipt
+
       const voterId = getAnonymousVoterId();
       const nullifierHash = await sha256(`truevote:nullifier:${event.id}:${voterId}:${Date.now()}`);
       const receiptHash = `0x${nullifierHash.substring(0, 32)}`;
@@ -736,13 +697,11 @@ export const VotingPage: React.FC = () => {
       const selectedOption = event.options.find((o) => o.id === selectedOptionId);
       const optionLabel = selectedOption ? selectedOption.label : 'Option';
 
-      // 4. Update Event Vote Count anonymously in Storage
       const updatedOptions = event.options.map((opt) =>
         opt.id === selectedOptionId ? { ...opt, votesCount: (opt.votesCount || 0) + 1 } : opt
       );
       const updatedTotalCast = (event.totalVotesCast || 0) + 1;
 
-      // Activity entry for this ballot
       const now = Date.now();
       const voterShortTag = receiptHash.substring(2, 6);
       const newActivity = {
@@ -767,7 +726,6 @@ export const VotingPage: React.FC = () => {
         recentVotes: updatedRecentVotes,
       };
 
-      // Persist event update
       const storedEventsStr = localStorage.getItem('truevote_events');
       let events: EventItem[] = [];
       if (storedEventsStr) {
@@ -784,7 +742,6 @@ export const VotingPage: React.FC = () => {
       localStorage.setItem('truevote_events', JSON.stringify(events));
       saveEventsToBackup(events);
 
-      // Record anonymous activity log
       try {
         const actStr = localStorage.getItem('truevote_activities') || '[]';
         const activities = JSON.parse(actStr);
@@ -795,21 +752,17 @@ export const VotingPage: React.FC = () => {
         console.error(e);
       }
 
-      // Update total votes used counter in storage
       const totalUsed = events.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
       localStorage.setItem('truevote_votes_used', String(totalUsed));
 
-      // Notify components in current window
       window.dispatchEvent(new Event('truevote_events_updated'));
 
-      // Broadcast update across all open tabs
       try {
         const bc = new BroadcastChannel('truevote_events_channel');
         bc.postMessage({ type: 'EVENT_UPDATED', eventId: event.id, activity: newActivity });
         bc.close();
       } catch (e) {}
 
-      // Automatically sync updated vote count to Pinata IPFS in the background
       uploadEventToPinata(updatedEvent)
         .then((pinResult) => {
           if (pinResult?.IpfsHash) {
@@ -832,7 +785,6 @@ export const VotingPage: React.FC = () => {
           console.warn('Pinata vote sync notice:', err);
         });
 
-      // 5. Seal Nullifier to permanently lock double-voting
       const receiptData = {
         receiptHash,
         timestamp,
@@ -848,7 +800,6 @@ export const VotingPage: React.FC = () => {
       setVoteSuccess(true);
       setHasAlreadyVoted(true);
 
-      // Play PhonePe / UPI confirmation chime
       playSuccessChime();
     } catch (err) {
       console.error('Error casting vote:', err);
@@ -894,7 +845,6 @@ export const VotingPage: React.FC = () => {
               Establishing zero-knowledge anonymous voting session...
             </p>
 
-            {/* Stepped connection sequence */}
             <div className="loading-steps-track">
               <div className={`loading-step-item ${loadingPhase >= 0 ? 'step-done' : ''} ${loadingPhase === 0 ? 'step-current' : ''}`}>
                 <span className="step-num">{loadingPhase > 0 ? '✓' : '1'}</span>
@@ -987,7 +937,6 @@ export const VotingPage: React.FC = () => {
   const totalVotesCast = event.totalVotesCast || event.options.reduce((sum, o) => sum + (o.votesCount || 0), 0);
   const maxVotesDisplay = event.totalAllowedVotes === 'unlimited' ? '∞ Unlimited' : event.totalAllowedVotes;
 
-  // Real-time Leading Option Calculation
   const sortedOptions = [...(event.options || [])].sort(
     (a, b) => (b.votesCount || 0) - (a.votesCount || 0)
   );
@@ -1000,13 +949,12 @@ export const VotingPage: React.FC = () => {
 
   return (
     <div className="voting-page-wrapper">
-      {/* Background Subtle Gradient Glows - Contained to prevent scroll overflow */}
+
       <div className="voting-ambient-background" aria-hidden="true">
         <div className="voting-glow-ambient voting-glow-top"></div>
         <div className="voting-glow-ambient voting-glow-bottom"></div>
       </div>
 
-      {/* Top Navbar: only logo and real-time clock */}
       <header className="voting-navbar">
         <div className="voting-brand" onClick={() => navigate('/dashboard')} title="TrueVote Dashboard">
           <img src="/images/logo.png" alt="TrueVote Logo" className="voting-brand-logo" />
@@ -1022,10 +970,9 @@ export const VotingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Ballot Card */}
       <main className="voting-main-container">
         <div className="voting-card">
-          {/* Honeypot Bot Trap Field */}
+
           <input
             type="text"
             name="security_trap"
@@ -1036,7 +983,6 @@ export const VotingPage: React.FC = () => {
             autoComplete="off"
           />
 
-          {/* Connected MetaMask Wallet Pill Bar */}
           <div className="voter-identity-pill-bar">
             <div className="voter-identity-left">
               <img
@@ -1057,7 +1003,6 @@ export const VotingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Event Header */}
           <div className="voting-card-header">
             <div className="event-tag-row">
               <span className="voting-event-num-pill">{event.votingNumber}</span>
@@ -1106,7 +1051,6 @@ export const VotingPage: React.FC = () => {
             <h1 className="voting-event-title">{event.name}</h1>
             <p className="voting-event-bio">{event.bio}</p>
 
-            {/* Quorum / Capacity Progress */}
             <div className="voting-progress-wrap">
               <div className="progress-labels-row">
                 <span className="progress-label-text">Total Ballots Cast:</span>
@@ -1128,7 +1072,6 @@ export const VotingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* ALREADY VOTED STATE (Strict Anti-Double-Voting Prevention) */}
           {hasAlreadyVoted && !voteSuccess && (
             <div className="already-voted-panel">
               <div className="shield-icon-badge">
@@ -1183,7 +1126,6 @@ export const VotingPage: React.FC = () => {
             </div>
           )}
 
-          {/* SUCCESSFUL BALLOT CONFIRMATION (PhonePe / UPI Style Animation) */}
           {voteSuccess && latestReceipt && (
             <div className="vote-success-panel phonepe-success-container">
               <div className="phonepe-animation-wrapper">
@@ -1243,7 +1185,6 @@ export const VotingPage: React.FC = () => {
             </div>
           )}
 
-          {/* ACTIVE VOTING BALLOT */}
           {!hasAlreadyVoted && !voteSuccess && (
             <div className="ballot-form-section">
               {errorMessage && (
@@ -1257,7 +1198,6 @@ export const VotingPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Inactive Schedule Notice */}
               {!isVotingActive && (
                 <div className="voting-inactive-notice">
                   <div className="inactive-notice-icon-wrap">
@@ -1277,7 +1217,6 @@ export const VotingPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Ballot Options List */}
               <div className={`ballot-options-list ${!isVotingActive ? 'ballot-list-disabled' : ''}`}>
                 <h3 className="section-label">Select Your Ballot Choice</h3>
                 {event.options.map((option: BallotOption, idx: number) => {
@@ -1311,7 +1250,6 @@ export const VotingPage: React.FC = () => {
                 })}
               </div>
 
-              {/* Cloudflare Turnstile Proof of Humanity Challenge */}
               <div className={`cf-turnstile-container ${!isVotingActive ? 'cf-disabled' : ''}`}>
                 <div
                   className={`cf-turnstile-box ${isCaptchaSolved ? 'cf-verified' : ''} ${turnstileBotDetected ? 'cf-blocked' : ''}`}
@@ -1371,7 +1309,6 @@ export const VotingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Cast Ballot Action with Blue Pill Theme */}
               <div className="ballot-cast-actions">
                 <button
                   type="button"
@@ -1413,3 +1350,4 @@ export const VotingPage: React.FC = () => {
 };
 
 export default VotingPage;
+

@@ -30,7 +30,7 @@ const getStoredVotesUsed = (): number => {
       const parsed = JSON.parse(licenseStored);
       if (typeof parsed.usedVotes === 'number' && parsed.usedVotes > 0) return parsed.usedVotes;
     }
-    // Check total votes cast across all stored events
+
     const eventsStr = localStorage.getItem('truevote_events');
     if (eventsStr) {
       const parsed: EventItem[] = JSON.parse(eventsStr);
@@ -91,7 +91,6 @@ export const getStoredActivities = (): ActivityItem[] => {
       return true;
     };
 
-    // 1. Read directly stored activities from localStorage
     const stored = localStorage.getItem('truevote_activities');
     if (stored) {
       try {
@@ -110,7 +109,6 @@ export const getStoredActivities = (): ActivityItem[] => {
       } catch (e) {}
     }
 
-    // 2. Read truevote_events to incorporate recentVotes & cast votes
     const eventsStr = localStorage.getItem('truevote_events');
     if (eventsStr) {
       try {
@@ -120,7 +118,6 @@ export const getStoredActivities = (): ActivityItem[] => {
             const ev = events[i];
             if (!ev || isDeleted(ev)) continue;
 
-            // A. Include embedded recentVotes
             if (Array.isArray(ev.recentVotes)) {
               for (let j = 0; j < ev.recentVotes.length; j++) {
                 const rv = ev.recentVotes[j];
@@ -133,7 +130,6 @@ export const getStoredActivities = (): ActivityItem[] => {
               }
             }
 
-            // B. Ensure ballots match totalVotesCast
             const castCount = Number(ev.totalVotesCast) || 0;
             let existingBallots = 0;
             for (let k = 0; k < allActivities.length; k++) {
@@ -172,7 +168,6 @@ export const getStoredActivities = (): ActivityItem[] => {
               }
             }
 
-            // C. Admin creation item (strictly one per election)
             const vKey = ev.votingNumber ? String(ev.votingNumber).toLowerCase() : '';
             if (vKey && !seenAdminEvents.has(vKey)) {
               seenAdminEvents.add(vKey);
@@ -196,7 +191,6 @@ export const getStoredActivities = (): ActivityItem[] => {
       } catch (e) {}
     }
 
-    // Sort: ballots first, newest timestamp first
     allActivities.sort((a, b) => {
       const timeA = a.timestamp || (a.type === 'ballot' ? 2 : 1);
       const timeB = b.timestamp || (b.type === 'ballot' ? 2 : 1);
@@ -261,7 +255,6 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
       };
     } catch (e) {}
 
-    // Dynamic timer to keep timestamps ("Just now", "2m ago") and activities fresh
     const timer = setInterval(() => {
       handleUpdate();
     }, 10000);
@@ -280,7 +273,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
 
   return (
     <aside className="wyborek-stats-panel">
-      {/* License Status Widget */}
+
       <div className="license-status-section">
         <h3 className="stats-section-title">Current license status</h3>
         <div className="license-card">
@@ -291,7 +284,6 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
         </div>
       </div>
 
-      {/* Voting Activity Feed */}
       <div className="voting-activity-section">
         <h3 className="stats-section-title">voting activity</h3>
         <div className="activity-list">
@@ -310,7 +302,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
               <div key={item.id} className="activity-item">
                 <div className="activity-icon-container">
                   {item.type === 'announcement' ? (
-                    // Megaphone / Admin announcement icon
+
                     <svg
                       className="activity-icon megaphone"
                       width="20"
@@ -325,7 +317,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
                       <path d="M3 11l19-9-9 19-2-8-8-2z" />
                     </svg>
                   ) : (
-                    // Ballot / Envelope vote cast icon
+
                     <svg
                       className="activity-icon ballot"
                       width="20"
@@ -373,3 +365,4 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
 };
 
 export default StatsPanel;
+

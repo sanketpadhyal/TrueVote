@@ -92,7 +92,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* Log Out Button at the bottom of the sidebar */}
       <div className="wyborek-sidebar-footer">
         <button
           type="button"
@@ -125,3 +124,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
 };
 
 export default Sidebar;
+

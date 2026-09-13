@@ -33,11 +33,9 @@ describe('NewEventModal Component', () => {
     expect(screen.getByText(/How many choices to vote on?/i)).toBeInTheDocument();
     expect(screen.getByText(/Step 1 of 4/i)).toBeInTheDocument();
 
-    // Check choice cards 2, 3, 4, 5
     const choiceCards = screen.getAllByRole('button', { name: /[2-5]\s*Choices/i });
     expect(choiceCards.length).toBe(4);
 
-    // Default 2 choices inputs exist
     expect(screen.getByPlaceholderText(/Name for Option 1/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Name for Option 2/i)).toBeInTheDocument();
   });
@@ -70,7 +68,6 @@ describe('NewEventModal Component', () => {
     const continueBtn = screen.getByRole('button', { name: /Continue/i });
     fireEvent.click(continueBtn);
 
-    // Step 2 should display total votes capacity presets
     expect(screen.getByText(/Total Votes Requested/i)).toBeInTheDocument();
     expect(screen.getByText(/Step 2 of 4/i)).toBeInTheDocument();
     expect(screen.getByText('50')).toBeInTheDocument();
@@ -78,3 +75,4 @@ describe('NewEventModal Component', () => {
     expect(screen.getAllByText(/Unlimited/i).length).toBeGreaterThan(0);
   });
 });
+

@@ -33,7 +33,7 @@ describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
   });
 
   test('merges concurrent votes from two devices without dropping votes', () => {
-    // Device A votes for Approve
+
     const versionA = {
       id: 'ev-1',
       votingNumber: 'VOTE-7738',
@@ -56,7 +56,6 @@ describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
       ],
     };
 
-    // Device B votes for Reject at the same time
     const versionB = {
       id: 'ev-1',
       votingNumber: 'VOTE-7738',
@@ -81,11 +80,9 @@ describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
 
     const merged = mergeEventVersions([versionA, versionB]);
 
-    // Both ballots should be preserved
     expect(merged.recentVotes.length).toBe(2);
     expect(merged.totalVotesCast).toBe(2);
 
-    // Both options should have 1 vote
     const optApprove = merged.options.find((o) => o.id === 'opt-1');
     const optReject = merged.options.find((o) => o.id === 'opt-2');
     expect(optApprove.votesCount).toBe(1);
@@ -115,7 +112,7 @@ describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
       votingNumber: 'VOTE-7738',
       totalVotesCast: 1,
       options: [{ id: 'opt-1', label: 'Approve', votesCount: 1 }],
-      recentVotes: [ballot1], // duplicate
+      recentVotes: [ballot1],
     };
 
     const merged = mergeEventVersions([version1, version2]);
@@ -124,3 +121,4 @@ describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
     expect(merged.options[0].votesCount).toBe(1);
   });
 });
+

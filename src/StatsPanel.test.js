@@ -50,3 +50,4 @@ describe('StatsPanel Component', () => {
     ).toBeInTheDocument();
   });
 });
+

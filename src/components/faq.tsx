@@ -113,7 +113,7 @@ export const FaqPage: React.FC = () => {
 
   const filteredFaqs = FAQ_DATA.filter((item) => {
     const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
-    const matchesSearch = 
+    const matchesSearch =
       item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.answer.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -124,7 +124,7 @@ export const FaqPage: React.FC = () => {
       <Navbar />
 
       <main className="faq-page-main">
-        {/* Header Hero */}
+
         <section className="faq-hero-container">
           <h1 className="faq-main-title blur-animate delay-1">
             Frequently Asked <br />
@@ -135,13 +135,12 @@ export const FaqPage: React.FC = () => {
             Everything you need to know about TrueVote's zero-knowledge voting protocol, gasless relayer infrastructure, and cryptographic election integrity.
           </p>
 
-          {/* Search Input */}
           <div className="faq-search-box blur-animate delay-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input 
+            <input
               type="text"
               className="faq-search-input"
               placeholder="Search by keyword, e.g. 'nullifier', 'gasless', 'merkle'..."
@@ -149,8 +148,8 @@ export const FaqPage: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="faq-search-clear"
                 onClick={() => setSearchQuery('')}
                 aria-label="Clear search"
@@ -160,7 +159,6 @@ export const FaqPage: React.FC = () => {
             )}
           </div>
 
-          {/* Filter Pills */}
           <div className="faq-filter-pills blur-animate delay-3">
             {[
               { id: 'all', label: 'All Questions' },
@@ -181,27 +179,26 @@ export const FaqPage: React.FC = () => {
           </div>
         </section>
 
-        {/* FAQ Accordion List */}
         <section className="faq-content-section blur-animate delay-4">
           {filteredFaqs.length > 0 ? (
             <div className="faq-accordion-list">
               {filteredFaqs.map((item) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className={`faq-item ${openFaqIndex === item.id ? 'open' : ''}`}
                   onClick={() => toggleFaq(item.id)}
                 >
                   <button className="faq-question" type="button">
                     <span>{item.question}</span>
-                    <svg 
-                      className={`faq-chevron ${openFaqIndex === item.id ? 'rotated' : ''}`} 
-                      width="18" 
-                      height="18" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2.2" 
-                      strokeLinecap="round" 
+                    <svg
+                      className={`faq-chevron ${openFaqIndex === item.id ? 'rotated' : ''}`}
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <polyline points="6 9 12 15 18 9" />
@@ -218,8 +215,8 @@ export const FaqPage: React.FC = () => {
           ) : (
             <div className="faq-empty-state">
               <p>No questions matched your search: "<strong>{searchQuery}</strong>"</p>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="faq-reset-btn"
                 onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
               >
@@ -229,7 +226,6 @@ export const FaqPage: React.FC = () => {
           )}
         </section>
 
-        {/* Bottom Help Banner */}
         <section className="faq-help-banner blur-animate delay-5">
           <div className="faq-help-card">
             <div className="faq-help-icon">
@@ -242,8 +238,8 @@ export const FaqPage: React.FC = () => {
               <p>Explore the architecture specs in our Hackathon Prototype dialogue or connect with the core architect.</p>
             </div>
             <div className="faq-help-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="faq-help-btn-primary"
                 onClick={() => setIsHackathonModalOpen(true)}
               >
@@ -259,12 +255,13 @@ export const FaqPage: React.FC = () => {
 
       <Footer onOpenHackathon={() => setIsHackathonModalOpen(true)} />
 
-      <DialogueBox 
-        isOpen={isHackathonModalOpen} 
-        onClose={() => setIsHackathonModalOpen(false)} 
+      <DialogueBox
+        isOpen={isHackathonModalOpen}
+        onClose={() => setIsHackathonModalOpen(false)}
       />
     </div>
   );
 };
 
 export default FaqPage;
+

@@ -73,11 +73,8 @@ describe('UniversalInformer Component', () => {
     expect(screen.getByText('Dismissable notification')).toBeInTheDocument();
 
     const closeBtn = screen.getByRole('button', { name: /Dismiss notification/i });
-    act(() => {
-      fireEvent.click(closeBtn);
-    });
+    fireEvent.click(closeBtn);
 
-    // Fast-forward exit animation (300ms)
     act(() => {
       jest.advanceTimersByTime(350);
     });
@@ -98,7 +95,6 @@ describe('UniversalInformer Component', () => {
       jest.advanceTimersByTime(3000);
     });
 
-    // Exit animation time
     act(() => {
       jest.advanceTimersByTime(350);
     });
@@ -106,3 +102,4 @@ describe('UniversalInformer Component', () => {
     expect(screen.queryByText('Auto disappearing toast')).not.toBeInTheDocument();
   });
 });
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EventItem, BallotOption } from './types';
 import { uploadEventToPinata } from '../services/pinata';
 import { saveEventsToBackup } from '../services/storage';
@@ -9,7 +9,6 @@ interface NewEventModalProps {
   onEventCreated: (event: EventItem) => void;
 }
 
-// Format date to YYYY-MM-DD in Indian Standard Time (IST)
 const getIstTodayString = (): string => {
   const now = new Date();
   const istOffset = 5.5 * 60 * 60 * 1000;
@@ -26,7 +25,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
   const [isClosing, setIsClosing] = useState<boolean>(false);
   const [shouldRender, setShouldRender] = useState<boolean>(isOpen);
 
-  // Form State
   const [optionsCount, setOptionsCount] = useState<number>(2);
   const [options, setOptions] = useState<string[]>(['Option 1', 'Option 2']);
   const [totalVotes, setTotalVotes] = useState<number | 'unlimited'>(100);
@@ -39,13 +37,11 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
   const [endDate, setEndDate] = useState<string>(getIstTodayString());
   const [endTime, setEndTime] = useState<string>('18:00');
 
-  // Submission / Pinata state
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [createdEvent, setCreatedEvent] = useState<EventItem | null>(null);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
-  // Smooth Dynamic Height Measurement
   const innerContentRef = React.useRef(null);
   const [dynamicHeight, setDynamicHeight] = useState<number | undefined>(undefined);
 
@@ -56,7 +52,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       const el = innerContentRef.current as HTMLElement | null;
       if (el) {
         const naturalH = el.offsetHeight;
-        setDynamicHeight(naturalH + 52); // Natural height + 28px top + 24px bottom padding
+        setDynamicHeight(naturalH + 52);
       }
     };
 
@@ -78,12 +74,11 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     };
   }, [step, optionsCount, options.length, errorMsg, activationType, totalVotes]);
 
-  // Handle open/close animation lifecycle
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
       setIsClosing(false);
-      // Restore draft from local storage if available
+
       try {
         const savedDraft = localStorage.getItem('truevote_event_draft');
         if (savedDraft) {
@@ -121,20 +116,20 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     }, 240);
   };
 
-  // Keyboard Escape listener
+  const handleDismissRef = useRef(handleDismiss);
+  handleDismissRef.current = handleDismiss;
+
   useEffect(() => {
     if (!shouldRender) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleDismiss();
+        handleDismissRef.current();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
-  // Clean local draft helper
   const clearDraft = () => {
     try {
       localStorage.removeItem('truevote_event_draft');
@@ -143,7 +138,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     }
   };
 
-  // Save current step data to localStorage
   const saveDraftLocally = (opts = options, count = optionsCount) => {
     try {
       const draft = {
@@ -164,7 +158,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     }
   };
 
-  // Step 1: Change options count (choices 2 to 5)
   const handleOptionsCountSelect = (count: number) => {
     const validCount = Math.min(5, Math.max(2, count));
     setOptionsCount(validCount);
@@ -187,7 +180,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     saveDraftLocally(updated, optionsCount);
   };
 
-  // Step 2: Handle total votes selection
   const handleTotalVotesSelect = (val: number | 'unlimited') => {
     setTotalVotes(val);
     if (val === 'unlimited') {
@@ -205,7 +197,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     }
   };
 
-  // Final Step: Submit and pin to Pinata IPFS
   const handleSubmit = async () => {
     setErrorMsg('');
     if (!eventName.trim()) {
@@ -225,7 +216,6 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
       votesCount: 0,
     }));
 
-// Cryptographic wallet signature generator for tamper-proof ballot schemas
 async function generateWalletSignature(manifest: string, walletAddress: string): Promise<string> {
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     try {
@@ -311,7 +301,7 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
       console.warn('Wallet signing aborted:', sigErr);
       setErrorMsg(sigErr?.message || 'Wallet signature rejected. Election creation cancelled.');
       setIsSubmitting(false);
-      return; // Stop immediately! Never create event or link!
+      return;
     }
 
     const eventPayload: EventItem = {
@@ -339,13 +329,12 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
     };
 
     try {
-      // 1. Upload to Pinata IPFS
+
       const pinResult = await uploadEventToPinata(eventPayload);
       eventPayload.ipfsHash = pinResult.IpfsHash;
       eventPayload.ipfsUrl = pinResult.gatewayUrl;
       eventPayload.ipfsFileId = pinResult.fileId;
 
-      // 2. Persist in localStorage
       const existingStr = localStorage.getItem('truevote_events');
       let currentEvents: EventItem[] = [];
       if (existingStr) {
@@ -361,7 +350,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
       saveEventsToBackup(updatedEvents);
       clearDraft();
 
-      // Dispatch storage and broadcast notification
       window.dispatchEvent(new Event('truevote_events_updated'));
       try {
         const bc = new BroadcastChannel('truevote_events_channel');
@@ -371,7 +359,7 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
 
       setCreatedEvent(eventPayload);
       onEventCreated(eventPayload);
-      setStep(5); // Link generation screen
+      setStep(5);
     } catch (err: any) {
       console.error('Error creating event:', err);
       setErrorMsg('Failed to pin to IPFS or finalize event. Please check connection and retry.');
@@ -403,7 +391,7 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
         onClick={(e) => e.stopPropagation()}
       >
         <div ref={innerContentRef} className="new-event-modal-inner-wrapper">
-        {/* Modal Close Button */}
+
         <button
           type="button"
           className="logout-modal-close-btn"
@@ -416,7 +404,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
           </svg>
         </button>
 
-        {/* Modal Header: Step Indicator & Smooth Error Accordion */}
         <div className="new-event-modal-header">
           {step <= 4 && (
             <div className="new-event-stepper-wrap">
@@ -457,7 +444,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
             </div>
           )}
 
-          {/* Smooth Animated Error Banner Container */}
           <div className={`new-event-error-container ${errorMsg ? 'has-error' : ''}`}>
             {errorMsg && (
               <div className="new-event-error-alert">
@@ -472,9 +458,8 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
           </div>
         </div>
 
-        {/* Stable Scrollable Step Body */}
         <div className="new-event-step-body" key={step}>
-          {/* STEP 1: How many things to vote on (1, 2, 3, 4, 5) */}
+
           {step === 1 && (
             <div className="new-event-step-inner">
               <div className="new-event-illustration">
@@ -495,7 +480,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                 Select how many voting options or proposals will be presented on this ballot.
               </p>
 
-              {/* Modern Choice Cards Grid */}
               <div className="choice-count-grid">
                 {[2, 3, 4, 5].map((n) => (
                   <button
@@ -510,7 +494,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                 ))}
               </div>
 
-              {/* Compact Options Input List */}
               <div className="options-input-list">
                 {options.map((opt, idx) => (
                   <div key={idx} className="option-input-row">
@@ -546,7 +529,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
             </div>
           )}
 
-          {/* STEP 2: Total Votes Capacity (50 to Unlimited) */}
           {step === 2 && (
             <div className="new-event-step-inner">
               <div className="new-event-illustration">
@@ -563,7 +545,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                 Set the voter quorum capacity (minimum 50 votes) or allow unlimited participation.
               </p>
 
-              {/* Modern Total Votes Capacity Grid */}
               <div className="votes-presets-grid">
                 {[50, 100, 250, 500, 1000].map((num) => (
                   <button
@@ -633,7 +614,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
             </div>
           )}
 
-          {/* STEP 3: Vote Title & Bio */}
           {step === 3 && (
             <div className="new-event-step-inner">
               <div className="new-event-illustration">
@@ -707,7 +687,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
             </div>
           )}
 
-          {/* STEP 4: Activation & Indian Standard Time Schedule */}
           {step === 4 && (
             <div className="new-event-step-inner">
               <div className="new-event-illustration">
@@ -821,7 +800,6 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
             </div>
           )}
 
-          {/* STEP 5: Success & Generated Shareable Voting Link */}
           {step === 5 && createdEvent && (
             <div className="new-event-step-inner success-view">
               <div className="phonepe-success-wrap">
@@ -906,3 +884,4 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
 };
 
 export default NewEventModal;
+

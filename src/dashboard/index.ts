@@ -8,3 +8,4 @@ export { StatsPanel } from './StatsPanel';
 export { EventsTab } from './EventsTab';
 export { LogoutModal } from './LogoutModal';
 export { NewEventModal } from './NewEventModal';
+

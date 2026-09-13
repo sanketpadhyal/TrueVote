@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import logoutImg from './images/logout-account-illustration-svg-download-png-4707120.webp';
 
 interface LogoutModalProps {
@@ -21,10 +21,7 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
       setIsClosing(false);
     } else {
       setIsClosing(true);
-      const timer = setTimeout(() => {
-        setShouldRender(false);
-        setIsClosing(false);
-      }, 250);
+      const timer = setTimeout(() => setShouldRender(false), 240);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -36,18 +33,21 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
     }, 240);
   };
 
+  const handleDismissRef = useRef(handleDismiss);
+  handleDismissRef.current = handleDismiss;
+
   useEffect(() => {
     if (!shouldRender) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleDismiss();
+        handleDismissRef.current();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [shouldRender]);
 
   if (!shouldRender) return null;
@@ -112,3 +112,4 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
 };
 
 export default LogoutModal;
+

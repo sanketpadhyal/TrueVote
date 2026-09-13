@@ -5,7 +5,7 @@ export const ScrollToTop: React.FC = () => {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // Disable browser default scroll restoration so route transitions always start at top
+
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
@@ -21,7 +21,6 @@ export const ScrollToTop: React.FC = () => {
         (window as any).lenis.scrollTo(0, { immediate: true });
       }
 
-      // Safeguard timeout to ensure position 0 after route render
       const timer = setTimeout(() => {
         window.scrollTo(0, 0);
         if ((window as any).lenis) {
@@ -37,3 +36,4 @@ export const ScrollToTop: React.FC = () => {
 };
 
 export default ScrollToTop;
+

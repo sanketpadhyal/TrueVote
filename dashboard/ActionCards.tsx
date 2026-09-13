@@ -11,7 +11,7 @@ export const ActionCards: React.FC<ActionCardsProps> = ({
 }) => {
   return (
     <div className="dashboard-action-cards">
-      {/* Event Action Card */}
+
       <div className="action-card">
         <div className="action-card-artwork">
           <img
@@ -44,3 +44,4 @@ export const ActionCards: React.FC<ActionCardsProps> = ({
 };
 
 export default ActionCards;
+

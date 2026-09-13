@@ -1,8 +1,6 @@
 @import '../styles/animations.css';
 
-/* ==========================================================================
-   FAQ PAGE STYLES
-   ========================================================================== */
+
 .faq-page-wrapper {
   min-height: 100vh;
   display: flex;
@@ -23,7 +21,7 @@
   box-sizing: border-box;
 }
 
-/* FAQ Hero */
+
 .faq-hero-container {
   width: 100%;
   display: flex;
@@ -68,7 +66,7 @@
   font-weight: 450;
 }
 
-/* Search Bar */
+
 .faq-search-box {
   width: 100%;
   max-width: 620px;
@@ -120,7 +118,7 @@
   color: #0f172a;
 }
 
-/* Category Filter Pills */
+
 .faq-filter-pills {
   display: flex;
   flex-wrap: wrap;
@@ -153,7 +151,7 @@
   box-shadow: 0 2px 8px rgba(29, 107, 243, 0.25);
 }
 
-/* FAQ Content Accordion */
+
 .faq-content-section {
   width: 100%;
   margin-bottom: 4rem;
@@ -254,7 +252,7 @@
   cursor: pointer;
 }
 
-/* Bottom Help Banner */
+
 .faq-help-banner {
   width: 100%;
 }

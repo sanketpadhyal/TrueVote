@@ -30,3 +30,4 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 };
 
 export default HeroBanner;
+

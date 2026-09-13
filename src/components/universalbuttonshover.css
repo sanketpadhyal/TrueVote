@@ -1,6 +1,4 @@
-/* ==========================================================================
-   Framer-Style Universal Button Text Roll Hover Animation (Slow & Buttery)
-   ========================================================================== */
+
 
 .framer-flip-btn {
   overflow: hidden !important;
@@ -42,7 +40,7 @@
   opacity: 0;
 }
 
-/* On Button Hover: Primary smoothly glides UP (-130%), Secondary glides IN from bottom (0%) */
+
 .framer-flip-btn:hover .flip-text-primary,
 button:hover .flip-text-track .flip-text-primary,
 a:hover .flip-text-track .flip-text-primary {

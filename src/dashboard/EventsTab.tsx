@@ -55,7 +55,6 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
         </button>
       </header>
 
-      {/* Quick Metrics Bar */}
       <div className="tab-stats-grid">
         <div className="tab-stat-card">
           <div className="tab-stat-header">
@@ -87,7 +86,6 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
         </div>
       </div>
 
-      {/* Search & Filter Toolbar */}
       <div className="tab-toolbar">
         <div className="tab-search-wrap">
           <svg className="tab-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -117,7 +115,6 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
         </div>
       </div>
 
-      {/* Events Table Container */}
       <div className="tab-table-wrapper">
         <EventsTable />
       </div>
@@ -126,3 +123,4 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
 };
 
 export default EventsTab;
+
