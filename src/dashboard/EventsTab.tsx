@@ -28,7 +28,6 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
   const totalEvents = events.length;
   const activeEvents = events.filter((e) => e.isActivated || e.activationType === 'automatic').length;
   const upcomingEvents = 0;
-  const avgTurnout = totalEvents > 0 ? '—' : '0%';
 
   const handleCreate = () => {
     if (onCreateEvent) {
@@ -85,15 +84,6 @@ export const EventsTab: React.FC<EventsTabProps> = ({ onCreateEvent }) => {
           </div>
           <div className="tab-stat-value">{upcomingEvents}</div>
           <div className="tab-stat-desc">{upcomingEvents === 0 ? 'No upcoming sessions' : 'Starts within 7 days'}</div>
-        </div>
-
-        <div className="tab-stat-card">
-          <div className="tab-stat-header">
-            <span className="tab-stat-label">Avg. Turnout</span>
-            <span className="tab-stat-badge badge-purple">ZKP Verified</span>
-          </div>
-          <div className="tab-stat-value">{avgTurnout}</div>
-          <div className="tab-stat-desc">{totalEvents === 0 ? 'No votes recorded' : 'Verified participation'}</div>
         </div>
       </div>
 
