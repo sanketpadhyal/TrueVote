@@ -755,7 +755,23 @@ export const VotingPage: React.FC = () => {
 
         <main className="voting-main-container">
           <div className="voting-card" style={{ textAlign: 'center', padding: '50px 24px', maxWidth: '520px', margin: '20px auto' }}>
-            <div style={{ fontSize: '44px', marginBottom: '16px' }}>🗳️</div>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: '#f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+              color: '#64748b'
+            }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 8V4.5C17 3.67 16.33 3 15.5 3h-7C7.67 3 7 3.67 7 4.5V8" />
+                <rect x="3" y="8" width="18" height="13" rx="2" />
+                <path d="m9 14.5 2 2 4-4" />
+              </svg>
+            </div>
             <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '10px' }}>
               Ballot Event Not Found
             </h2>
@@ -857,7 +873,9 @@ export const VotingPage: React.FC = () => {
               </span>
               {hasAnyVotes && !isTied && topOption && (
                 <span className="voting-leading-pill" title={`Leader: ${topOption.label} (${topOption.votesCount || 0} votes)`}>
-                  <span className="leading-fire">🔥</span>
+                  <svg className="leading-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                  </svg>
                   <span className="leading-label">Leading:</span>
                   <strong className="leading-name">
                     {topOption.label.length > 20 ? `${topOption.label.slice(0, 18)}...` : topOption.label}
@@ -867,7 +885,13 @@ export const VotingPage: React.FC = () => {
               )}
               {hasAnyVotes && isTied && (
                 <span className="voting-leading-pill pill-tied" title="Tied votes among top choices">
-                  <span className="leading-fire">⚖️</span>
+                  <svg className="leading-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+                    <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+                    <path d="M7 21h10" />
+                    <path d="M12 3v18" />
+                    <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+                  </svg>
                   <span className="leading-label">Leading:</span>
                   <strong className="leading-name">Tied</strong>
                   <span className="leading-count">({topOption?.votesCount || 0})</span>
@@ -875,7 +899,11 @@ export const VotingPage: React.FC = () => {
               )}
               {!hasAnyVotes && (
                 <span className="voting-leading-pill pill-neutral" title="No votes cast yet">
-                  <span className="leading-fire">📊</span>
+                  <svg className="leading-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
                   <span className="leading-label">Leading:</span>
                   <strong className="leading-name">No votes yet</strong>
                 </span>
