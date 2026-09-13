@@ -73,9 +73,7 @@ describe('UniversalInformer Component', () => {
     expect(screen.getByText('Dismissable notification')).toBeInTheDocument();
 
     const closeBtn = screen.getByRole('button', { name: /Dismiss notification/i });
-    act(() => {
-      fireEvent.click(closeBtn);
-    });
+    fireEvent.click(closeBtn);
 
     act(() => {
       jest.advanceTimersByTime(350);

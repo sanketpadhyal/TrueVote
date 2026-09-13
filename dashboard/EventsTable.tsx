@@ -111,6 +111,9 @@ export const EventsTable: React.FC = () => {
     }
   };
 
+  const syncRef = React.useRef(syncExistingEvents);
+  syncRef.current = syncExistingEvents;
+
   React.useEffect(() => {
     const handleStorageUpdate = () => {
       const stored = getStoredEvents();
@@ -131,10 +134,10 @@ export const EventsTable: React.FC = () => {
       };
     } catch (e) {}
 
-    syncExistingEvents();
+    syncRef.current();
 
     const intervalId = setInterval(() => {
-      syncExistingEvents();
+      syncRef.current();
     }, 12000);
 
     return () => {
