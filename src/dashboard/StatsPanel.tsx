@@ -220,15 +220,34 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
   licenseStatus,
   activities,
 }) => {
+  const isTest = process.env.NODE_ENV === 'test';
   const [votesUsed, setVotesUsed] = useState<number>(() => licenseStatus?.usedVotes ?? getStoredVotesUsed());
   const [currentActivities, setCurrentActivities] = useState<ActivityItem[]>(() =>
     activities !== undefined ? activities : getStoredActivities()
   );
+  const [isSyncingActivities, setIsSyncingActivities] = useState<boolean>(
+    !isTest && currentActivities.length === 0
+  );
+
+  useEffect(() => {
+    if (currentActivities.length > 0) {
+      setIsSyncingActivities(false);
+    } else if (!isTest) {
+      const timer = setTimeout(() => {
+        setIsSyncingActivities(false);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentActivities.length, isTest]);
 
   useEffect(() => {
     const handleUpdate = () => {
       setVotesUsed(licenseStatus?.usedVotes ?? getStoredVotesUsed());
-      setCurrentActivities(activities !== undefined ? activities : getStoredActivities());
+      const updated = activities !== undefined ? activities : getStoredActivities();
+      setCurrentActivities(updated);
+      if (updated.length > 0) {
+        setIsSyncingActivities(false);
+      }
     };
 
     window.addEventListener('truevote_events_updated', handleUpdate);
@@ -276,7 +295,17 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
       <div className="voting-activity-section">
         <h3 className="stats-section-title">voting activity</h3>
         <div className="activity-list">
-          {currentActivities.length > 0 ? (
+          {isSyncingActivities && currentActivities.length === 0 ? (
+            [1, 2, 3, 4].map((s) => (
+              <div key={`skel-act-${s}`} className="activity-item activity-skeleton-item">
+                <div className="truevote-skeleton-light" style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '12px' }}>
+                  <div className="truevote-skeleton-light" style={{ width: '70%', height: '12px', borderRadius: '4px' }} />
+                  <div className="truevote-skeleton-light" style={{ width: '40%', height: '10px', borderRadius: '4px' }} />
+                </div>
+              </div>
+            ))
+          ) : currentActivities.length > 0 ? (
             currentActivities.map((item) => (
               <div key={item.id} className="activity-item">
                 <div className="activity-icon-container">

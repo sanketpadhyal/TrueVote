@@ -548,22 +548,46 @@ export const VotingPage: React.FC = () => {
       <div className="voting-page-wrapper">
         <div className="voting-glow-ambient voting-glow-top"></div>
         <div className="voting-glow-ambient voting-glow-bottom"></div>
-        <div className="voting-card" style={{ textAlign: 'center', padding: '60px 24px', maxWidth: '520px', margin: '80px auto' }}>
-          <div style={{
-            width: '44px',
-            height: '44px',
-            margin: '0 auto 20px auto',
-            border: '3px solid rgba(255,255,255,0.1)',
-            borderTopColor: '#38bdf8',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
-          <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
-            Retrieving Verifiable Ballot...
-          </h2>
-          <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.5' }}>
-            Fetching verified cryptographic election schema from decentralized IPFS network.
-          </p>
+
+        {/* Real-time Web3 Skeleton Ballot Card */}
+        <div className="voting-card" style={{ maxWidth: '580px', margin: '40px auto 60px auto' }}>
+          {/* Top Real-time Status Banner */}
+          <div className="ballot-sync-banner">
+            <span className="sync-pulse-dot" />
+            <span className="sync-status-text">Synchronizing & Decrypting Ballot from IPFS...</span>
+          </div>
+
+          <div className="skeleton-shimmer-dark" style={{ width: '130px', height: '24px', borderRadius: '20px', marginBottom: '16px' }} />
+          <div className="skeleton-shimmer-dark" style={{ width: '80%', height: '28px', marginBottom: '12px', borderRadius: '8px' }} />
+          <div className="skeleton-shimmer-dark" style={{ width: '95%', height: '14px', marginBottom: '8px', borderRadius: '6px' }} />
+          <div className="skeleton-shimmer-dark" style={{ width: '60%', height: '14px', marginBottom: '24px', borderRadius: '6px' }} />
+
+          {/* Skeleton Quorum Box */}
+          <div className="skeleton-quorum-box">
+            <div className="skeleton-shimmer-dark" style={{ width: '40%', height: '14px', borderRadius: '6px' }} />
+            <div className="skeleton-shimmer-dark" style={{ width: '100%', height: '8px', borderRadius: '4px', marginTop: '10px' }} />
+          </div>
+
+          {/* Skeleton Choice Options */}
+          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[1, 2, 3].map((optIdx) => (
+              <div key={optIdx} className="skeleton-option-card">
+                <div className="skeleton-shimmer-dark" style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0 }} />
+                <div className="skeleton-shimmer-dark" style={{ width: `${50 + optIdx * 15}%`, height: '16px', borderRadius: '6px' }} />
+              </div>
+            ))}
+          </div>
+
+          {/* Skeleton Security Challenge Box */}
+          <div className="skeleton-security-box" style={{ marginTop: '24px' }}>
+            <div className="skeleton-shimmer-dark" style={{ width: '50%', height: '14px', borderRadius: '6px' }} />
+            <div className="skeleton-shimmer-dark" style={{ width: '85%', height: '12px', marginTop: '8px', borderRadius: '4px' }} />
+          </div>
+
+          {/* Skeleton Submit Button */}
+          <div style={{ marginTop: '28px' }}>
+            <div className="skeleton-shimmer-dark" style={{ width: '100%', height: '48px', borderRadius: '9999px' }} />
+          </div>
         </div>
       </div>
     );

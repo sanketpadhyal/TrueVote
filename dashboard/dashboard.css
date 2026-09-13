@@ -3011,6 +3011,39 @@ input:checked + .slider.round:before {
   box-sizing: border-box;
 }
 
+/* Shimmer Skeleton Loaders for Table & Activity Feed */
+@keyframes truevoteShimmerLight {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.truevote-skeleton-light {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e2e8f0 50%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: truevoteShimmerLight 1.5s infinite linear;
+  display: inline-block;
+}
+
+.table-row-skeleton td {
+  padding: 18px 16px;
+  vertical-align: middle;
+}
+
+.activity-skeleton-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+}
+
 /* =========================================================
    10. Real-time Live Stats & Analytics iOS Modal
    ========================================================= */

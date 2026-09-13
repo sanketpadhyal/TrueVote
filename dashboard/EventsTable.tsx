@@ -24,6 +24,7 @@ export const EventsTable: React.FC = () => {
   const isTest = process.env.NODE_ENV === 'test';
   const initialEvents = getStoredEvents();
   const [events, setEvents] = useState<EventItem[]>(initialEvents);
+  const [isInitialSyncing, setIsInitialSyncing] = useState<boolean>(!isTest && initialEvents.length === 0);
   const [selectedAnalyticsEventId, setSelectedAnalyticsEventId] = useState<string | null>(null);
   const [selectedPauseQuitEvent, setSelectedPauseQuitEvent] = useState<EventItem | null>(null);
 
@@ -108,6 +109,8 @@ export const EventsTable: React.FC = () => {
       if (idbEvents && idbEvents.length > 0) {
         setEvents(idbEvents);
       }
+    } finally {
+      setIsInitialSyncing(false);
     }
   };
 
@@ -355,7 +358,27 @@ export const EventsTable: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-            {events.length > 0 ? (
+            {isInitialSyncing && events.length === 0 ? (
+              [1, 2, 3].map((sKey) => (
+                <tr key={`table-skel-${sKey}`} className="table-row table-row-skeleton">
+                  <td className="td-event">
+                    <div className="truevote-skeleton-light" style={{ width: '130px', height: '16px', borderRadius: '6px' }} />
+                  </td>
+                  <td className="td-voting">
+                    <div className="truevote-skeleton-light" style={{ width: '85px', height: '16px', borderRadius: '6px' }} />
+                  </td>
+                  <td className="td-activation">
+                    <div className="truevote-skeleton-light" style={{ width: '65px', height: '16px', borderRadius: '6px' }} />
+                  </td>
+                  <td className="td-dates-cell">
+                    <div className="table-actions-group">
+                      <div className="truevote-skeleton-light" style={{ width: '85px', height: '28px', borderRadius: '9999px' }} />
+                      <div className="truevote-skeleton-light" style={{ width: '70px', height: '28px', borderRadius: '9999px' }} />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : events.length > 0 ? (
               events.map((event, idx) => {
                 const isAlt = idx % 2 === 1;
                 return (
