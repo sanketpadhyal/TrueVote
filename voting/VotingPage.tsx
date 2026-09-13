@@ -732,19 +732,23 @@ export const VotingPage: React.FC = () => {
             autoComplete="off"
           />
 
-          {/* Sleek Compact Voter Identity & ZKP Privacy Bar */}
+          {/* Connected MetaMask Wallet Pill Bar */}
           <div className="voter-identity-pill-bar">
             <div className="voter-identity-left">
-              <span className="voter-live-dot" title="Ballot cryptographic identity active"></span>
-              <span className="voter-id-label">Ballot Key:</span>
+              <img
+                src={`${process.env.PUBLIC_URL || ''}/images/stacks/muskmask.webp`}
+                alt="MetaMask"
+                className="metamask-wallet-icon"
+              />
+              <span className="voter-id-label">Connected MetaMask:</span>
               <code className="voter-id-hash" title={voterWalletAddress}>
                 {voterWalletAddress ? `${voterWalletAddress.slice(0, 8)}...${voterWalletAddress.slice(-6)}` : '0x71C4...84B2'}
               </code>
             </div>
             <div className="voter-identity-right">
-              <span className="voter-zk-tag">
+              <span className="metamask-connected-badge">
                 <span className="zk-green-dot"></span>
-                Zero-Knowledge Privacy Active
+                Connected
               </span>
             </div>
           </div>
@@ -755,6 +759,10 @@ export const VotingPage: React.FC = () => {
               <span className="voting-event-num-pill">{event.votingNumber}</span>
               <span className={`voting-status-pill ${isVotingActive ? 'pill-active' : 'pill-closed'}`}>
                 {isVotingActive ? 'Polls Open' : 'Voting Inactive'}
+              </span>
+              <span className="voting-zk-tag">
+                <span className="zk-green-dot"></span>
+                Zero-Knowledge Privacy Active
               </span>
             </div>
 
