@@ -1,7 +1,3 @@
-/**
- * TrueVote Persistent IndexedDB Backup Service
- * Ensures election sessions and ballots survive browser localStorage clears and relogins.
- */
 
 const DB_NAME = 'truevote_persistence_db';
 const STORE_NAME = 'events';
@@ -91,3 +87,4 @@ export async function removeEventFromBackup(id: string, votingNumber?: string): 
     console.warn('IndexedDB delete notice:', e);
   }
 }
+

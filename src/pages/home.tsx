@@ -16,10 +16,8 @@ export const HomePage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isHackathonModalOpen, setIsHackathonModalOpen] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
+  const [, setConnectedWallet] = useState<string | null>(null);
 
-  // If user is already logged in with connected wallet, directly send them to dashboard
   useEffect(() => {
     const wallet = localStorage.getItem('truevote_connected_wallet');
     if (wallet) {
@@ -27,7 +25,6 @@ export const HomePage: React.FC = () => {
     }
   }, [navigate]);
 
-  // If directed with ?login=true or open-auth-modal event, automatically trigger auth modal
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('login') === 'true') {
@@ -66,7 +63,6 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     document.title = 'TrueVote | Decentralized Anonymous Voting Protocol';
 
-    // Handle hash scroll on mount
     if (window.location.hash) {
       const targetId = window.location.hash.replace('#', '');
       setTimeout(() => {
@@ -82,7 +78,6 @@ export const HomePage: React.FC = () => {
     };
     window.addEventListener('hashchange', handleHashChange);
 
-    // Check initial window width for mobile mode
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -90,7 +85,6 @@ export const HomePage: React.FC = () => {
 
     window.addEventListener('resize', checkMobile);
 
-    // Initialize Lenis Smooth Scroll on desktop
     let lenis: Lenis | null = null;
     if (window.innerWidth > 768) {
       lenis = new Lenis({
@@ -111,7 +105,6 @@ export const HomePage: React.FC = () => {
       requestAnimationFrame(raf);
     }
 
-    // Scroll listener for 3D Back-to-Front tilt animation on desktop
     const handleScroll = () => {
       if (window.innerWidth <= 768) return;
       const scrollY = window.scrollY;
@@ -121,7 +114,6 @@ export const HomePage: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Smooth entrance on mount for hero elements only
     const heroTimer = setTimeout(() => {
       const topElements = document.querySelectorAll('.hero-container .blur-animate');
       topElements.forEach((el) => el.classList.add('visible'));
@@ -146,7 +138,6 @@ export const HomePage: React.FC = () => {
     }, 3500);
   };
 
-  // 3D transformation values (bypassed on mobile)
   const rotateX = isMobile ? 0 : 16 * (1 - scrollProgress);
   const scale = isMobile ? 1 : 0.92 + 0.08 * scrollProgress;
   const translateY = isMobile ? 0 : 18 * (1 - scrollProgress);
@@ -154,13 +145,12 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="landing-wrapper">
-      {/* Persistent Glass Navbar */}
+
       <Navbar />
 
-      {/* Hero Section */}
       <section className="hero-container">
         <div className="hero-content-area">
-          {/* Floating Tech Stack Cards (Fixed Positions with Blur-to-Normal Entrance) */}
+
           <div className="floating-icon-card float-top-left blur-animate delay-1" title="Pinata">
             <img src="/images/stacks/Pinata.png" alt="Pinata" className="stack-logo-img" />
           </div>
@@ -177,8 +167,7 @@ export const HomePage: React.FC = () => {
             <img src="/images/stacks/ipfs.png" alt="IPFS" className="stack-logo-img" />
           </div>
 
-          {/* Top Hackathon Badge with Icon */}
-          <div 
+          <div
             className="trusted-pill blur-animate clickable-pill"
             onClick={() => setIsHackathonModalOpen(true)}
             role="button"
@@ -193,7 +182,6 @@ export const HomePage: React.FC = () => {
             <span className="trusted-text">This is a Hackathon Project</span>
           </div>
 
-          {/* Main Title with Serif Accent */}
           <h1 className="main-title blur-animate delay-1">
             Turn Web3 Voting <br />
             Into <span className="serif-italic-accent" style={{ color: '#1d6bf3', fontSize: '1.08em' }}>Instant Decisions</span>
@@ -203,9 +191,8 @@ export const HomePage: React.FC = () => {
             One simple platform for election security <span className="serif-italic-accent" style={{ fontSize: '1.08em', color: '#0f172a' }}>without the blind spots.</span> Zero-knowledge voter privacy, decentralized records and walletless voting.
           </p>
 
-          {/* Action Button & Caption with Tight Gap */}
           <div className="hero-action-group blur-animate delay-3">
-            <button 
+            <button
               className="btn-primary-blue framer-flip-btn"
               onClick={() => setIsAuthModalOpen(true)}
             >
@@ -224,7 +211,6 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* 3D PERSPECTIVE DASHBOARD SHOWCASE */}
         <div className="dashboard-perspective-wrapper blur-animate delay-4" id="features">
           <div
             className="dashboard-shell-wrapper"
@@ -246,9 +232,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ==========================================================================
-          BENEFITS SECTION (Matching Screenshot 3)
-          ========================================================================== */}
       <section className="benefits-section" id="benefits">
         <h2 className="benefits-title">
           Benefits That Truly <br />
@@ -260,7 +243,7 @@ export const HomePage: React.FC = () => {
         </p>
 
         <div className="benefits-grid">
-          {/* Benefit 1 */}
+
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -274,7 +257,6 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Benefit 2 */}
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -288,7 +270,6 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Benefit 3 */}
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -302,7 +283,6 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Benefit 4 */}
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -316,7 +296,6 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Benefit 5 */}
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -332,7 +311,6 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Benefit 6 */}
           <div className="benefit-card">
             <div className="benefit-icon-wrapper">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -349,9 +327,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ==========================================================================
-          HOW IT WORKS SECTION
-          ========================================================================== */}
       <section className="workflow-section" id="how-it-works">
         <h2 className="section-title">
           How TrueVote Works <br />
@@ -432,9 +407,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ==========================================================================
-          SECURITY & ARCHITECTURE SECTION
-          ========================================================================== */}
       <section className="security-section" id="security">
         <h2 className="section-title">
           Mathematical Truth & <br />
@@ -505,7 +477,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Shared Reusable Footer */}
       <Footer onOpenHackathon={() => setIsHackathonModalOpen(true)} />
       {toastMessage && (
         <div className="vote-toast glass-panel-dark">
@@ -513,16 +484,14 @@ export const HomePage: React.FC = () => {
         </div>
       )}
 
-      {/* Hackathon Prototype Dialogue Box */}
-      <DialogueBox 
-        isOpen={isHackathonModalOpen} 
-        onClose={() => setIsHackathonModalOpen(false)} 
+      <DialogueBox
+        isOpen={isHackathonModalOpen}
+        onClose={() => setIsHackathonModalOpen(false)}
       />
 
-      {/* Web3 Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
         onConnect={(addr) => {
           setConnectedWallet(addr);
           triggerToast(`🦊 MetaMask connected: ${addr.slice(0, 6)}...${addr.slice(-4)}`);
@@ -538,3 +507,4 @@ export const HomePage: React.FC = () => {
 };
 
 export default HomePage;
+

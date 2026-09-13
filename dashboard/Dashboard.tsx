@@ -17,7 +17,6 @@ export const Dashboard: React.FC = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState<boolean>(false);
 
-  // Helper to derive tab from route parameter or window location
   const getTabFromRoute = React.useCallback((): string => {
     if (params.tab) {
       const t = params.tab.toLowerCase();
@@ -32,7 +31,6 @@ export const Dashboard: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<string>(getTabFromRoute);
 
-  // Synchronize activeTab whenever location or params change
   useEffect(() => {
     const routeTab = getTabFromRoute();
     setActiveTab(routeTab);
@@ -70,13 +68,10 @@ export const Dashboard: React.FC = () => {
               <h1 className="dashboard-title">Dashboard</h1>
             </header>
 
-            {/* Greeting Hero Banner */}
             <HeroBanner />
 
-            {/* Events Table */}
             <EventsTable />
 
-            {/* Action Cards (Bottom) */}
             <ActionCards onNewEvent={handleNewEvent} />
           </div>
         );
@@ -85,36 +80,32 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className={`wyborek-dashboard-root tab-active-${activeTab}`}>
-      {/* 1. Left Sidebar */}
+
       <Sidebar
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onLogout={() => setIsLogoutModalOpen(true)}
       />
 
-      {/* 2. Main Center Content Container */}
       <main className="wyborek-main-content">
         <div className="main-content-card" key={activeTab}>
           {renderActiveTabContent()}
         </div>
       </main>
 
-      {/* 3. Right Stats Panel */}
       <StatsPanel />
 
-      {/* 4. Logout Confirmation Popup Panel */}
       <LogoutModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirmLogout={handleConfirmLogout}
       />
 
-      {/* 5. iOS-Style New Event Creation Modal */}
       <NewEventModal
         isOpen={isNewEventModalOpen}
         onClose={() => setIsNewEventModalOpen(false)}
         onEventCreated={() => {
-          // Event was saved to localStorage & dispatched
+
         }}
       />
     </div>
@@ -122,3 +113,4 @@ export const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+

@@ -9,3 +9,4 @@ Lenis.prototype.scrollTo = jest.fn();
 
 module.exports = Lenis;
 module.exports.default = Lenis;
+

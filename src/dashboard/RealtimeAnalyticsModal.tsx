@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { EventItem } from './types';
 
@@ -18,7 +18,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
   const [event, setEvent] = useState<EventItem | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Load and subscribe to real-time event updates
   useEffect(() => {
     if (!isOpen || !eventId) return;
 
@@ -43,7 +42,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
 
     loadEvent();
 
-    // Listen for live vote updates
     window.addEventListener('truevote_events_updated', loadEvent);
     window.addEventListener('storage', loadEvent);
     const interval = setInterval(loadEvent, 1500);
@@ -55,7 +53,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
     };
   }, [isOpen, eventId]);
 
-  // Handle open/close animations
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
@@ -77,14 +74,16 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
     }, 220);
   };
 
+  const handleDismissRef = useRef(handleDismiss);
+  handleDismissRef.current = handleDismiss;
+
   useEffect(() => {
     if (!shouldRender) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleDismiss();
+      if (e.key === 'Escape') handleDismissRef.current();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
   const handleCopyLink = () => {
@@ -101,13 +100,11 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
 
   if (!shouldRender || !event || typeof document === 'undefined') return null;
 
-  // Calculate live statistics
   const totalVotesCast =
     event.options.reduce((sum, opt) => sum + (opt.votesCount || 0), 0) ||
     event.totalVotesCast ||
     0;
 
-  // Sort options by vote count descending for rankings
   const sortedOptions = [...event.options].sort(
     (a, b) => (b.votesCount || 0) - (a.votesCount || 0)
   );
@@ -132,7 +129,7 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
         className={`analytics-modal-card ${isClosing ? 'card-closing' : 'card-entering'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
+
         <button
           type="button"
           className="analytics-close-btn"
@@ -154,7 +151,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           </svg>
         </button>
 
-        {/* Top Header Tag */}
         <div className="analytics-modal-header">
           <div className="analytics-live-tag">
             <span className="pulsing-live-dot"></span>
@@ -162,7 +158,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           </div>
         </div>
 
-        {/* Event Title & Metadata */}
         <div className="analytics-event-heading">
           <div className="analytics-badge-row">
             <span className="analytics-voting-code">{event.votingNumber}</span>
@@ -173,7 +168,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           {event.bio && <p className="analytics-event-bio">{event.bio}</p>}
         </div>
 
-        {/* Total Ballots Cast Summary Card */}
         <div className="analytics-kpi-single">
           <div className="analytics-kpi-card">
             <span className="kpi-label">Total Ballots Cast</span>
@@ -184,7 +178,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           </div>
         </div>
 
-        {/* Real-time Interactive Vote Distribution Graphs */}
         <div className="analytics-graph-section">
           <div className="graph-section-header">
             <h3 className="graph-section-title">Live Vote Distribution</h3>
@@ -225,7 +218,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Visual Progress Bar Track */}
                   <div className="analytics-track">
                     <div
                       className={`analytics-fill ${isLeader ? 'fill-leader' : ''}`}
@@ -240,7 +232,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           </div>
         </div>
 
-        {/* Shareable Link Box */}
         <div className="analytics-link-box">
           <span className="link-label">Ballot URL:</span>
           <code className="link-url-text">
@@ -255,7 +246,6 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
           </button>
         </div>
 
-        {/* Footer Actions with Buttons Styled Like Screenshot 3 */}
         <div className="analytics-modal-actions-row">
           <button
             type="button"
@@ -291,3 +281,4 @@ export const RealtimeAnalyticsModal: React.FC<RealtimeAnalyticsModalProps> = ({
 };
 
 export default RealtimeAnalyticsModal;
+

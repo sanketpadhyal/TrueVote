@@ -33,3 +33,4 @@ describe('TrueVote Application', () => {
     expect(dashboardLinks.length).toBeGreaterThan(0);
   });
 });
+

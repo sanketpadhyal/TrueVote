@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { EventItem } from './types';
 
@@ -46,14 +46,16 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
     }, 220);
   };
 
+  const handleDismissRef = useRef(handleDismiss);
+  handleDismissRef.current = handleDismiss;
+
   useEffect(() => {
     if (!shouldRender) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleDismiss();
+      if (e.key === 'Escape') handleDismissRef.current();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
   const handleDeleteClick = async () => {
@@ -89,7 +91,7 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
         className={`action-sheet-card ${isClosing ? 'card-closing' : 'card-entering'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* iOS Dismiss Icon */}
+
         <button
           type="button"
           className="action-sheet-close-btn"
@@ -111,7 +113,6 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
           </svg>
         </button>
 
-        {/* Icon & Title */}
         <div className="action-sheet-header">
           <div className="action-sheet-icon-wrap">
             <svg
@@ -139,9 +140,8 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
           </p>
         </div>
 
-        {/* Action Buttons Row Styled Like Screenshot 3 */}
         <div className="action-sheet-actions-row">
-          {/* Pause or Resume Action Button */}
+
           {isActive ? (
             <button
               type="button"
@@ -189,7 +189,6 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
             </button>
           )}
 
-          {/* Delete This Vote Action Button */}
           <button
             type="button"
             className="btn-action-quit btn-action-delete"
@@ -215,7 +214,6 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
             <span>{isDeleting ? 'Deleting...' : 'Delete This Vote'}</span>
           </button>
 
-          {/* Cancel Button */}
           <button
             type="button"
             className="btn-action-cancel"
@@ -231,3 +229,4 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
 };
 
 export default PauseOrQuitModal;
+

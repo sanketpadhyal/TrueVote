@@ -91,7 +91,7 @@ export const Navbar: React.FC = () => {
       if (!element) return;
 
       element.classList.remove('nav-highlight-animate');
-      void element.offsetWidth; // Force reflow
+      void element.offsetWidth;
       element.classList.add('nav-highlight-animate');
       setTimeout(() => {
         element.classList.remove('nav-highlight-animate');
@@ -117,7 +117,7 @@ export const Navbar: React.FC = () => {
     <>
       <header className={`navbar-header ${isScrolled ? 'scrolled' : ''} ${isMounted ? 'nav-visible' : 'nav-blur-initial'} ${isMobileMenuOpen ? 'mobile-expanded' : ''}`}>
         <div className="navbar-inner">
-          {/* Logo with User's Brand Logo */}
+
           <a href="/" className="navbar-brand" onClick={handleBrandClick}>
             <img
               src="/images/logo.png"
@@ -127,7 +127,6 @@ export const Navbar: React.FC = () => {
             <span className="navbar-brand-name">True<span className="brand-accent">Vote</span></span>
           </a>
 
-          {/* Center Nav Links */}
           <ul className="navbar-menu">
             <li><a href="#features" className="navbar-link" onClick={(e) => handleNavClick(e, 'features')}>Features</a></li>
             <li><a href="#benefits" className="navbar-link" onClick={(e) => handleNavClick(e, 'benefits')}>Benefits</a></li>
@@ -137,9 +136,8 @@ export const Navbar: React.FC = () => {
             <li><a href="/dashboard" className={`navbar-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'dashboard')}>Dashboard</a></li>
           </ul>
 
-          {/* Action CTA */}
           <div className="navbar-actions">
-            <button 
+            <button
               className={`btn-hyper-blue framer-flip-btn ${location.pathname === '/team' ? 'active' : ''}`}
               onClick={(e) => handleNavClick(e, 'team')}
             >
@@ -152,7 +150,7 @@ export const Navbar: React.FC = () => {
               <FlipText>About Team</FlipText>
             </button>
 
-            <button 
+            <button
               className={`mobile-toggle-btn ${isMobileMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle Mobile Menu"
@@ -172,7 +170,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Seamlessly Extending Mobile Panel inside Navbar */}
         <div className="mobile-expand-panel">
           <div className="mobile-expand-content">
             <a href="#features" className="mobile-nav-link" onClick={(e) => handleNavClick(e, 'features')}>Features</a>
@@ -181,8 +178,8 @@ export const Navbar: React.FC = () => {
             <a href="#security" className="mobile-nav-link" onClick={(e) => handleNavClick(e, 'security')}>Security</a>
             <a href="/faq" className={`mobile-nav-link ${location.pathname === '/faq' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'faq')}>FAQ</a>
             <a href="/dashboard" className={`mobile-nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'dashboard')}>Dashboard</a>
-            <button 
-              className={`btn-hyper-blue framer-flip-btn mobile-team-cta ${location.pathname === '/team' ? 'active' : ''}`} 
+            <button
+              className={`btn-hyper-blue framer-flip-btn mobile-team-cta ${location.pathname === '/team' ? 'active' : ''}`}
               onClick={(e) => handleNavClick(e, 'team')}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -197,8 +194,7 @@ export const Navbar: React.FC = () => {
         </div>
       </header>
 
-      {/* Backdrop for tapping outside to close */}
-      <div 
+      <div
         className={`navbar-backdrop ${isMobileMenuOpen ? 'active' : ''}`}
         onClick={() => setIsMobileMenuOpen(false)}
       />
@@ -207,3 +203,4 @@ export const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+

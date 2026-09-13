@@ -1,4 +1,4 @@
-/* Wyborek Election Dashboard Styling - Pixel Perfect & Fully Responsive */
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -31,9 +31,7 @@
   overflow: hidden;
 }
 
-/* =========================================================
-   1. Left Sidebar
-   ========================================================= */
+
 .wyborek-sidebar {
   grid-column: 1;
   background-color: var(--dash-navy-dark);
@@ -159,7 +157,7 @@
   max-width: 80px;
 }
 
-/* Active State */
+
 .nav-item.active {
   color: var(--dash-mint);
   background: linear-gradient(90deg, rgba(0, 229, 163, 0.03) 0%, rgba(0, 229, 163, 0.15) 100%);
@@ -181,7 +179,7 @@
   box-shadow: 0 0 10px rgba(0, 229, 163, 0.6);
 }
 
-/* Sidebar Footer - Log Out Button */
+
 .wyborek-sidebar-footer {
   width: 100%;
   padding: 0 8px;
@@ -230,9 +228,7 @@
   letter-spacing: 0.1px;
 }
 
-/* =========================================================
-   2. Main Center Content Container
-   ========================================================= */
+
 .wyborek-main-content {
   grid-column: 2;
   padding: 24px 16px 24px 20px;
@@ -288,7 +284,7 @@
   margin: 0;
 }
 
-/* Hero Banner */
+
 .dashboard-hero-banner {
   background: var(--dash-peach-bg);
   border-radius: 20px;
@@ -352,7 +348,7 @@
   filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.08));
 }
 
-/* Table */
+
 .dashboard-table-container {
   margin-top: 24px;
   width: 100%;
@@ -370,7 +366,7 @@
   scrollbar-color: #cbd5e1 rgba(241, 245, 249, 0.7);
 }
 
-/* Custom sleek scrollbar for table wrapper */
+
 .table-responsive-wrapper::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -559,7 +555,7 @@
   margin-left: 4px;
 }
 
-/* Action Cards */
+
 .dashboard-action-cards {
   display: flex;
   justify-content: center;
@@ -652,9 +648,7 @@
   transform: scale(0.97);
 }
 
-/* =========================================================
-   3. Right Stats Panel
-   ========================================================= */
+
 .wyborek-stats-panel {
   grid-column: 3;
   background-color: #ffffff;
@@ -738,7 +732,7 @@
   margin-top: 5px;
 }
 
-/* Activity Feed */
+
 .voting-activity-section {
   display: flex;
   flex-direction: column;
@@ -839,11 +833,9 @@
   color: var(--dash-navy-muted);
 }
 
-/* =========================================================
-   Responsive Breakpoints - PC, Laptop, Tablet, Mobile
-   ========================================================= */
 
-/* Laptops & medium monitors (1180px - 1380px) */
+
+
 @media (max-width: 1380px) {
   .wyborek-dashboard-root {
     grid-template-columns: 96px minmax(0, 1fr) 300px;
@@ -875,7 +867,7 @@
   }
 }
 
-/* Small Laptops & Tablets Landscape (960px - 1180px) */
+
 @media (max-width: 1180px) {
   .wyborek-dashboard-root {
     grid-template-columns: 88px minmax(0, 1fr) 270px;
@@ -906,7 +898,7 @@
   }
 }
 
-/* Tablets Portrait (768px - 960px) */
+
 @media (max-width: 960px) {
   .wyborek-dashboard-root {
     grid-template-columns: 84px minmax(0, 1fr);
@@ -942,7 +934,7 @@
   }
 }
 
-/* Mobile Devices (< 768px) */
+
 @media (max-width: 768px) {
   .wyborek-dashboard-root {
     display: flex;
@@ -962,7 +954,7 @@
     height: auto;
   }
 
-  /* Mobile Top App Bar */
+  
   .wyborek-sidebar {
     width: 100%;
     height: auto;
@@ -1010,7 +1002,7 @@
   }
 
   .nav-label {
-    display: none; /* Icon-only on small mobile screens */
+    display: none; 
   }
 
   .nav-icon-wrap {
@@ -1044,7 +1036,7 @@
     display: none;
   }
 
-  /* Main content on mobile */
+  
   .wyborek-main-content {
     padding: 14px 12px;
   }
@@ -1080,7 +1072,7 @@
     display: none;
   }
 
-  /* Action Cards Stack */
+  
   .dashboard-action-cards {
     display: flex;
     justify-content: center;
@@ -1121,7 +1113,7 @@
     font-size: 11.5px;
   }
 
-  /* Stats panel on mobile */
+  
   .wyborek-stats-panel {
     padding: 20px 16px 32px 16px;
     margin: 0 12px 24px 12px;
@@ -1138,9 +1130,7 @@
   }
 }
 
-/* =========================================================
-   6. Tab Blur Animations & View Switching
-   ========================================================= */
+
 @keyframes tabBlurIn {
   0% {
     opacity: 0;
@@ -1168,7 +1158,7 @@
   width: 100%;
 }
 
-/* Tab Header & Action Buttons */
+
 .tab-header-row {
   display: flex;
   align-items: flex-start;
@@ -1237,7 +1227,7 @@
   color: var(--dash-navy-text);
 }
 
-/* Tab Metrics Grid */
+
 .tab-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1333,7 +1323,7 @@
   font-weight: 500;
 }
 
-/* Multi-Sig Health Banner */
+
 .multisig-banner-card {
   background: linear-gradient(135deg, rgba(7, 11, 40, 0.03) 0%, rgba(0, 229, 163, 0.08) 100%);
   border: 1px solid rgba(0, 229, 163, 0.3);
@@ -1393,7 +1383,7 @@
   white-space: nowrap;
 }
 
-/* Tab Toolbar & Filtering */
+
 .tab-toolbar {
   display: flex;
   align-items: center;
@@ -1482,7 +1472,7 @@
   font-weight: 700;
 }
 
-/* Custom Table for Tabs */
+
 .tab-table-container {
   width: 100%;
   overflow-x: auto;
@@ -1711,7 +1701,7 @@
   font-weight: 500;
 }
 
-/* Settings Tab Layout */
+
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1872,7 +1862,7 @@
   line-height: 1.35;
 }
 
-/* Switch styling */
+
 .switch {
   position: relative;
   display: inline-block;
@@ -1935,7 +1925,7 @@ input:checked + .slider.round:before {
   animation: tabBlurIn 0.3s ease;
 }
 
-/* Responsive Overrides for Tabs */
+
 @media (max-width: 1024px) {
   .settings-grid {
     grid-template-columns: 1fr;
@@ -1973,9 +1963,7 @@ input:checked + .slider.round:before {
   }
 }
 
-/* =========================================================
-   7. Empty States for Events Table & Stats Panel
-   ========================================================= */
+
 .events-empty-cell {
   padding: 56px 24px !important;
   text-align: center;
@@ -2052,9 +2040,7 @@ input:checked + .slider.round:before {
   max-width: 220px;
 }
 
-/* =========================================================
-   8. Logout Confirmation Popup Panel
-   ========================================================= */
+
 @keyframes iosBackdropIn {
   0% {
     opacity: 0;
@@ -2223,7 +2209,7 @@ input:checked + .slider.round:before {
   width: 100%;
 }
 
-/* Red Logout Confirm Button - Matching Screenshot 4 with no hover transitions */
+
 .btn-logout-confirm {
   display: inline-flex;
   align-items: center;
@@ -2253,7 +2239,7 @@ input:checked + .slider.round:before {
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.22) !important;
 }
 
-/* Cancel Button in Logout Modal - No hover transitions */
+
 .btn-logout-cancel {
   display: inline-flex;
   align-items: center;
@@ -2281,9 +2267,7 @@ input:checked + .slider.round:before {
   box-shadow: none !important;
 }
 
-/* =========================================================
-   9. iOS-Style New Event Wizard Modal & Blue Button Theme
-   ========================================================= */
+
 .new-event-modal-card {
   background: rgba(255, 255, 255, 0.96);
   border-radius: 28px;
@@ -2320,7 +2304,7 @@ input:checked + .slider.round:before {
   animation: iosModalPopOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
-/* Modal Header: Step Indicator & Smooth Error Accordion */
+
 .new-event-modal-header {
   width: 100%;
   display: flex;
@@ -2329,7 +2313,7 @@ input:checked + .slider.round:before {
   flex-shrink: 0;
 }
 
-/* Connected Modern Stepper in Modal Header */
+
 .new-event-stepper-wrap {
   display: flex;
   flex-direction: column;
@@ -2408,7 +2392,7 @@ input:checked + .slider.round:before {
   color: #64748b;
 }
 
-/* Smooth Accordion Error Alert - no height jumps! */
+
 .new-event-error-container {
   max-height: 0;
   opacity: 0;
@@ -2450,7 +2434,7 @@ input:checked + .slider.round:before {
   40%, 60% { transform: translate3d(3px, 0, 0); }
 }
 
-/* Fluid Step Body */
+
 .new-event-step-body {
   width: 100%;
   display: flex;
@@ -2497,7 +2481,7 @@ input:checked + .slider.round:before {
   max-width: 360px;
 }
 
-/* Modern Choice Count Selection Grid */
+
 .choice-count-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2527,7 +2511,7 @@ input:checked + .slider.round:before {
 }
 
 .choice-count-card:hover {
-  /* Strictly NO hover movement, NO transform, NO hover jump */
+  
   transform: none !important;
 }
 
@@ -2569,7 +2553,7 @@ input:checked + .slider.round:before {
   color: rgba(255, 255, 255, 0.92);
 }
 
-/* Apple-Grade iOS Segmented Track for Choices 1, 2, 3, 4, 5 */
+
 .ios-segmented-track {
   display: flex;
   align-items: center;
@@ -2612,7 +2596,7 @@ input:checked + .slider.round:before {
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
-/* Compact Options Input List with fluid animations */
+
 .options-input-list {
   display: flex;
   flex-direction: column;
@@ -2708,7 +2692,7 @@ input:checked + .slider.round:before {
   margin-bottom: 6px;
 }
 
-/* Modern Total Votes Capacity Grid */
+
 .votes-presets-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2738,7 +2722,7 @@ input:checked + .slider.round:before {
 }
 
 .votes-preset-chip:hover {
-  /* Strictly NO hover movement, NO scale, NO jump */
+  
   transform: none !important;
 }
 
@@ -2788,7 +2772,7 @@ input:checked + .slider.round:before {
   animation: iosRowEntrance 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* IST Indicator & Schedule */
+
 .ist-badge-indicator {
   display: inline-flex;
   align-items: center;
@@ -2891,7 +2875,7 @@ input:checked + .slider.round:before {
   animation: iosRowEntrance 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Actions Row - snugly follows content without giant gap */
+
 .new-event-actions-row {
   display: flex;
   align-items: center;
@@ -2907,7 +2891,7 @@ input:checked + .slider.round:before {
   justify-content: center;
 }
 
-/* Blue Pill Button Theme with subtle active press */
+
 .btn-blue-pill {
   display: inline-flex;
   align-items: center;
@@ -2943,7 +2927,7 @@ input:checked + .slider.round:before {
   color: #ffffff !important;
 }
 
-/* Success View & Link Box */
+
 .shareable-link-box {
   display: flex;
   align-items: center;
@@ -3024,7 +3008,7 @@ input:checked + .slider.round:before {
   box-sizing: border-box;
 }
 
-/* Shimmer Skeleton Loaders for Table & Activity Feed */
+
 @keyframes truevoteShimmerLight {
   0% {
     background-position: -200% 0;
@@ -3057,9 +3041,7 @@ input:checked + .slider.round:before {
   padding: 10px 0;
 }
 
-/* =========================================================
-   10. Real-time Live Stats & Analytics iOS Modal
-   ========================================================= */
+
 .table-actions-group {
   display: inline-flex;
   align-items: center;
@@ -3094,7 +3076,7 @@ input:checked + .slider.round:before {
   background: #16a34a;
 }
 
-/* Analytics Modal Backdrop */
+
 .analytics-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -3275,7 +3257,7 @@ input:checked + .slider.round:before {
   line-height: 1.4;
 }
 
-/* KPI Summary Cards */
+
 .analytics-kpi-single {
   margin-bottom: 18px;
   width: 100%;
@@ -3348,7 +3330,7 @@ input:checked + .slider.round:before {
   font-weight: 500;
 }
 
-/* Graph Section */
+
 .analytics-graph-section {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -3470,7 +3452,7 @@ input:checked + .slider.round:before {
   background: linear-gradient(90deg, #2563eb, #00f5a0);
 }
 
-/* Analytics Link Box */
+
 .analytics-link-box {
   background: #f8fafc;
   border: 1px dashed #cbd5e1;
@@ -3522,7 +3504,7 @@ input:checked + .slider.round:before {
   color: #ffffff;
 }
 
-/* Actions Row Styled Matching Screenshot 3 */
+
 .analytics-modal-actions-row,
 .action-sheet-actions-row {
   display: flex;
@@ -3533,7 +3515,7 @@ input:checked + .slider.round:before {
   flex-wrap: wrap;
 }
 
-/* Blue Done Button Matching Screenshot 3 */
+
 .btn-analytics-done {
   display: inline-flex;
   align-items: center;
@@ -3564,7 +3546,7 @@ input:checked + .slider.round:before {
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.22) !important;
 }
 
-/* Amber Pause Button Matching Screenshot 3 */
+
 .btn-action-pause {
   display: inline-flex;
   align-items: center;
@@ -3595,7 +3577,7 @@ input:checked + .slider.round:before {
   box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.22) !important;
 }
 
-/* Red Delete / Quit Button Matching Screenshot 3 */
+
 .btn-action-quit,
 .btn-action-delete {
   display: inline-flex;
@@ -3636,7 +3618,7 @@ input:checked + .slider.round:before {
   cursor: not-allowed;
 }
 
-/* Secondary Cancel Button Matching Screenshot 3 */
+
 .btn-action-cancel {
   display: inline-flex;
   align-items: center;
@@ -3665,7 +3647,7 @@ input:checked + .slider.round:before {
   box-shadow: none !important;
 }
 
-/* Green Resume / Activate Button */
+
 .btn-action-resume {
   display: inline-flex;
   align-items: center;
@@ -3696,7 +3678,7 @@ input:checked + .slider.round:before {
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.22) !important;
 }
 
-/* Dedicated Table Row Delete Button */
+
 .btn-table-delete {
   display: inline-flex;
   align-items: center;
@@ -3725,9 +3707,7 @@ input:checked + .slider.round:before {
   transform: scale(0.95);
 }
 
-/* =========================================================
-   11. Pause or Quit iOS Action Sheet Dialog
-   ========================================================= */
+
 .action-sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -3833,9 +3813,7 @@ input:checked + .slider.round:before {
   max-width: 340px;
 }
 
-/* ==========================================================================
-   IPFS Sync Component
-   ========================================================================== */
+
 
 
 .btn-ipfs-sync {
@@ -3887,9 +3865,7 @@ input:checked + .slider.round:before {
   animation: syncSpin360 0.65s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==========================================================================
-   PhonePe-Style Animated Success Badge (Modal Step 5 Voting Link Published)
-   ========================================================================== */
+
 .phonepe-success-wrap {
   position: relative;
   display: flex;

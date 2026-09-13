@@ -1,7 +1,4 @@
-/* ==========================================================================
-   TrueVote Hackathon Dialogue Box Styles
-   Matches website theme: Light, airy frosted glass, serif typography accents
-   ========================================================================== */
+
 
 .ios-dialogue-overlay {
   position: fixed;
@@ -43,7 +40,7 @@
   }
 }
 
-/* Modal Card with Website Frosted Glass Aesthetic */
+
 .ios-dialogue-card {
   position: relative;
   width: 100%;
@@ -101,7 +98,7 @@
   }
 }
 
-/* Faint Decorative Geometric Lines */
+
 .hackathon-card-line {
   position: absolute;
   height: 1px;
@@ -134,7 +131,7 @@
   width: 95px;
 }
 
-/* Close Circle Button */
+
 .ios-close-btn {
   position: absolute;
   top: 1.15rem;
@@ -164,7 +161,7 @@
   transform: scale(0.94);
 }
 
-/* Banner Image */
+
 .ios-dialogue-image-box {
   width: 100%;
   display: flex;
@@ -185,7 +182,7 @@
   filter: drop-shadow(0 8px 20px rgba(15, 23, 42, 0.06));
 }
 
-/* Title & Description */
+
 .ios-dialogue-title {
   font-family: var(--font-main), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1.55rem;
@@ -212,7 +209,7 @@
   font-weight: 600;
 }
 
-/* Primary Action Button (Matching TrueVote Theme) */
+
 .ios-action-btn {
   width: 100%;
   padding: 0.9rem 1.5rem;
@@ -228,7 +225,7 @@
   cursor: pointer;
 }
 
-/* Custom Scrollbar for Card */
+
 .ios-dialogue-card::-webkit-scrollbar {
   width: 5px;
 }

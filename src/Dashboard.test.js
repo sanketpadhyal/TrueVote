@@ -30,3 +30,4 @@ describe('Dashboard Component', () => {
     expect(screen.getByRole('button', { name: /Log out/i })).toBeInTheDocument();
   });
 });
+

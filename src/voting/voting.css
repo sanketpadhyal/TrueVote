@@ -1,7 +1,4 @@
-/* =========================================================
-   TrueVote Anonymous Voting Page Styles
-   Web-Themed, Modern Glassmorphism & 1000% Mobile Optimized
-   ========================================================= */
+
 
 .voting-page-wrapper {
   min-height: 100vh;
@@ -14,7 +11,7 @@
   flex-direction: column;
 }
 
-/* Background Ambient Lighting (Contained so it never creates phantom scrollbars) */
+
 .voting-ambient-background {
   position: fixed;
   inset: 0;
@@ -46,10 +43,7 @@
   background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, rgba(248, 250, 252, 0) 70%);
 }
 
-/* =========================================================
-   Navbar: Clean, Lightweight, Website Themed
-   (Only Logo on Left, Real-time Clock on Right)
-   ========================================================= */
+
 .voting-navbar {
   position: fixed;
   top: 0;
@@ -119,9 +113,7 @@
   user-select: none;
 }
 
-/* =========================================================
-   Main Container & Ballot Card
-   ========================================================= */
+
 .voting-main-container {
   position: relative;
   z-index: 5;
@@ -159,9 +151,7 @@
   }
 }
 
-/* =========================================================
-   Sleek Compact Voter Identity & ZKP Privacy Bar
-   ========================================================= */
+
 .voter-identity-pill-bar {
   display: flex;
   align-items: center;
@@ -266,9 +256,7 @@
   flex-shrink: 0;
 }
 
-/* =========================================================
-   Event Header & Quorum Progress
-   ========================================================= */
+
 .voting-card-header {
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 22px;
@@ -377,7 +365,7 @@
   margin: 0 0 18px 0;
 }
 
-/* Quorum Progress */
+
 .voting-progress-wrap {
   background: #f8fafc;
   border: 1.5px solid #e2e8f0;
@@ -413,9 +401,7 @@
   transition: width 0.4s ease;
 }
 
-/* =========================================================
-   Ballot Choices Options
-   ========================================================= */
+
 .section-label {
   font-size: 13px;
   font-weight: 700;
@@ -519,9 +505,7 @@
   flex-shrink: 0;
 }
 
-/* =========================================================
-   Cloudflare Turnstile Auto-Verify Component
-   ========================================================= */
+
 .cf-turnstile-container {
   margin: 18px 0 24px 0;
   display: flex;
@@ -683,9 +667,7 @@
   pointer-events: none;
 }
 
-/* =========================================================
-   Cast Button: TrueVote Web Signature Mint Gradient
-   ========================================================= */
+
 .ballot-cast-actions {
   display: flex;
   justify-content: center;
@@ -729,9 +711,7 @@
   opacity: 1 !important;
 }
 
-/* =========================================================
-   Loading Card with WebM Animation & Phased Steps
-   ========================================================= */
+
 .voting-loading-card {
   text-align: center;
   padding: 44px 28px;
@@ -839,9 +819,7 @@
   transition: width 0.35s ease;
 }
 
-/* =========================================================
-   Panels (Already Voted & Vote Cast Confirmation)
-   ========================================================= */
+
 .already-voted-panel,
 .vote-success-panel {
   display: flex;
@@ -880,7 +858,7 @@
   }
 }
 
-/* PhonePe / UPI Style Payment Success Animation */
+
 .phonepe-success-container {
   display: flex;
   flex-direction: column;
@@ -901,7 +879,7 @@
   margin: 8px auto 26px auto;
 }
 
-/* Concentric Expanding Ripples */
+
 .phonepe-ripple {
   position: absolute;
   top: 50%;
@@ -940,7 +918,7 @@
   }
 }
 
-/* Central Green Circle Badge */
+
 .phonepe-circle-badge {
   position: relative;
   z-index: 2;
@@ -974,7 +952,7 @@
   }
 }
 
-/* Animated Checkmark Drawing */
+
 .phonepe-check-svg {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
 }
@@ -991,7 +969,7 @@
   }
 }
 
-/* Confetti Sparkles */
+
 .phonepe-sparkle {
   position: absolute;
   width: 6px;
@@ -1017,7 +995,7 @@
 @keyframes sparkle-5 { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 100% { transform: translate(-24px, 18px) scale(1.4); opacity: 0; } }
 @keyframes sparkle-6 { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 100% { transform: translate(-24px, -18px) scale(1.4); opacity: 0; } }
 
-/* Staggered Content Entrances */
+
 .phonepe-fade-1 {
   opacity: 0;
   animation: phonepe-fade-up 0.45s 0.32s ease-out forwards;
@@ -1201,9 +1179,7 @@
   box-sizing: border-box;
 }
 
-/* =========================================================
-   1000% Mobile Optimization Responsive Breakpoints
-   ========================================================= */
+
 @media (max-width: 640px) {
   .voting-navbar {
     padding: 12px 16px;

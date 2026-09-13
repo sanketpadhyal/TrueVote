@@ -1,8 +1,4 @@
-/* ==========================================================================
-   TrueVote Auth Modal Styles
-   Matches website theme: Light, airy, hyper-premium frosted glass
-   Animated with signature blur-to-normal + spring scale entrance
-   ========================================================================== */
+
 
 .auth-modal-overlay {
   position: fixed;
@@ -25,7 +21,7 @@
   pointer-events: auto;
 }
 
-/* Modal Card with TrueVote Frosted Glass Aesthetic & Blur-To-Normal Animation */
+
 .auth-modal-card {
   position: relative;
   width: 100%;
@@ -46,7 +42,7 @@
   text-align: center;
   overflow: hidden;
 
-  /* Animated Entrance (Blur-to-Normal with scale) */
+  
   opacity: 0;
   filter: blur(16px);
   transform: scale(0.86) translateY(24px);
@@ -63,7 +59,7 @@
   transform: scale(1) translateY(0);
 }
 
-/* Faint Decorative Accent Lines matching website aesthetic */
+
 .auth-card-line {
   position: absolute;
   height: 1px;
@@ -102,7 +98,7 @@
   width: 100px;
 }
 
-/* Close '✕' Button in Top Right */
+
 .auth-close-btn {
   position: absolute;
   top: 1.15rem;
@@ -132,7 +128,7 @@
   transform: scale(0.94);
 }
 
-/* Center Brand Logo Container with Frosted Glow */
+
 .auth-logo-wrapper {
   position: relative;
   width: 76px;
@@ -171,7 +167,7 @@
   display: block;
 }
 
-/* Title & Subtitle */
+
 .auth-modal-title {
   font-family: var(--font-main), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1.6rem;
@@ -196,7 +192,7 @@
   z-index: 2;
 }
 
-/* Primary Action Button (Signature TrueVote Hyper Blue) */
+
 .auth-continue-btn {
   width: 100%;
   background: linear-gradient(180deg, #1d6bf3 0%, #1557d0 100%);
@@ -231,7 +227,7 @@
   display: block;
 }
 
-/* Spinner during Connection */
+
 .auth-btn-spinner {
   width: 18px;
   height: 18px;
@@ -249,7 +245,7 @@
   }
 }
 
-/* Connected State Pill */
+
 .auth-connected-pill {
   width: 100%;
   padding: 0.88rem 1.25rem;
@@ -290,7 +286,7 @@
   letter-spacing: -0.01em;
 }
 
-/* Error Message */
+
 .auth-error-message {
   margin: 0.85rem 0 0;
   font-size: 0.84rem;
@@ -299,7 +295,7 @@
   z-index: 2;
 }
 
-/* Connected State Container */
+
 .auth-connected-container {
   width: 100%;
   display: flex;
@@ -323,7 +319,7 @@
   color: #ef4444;
 }
 
-/* Not Installed State */
+
 .auth-not-installed-box {
   width: 100%;
   display: flex;

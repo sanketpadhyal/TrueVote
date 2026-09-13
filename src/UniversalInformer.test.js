@@ -77,7 +77,6 @@ describe('UniversalInformer Component', () => {
       fireEvent.click(closeBtn);
     });
 
-    // Fast-forward exit animation (300ms)
     act(() => {
       jest.advanceTimersByTime(350);
     });
@@ -98,7 +97,6 @@ describe('UniversalInformer Component', () => {
       jest.advanceTimersByTime(3000);
     });
 
-    // Exit animation time
     act(() => {
       jest.advanceTimersByTime(350);
     });
@@ -106,3 +104,4 @@ describe('UniversalInformer Component', () => {
     expect(screen.queryByText('Auto disappearing toast')).not.toBeInTheDocument();
   });
 });
+

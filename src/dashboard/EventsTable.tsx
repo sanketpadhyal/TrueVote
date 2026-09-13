@@ -45,17 +45,14 @@ export const EventsTable: React.FC = () => {
         }
       } catch (e) {}
 
-      // Step 1: Query Pinata IPFS (primary cloud source of truth)
       const pinataEvents = await fetchEventsFromPinata();
 
-      // Filter out any known deleted events
       const validPinataEvents = (pinataEvents || []).filter((pEv) => {
         const idMatch = pEv.id && deletedSet.has(String(pEv.id).toLowerCase());
         const numMatch = pEv.votingNumber && deletedSet.has(String(pEv.votingNumber).toLowerCase());
         return !idMatch && !numMatch;
       });
 
-      // Keep recently created local events that might still be propagating to Pinata (within last 45s)
       const localEvents = getStoredEvents();
       const now = Date.now();
       const pendingUploads = localEvents.filter((ev) => {
@@ -96,17 +93,15 @@ export const EventsTable: React.FC = () => {
       localStorage.setItem('truevote_events', JSON.stringify(combined));
       saveEventsToBackup(combined);
 
-      // Restore total votes used
       const totalUsed = combined.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
       localStorage.setItem('truevote_votes_used', String(totalUsed));
 
-      // Ensure activities (latest votes and announcements) are kept in sync
       getStoredActivities();
 
       window.dispatchEvent(new Event('truevote_events_updated'));
     } catch (pinataErr) {
       console.warn('Pinata auto-sync notice:', pinataErr);
-      // Fallback to local backup only if Pinata network is unreachable
+
       const idbEvents = await loadEventsFromBackup();
       if (idbEvents && idbEvents.length > 0) {
         setEvents(idbEvents);
@@ -136,10 +131,8 @@ export const EventsTable: React.FC = () => {
       };
     } catch (e) {}
 
-    // Initial restoration from IPFS
     syncExistingEvents();
 
-    // Background auto-sync every 12 seconds to keep latest votes live from IPFS
     const intervalId = setInterval(() => {
       syncExistingEvents();
     }, 12000);
@@ -154,7 +147,7 @@ export const EventsTable: React.FC = () => {
         } catch (e) {}
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   const updateEventStatus = async (id: string, updates: Partial<EventItem>) => {
@@ -188,7 +181,6 @@ export const EventsTable: React.FC = () => {
       return updated;
     });
 
-    // Automatically sync updated activation status to Pinata IPFS
     if (targetUpdatedEvent) {
       try {
         const pinResult = await uploadEventToPinata(targetUpdatedEvent);
@@ -245,10 +237,10 @@ export const EventsTable: React.FC = () => {
   const handleActivationClick = (event: EventItem) => {
     if (activatingEventIds.has(event.id)) return;
     if (event.isActivated) {
-      // If already active, trigger iOS popup to ask "Pause or Quit?"
+
       setSelectedPauseQuitEvent(event);
     } else {
-      // If inactive, activate directly
+
       updateEventStatus(event.id, { isActivated: true });
     }
   };
@@ -264,7 +256,7 @@ export const EventsTable: React.FC = () => {
   };
 
   const handleDeleteEvent = async (eventToDelete: EventItem) => {
-    // 1. Unpin / delete this specific vote schema from Pinata IPFS
+
     try {
       await deleteEventFromPinata(
         eventToDelete.ipfsHash,
@@ -275,7 +267,6 @@ export const EventsTable: React.FC = () => {
       console.warn('Pinata delete error:', err);
     }
 
-    // 2. Mark event as deleted in tombstone storage so it is NEVER restored
     try {
       const deletedKey = 'truevote_deleted_events';
       const deletedList: string[] = JSON.parse(localStorage.getItem(deletedKey) || '[]');
@@ -288,7 +279,6 @@ export const EventsTable: React.FC = () => {
       localStorage.setItem(deletedKey, JSON.stringify(deletedList));
     } catch (e) {}
 
-    // 3. Remove vote from local storage, backup storage, and update state
     setEvents((prev) => {
       const updated = prev.filter(
         (ev) =>
@@ -299,11 +289,9 @@ export const EventsTable: React.FC = () => {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
         removeEventFromBackup(eventToDelete.id, eventToDelete.votingNumber);
 
-        // Update total votes used counter
         const totalUsed = updated.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
         localStorage.setItem('truevote_votes_used', String(totalUsed));
 
-        // Purge activities related to this deleted event
         const actsStr = localStorage.getItem('truevote_activities');
         if (actsStr) {
           try {
@@ -330,15 +318,13 @@ export const EventsTable: React.FC = () => {
       return updated;
     });
 
-    // 4. Clear any cached vote status flags for this event
     try {
       localStorage.removeItem(`truevote_voted_${eventToDelete.id}`);
       localStorage.removeItem(`truevote_voted_${eventToDelete.votingNumber}`);
     } catch (e) {
-      // ignore
+
     }
 
-    // 5. Close active analytics modal if it was open for this event
     if (selectedAnalyticsEventId === eventToDelete.id) {
       setSelectedAnalyticsEventId(null);
     }
@@ -431,7 +417,7 @@ export const EventsTable: React.FC = () => {
                     <td className="td-activation">{event.activationType}</td>
                     <td className="td-dates-cell">
                       <div className="table-actions-group">
-                        {/* Real-time Analytics Button */}
+
                         <button
                           type="button"
                           className="btn-live-stats"
@@ -455,7 +441,6 @@ export const EventsTable: React.FC = () => {
                           <span>Live Stats</span>
                         </button>
 
-                        {/* Scheduled Dates (if automatic) */}
                         {event.activationType === 'automatic' && (
                           <div className="dates-columns-wrapper">
                             <div className="date-block">
@@ -469,7 +454,6 @@ export const EventsTable: React.FC = () => {
                           </div>
                         )}
 
-                        {/* Activation Toggle Button (Active / Activate / Paused) */}
                         <div className="action-button-align">
                           <button
                             type="button"
@@ -543,7 +527,6 @@ export const EventsTable: React.FC = () => {
                           </button>
                         </div>
 
-                        {/* Dedicated Delete Button */}
                         <button
                           type="button"
                           className="btn-table-delete"
@@ -596,14 +579,12 @@ export const EventsTable: React.FC = () => {
         </table>
       </div>
 
-      {/* Real-time iOS Analytics Modal with Live Graphs */}
       <RealtimeAnalyticsModal
         isOpen={Boolean(selectedAnalyticsEventId)}
         onClose={() => setSelectedAnalyticsEventId(null)}
         eventId={selectedAnalyticsEventId}
       />
 
-      {/* iOS Action Sheet: Pause or Delete Confirmation */}
       <PauseOrQuitModal
         isOpen={Boolean(selectedPauseQuitEvent)}
         onClose={() => setSelectedPauseQuitEvent(null)}
@@ -617,3 +598,4 @@ export const EventsTable: React.FC = () => {
 };
 
 export default EventsTable;
+

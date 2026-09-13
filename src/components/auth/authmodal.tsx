@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './authmodal.css';
 
 export interface AuthModalProps {
@@ -7,15 +7,13 @@ export interface AuthModalProps {
   onConnect?: (address: string) => void;
 }
 
-// Safely locate genuine MetaMask provider (distinguishing from Phantom/Coinbase/Brave hijackers)
 const getRealMetaMaskProvider = () => {
   if (typeof window === 'undefined') return null;
   const eth = (window as any).ethereum;
   if (!eth) return null;
 
-  // Multi-wallet EIP-6963 / window.ethereum.providers array
   if (eth.providers && Array.isArray(eth.providers)) {
-    // Specifically search for MetaMask that is NOT Phantom, Coinbase, Brave, or Trust
+
     const realMetaMask = eth.providers.find(
       (p: any) => p.isMetaMask && !p.isPhantom && !p.isBraveWallet && !p.isCoinbaseWallet && !p.isTrust
     );
@@ -24,7 +22,6 @@ const getRealMetaMaskProvider = () => {
     if (fallbackMetaMask) return fallbackMetaMask;
   }
 
-  // Single provider check
   if (eth.isMetaMask) {
     return eth;
   }
@@ -34,14 +31,14 @@ const getRealMetaMaskProvider = () => {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
-  const [isAnimatingIn, setIsAnimatingIn] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const isClosingRef = React.useRef(false);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'not_installed' | 'error'>('idle');
   const [account, setAccount] = useState<string | null>(() => {
     return localStorage.getItem('truevote_connected_wallet') || null;
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Synchronize internal account state when localStorage or onConnect changes
   useEffect(() => {
     const saved = localStorage.getItem('truevote_connected_wallet');
     if (saved) {
@@ -50,43 +47,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
     }
   }, []);
 
-  // Manage mount lifecycle and smooth animated entrance
   useEffect(() => {
-    let timer: NodeJS.Timeout;
     if (isOpen) {
       setShouldRender(true);
-      timer = setTimeout(() => {
-        setIsAnimatingIn(true);
-      }, 30);
-    } else {
-      setIsAnimatingIn(false);
-      timer = setTimeout(() => {
+      setIsClosing(false);
+      isClosingRef.current = false;
+    } else if (shouldRender && !isClosingRef.current) {
+      setIsClosing(true);
+      isClosingRef.current = true;
+      const timer = setTimeout(() => {
         setShouldRender(false);
+        setIsClosing(false);
+        isClosingRef.current = false;
         setErrorMessage(null);
-      }, 360);
+      }, 300);
+      return () => clearTimeout(timer);
     }
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+  }, [isOpen, shouldRender]);
 
   const handleClose = () => {
-    setIsAnimatingIn(false);
+    if (isClosingRef.current) return;
+    setIsClosing(true);
+    isClosingRef.current = true;
     setTimeout(() => {
       setShouldRender(false);
+      setIsClosing(false);
+      isClosingRef.current = false;
       setErrorMessage(null);
       onClose();
-    }, 340);
+    }, 280);
   };
+
+  const handleCloseRef = useRef(handleClose);
+  handleCloseRef.current = handleClose;
 
   useEffect(() => {
     if (!shouldRender) return;
 
-    // Prevent background scrolling while modal is active
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleClose();
+        handleCloseRef.current();
       }
     };
 
@@ -96,28 +99,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
-  // REAL METAMASK WALLET CONNECTION HANDLER
   const handleConnectMetaMask = async () => {
     setStatus('connecting');
     setErrorMessage(null);
 
     const provider = getRealMetaMaskProvider();
 
-    // Check if on mobile device
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (!provider || (!provider.isMetaMask && !isMobileDevice)) {
       if (isMobileDevice) {
-        // Redirect to MetaMask Mobile app directly
+
         const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
         window.open(`https://metamask.app.link/dapp/${cleanUrl}`, '_blank');
         setStatus('idle');
         return;
       }
-      // MetaMask extension is not installed in desktop browser
+
       setStatus('not_installed');
       return;
     }
@@ -125,7 +125,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
     try {
       let accounts: string[] = [];
 
-      // Method 1: Request permissions to explicitly trigger the real MetaMask prompt UI
       try {
         const permissions = await provider.request({
           method: 'wallet_requestPermissions',
@@ -136,19 +135,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
           accounts = accountsPermission.caveats[0].value;
         }
       } catch (permErr: any) {
-        // User explicitly cancelled / rejected the MetaMask popup
+
         if (permErr?.code === 4001) {
           setStatus('error');
           setErrorMessage('Connection request was rejected in MetaMask.');
           return;
         }
-        // Fallback if wallet_requestPermissions is not supported by client
+
         accounts = await provider.request({
           method: 'eth_requestAccounts'
         });
       }
 
-      // If accounts were not populated by permissions, request directly
       if (!accounts || accounts.length === 0) {
         accounts = await provider.request({
           method: 'eth_requestAccounts'
@@ -194,8 +192,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
   if (!shouldRender) return null;
 
   return (
-    <div 
-      className={`auth-modal-overlay ${isAnimatingIn ? 'active' : ''}`}
+    <div
+      className={`auth-modal-overlay ${isClosing ? 'closing' : 'opening'}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           handleClose();
@@ -205,18 +203,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
-      <div className={`auth-modal-card ${isAnimatingIn ? 'visible' : ''}`}>
-        {/* Subtle Decorative Geometric Lines */}
+      <div className={`auth-modal-card ${isClosing ? 'closing' : 'opening'}`}>
+
         <div className="auth-card-line line-tl" />
         <div className="auth-card-line line-ml" />
         <div className="auth-card-line line-mr" />
         <div className="auth-card-line line-bl" />
         <div className="auth-card-line line-br" />
 
-        {/* Minimalist Close '✕' Button */}
-        <button 
-          className="auth-close-btn" 
-          onClick={handleClose} 
+        <button
+          className="auth-close-btn"
+          onClick={handleClose}
           aria-label="Close modal"
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -225,17 +222,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
           </svg>
         </button>
 
-        {/* Center Brand Emblem with Frosted Glow */}
         <div className="auth-logo-wrapper">
           <div className="auth-logo-ambient-glow" />
-          <img 
-            src="/images/logo.png" 
-            alt="TrueVote Logo" 
-            className="auth-brand-logo" 
+          <img
+            src="/images/logo.png"
+            alt="TrueVote Logo"
+            className="auth-brand-logo"
           />
         </div>
 
-        {/* Modal Title & Subtitle */}
         <h2 className="auth-modal-title" id="auth-modal-title">
           Welcome to True<span className="auth-brand-accent">Vote</span>
         </h2>
@@ -243,7 +238,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
           Instant verification, effortless voting
         </p>
 
-        {/* State 1: Already Connected */}
         {status === 'connected' && account ? (
           <div className="auth-connected-container">
             <div className="auth-connected-pill">
@@ -252,16 +246,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
                 Connected: {account.slice(0, 6)}...{account.slice(-4)}
               </span>
             </div>
-            <button 
-              className="auth-continue-btn" 
+            <button
+              className="auth-continue-btn"
               onClick={handleConnectMetaMask}
               type="button"
               style={{ marginTop: '0.45rem' }}
             >
-              <img 
-                src="/images/stacks/muskmask.webp" 
-                alt="MetaMask" 
-                className="auth-btn-icon" 
+              <img
+                src="/images/stacks/muskmask.webp"
+                alt="MetaMask"
+                className="auth-btn-icon"
               />
               <span>Switch or Reconnect MetaMask</span>
             </button>
@@ -270,7 +264,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
             </button>
           </div>
         ) : status === 'not_installed' ? (
-          /* State 2: MetaMask Extension is NOT installed in browser */
+
           <div className="auth-not-installed-box">
             <div className="auth-alert-badge">
               <img src="/images/stacks/muskmask.webp" alt="MetaMask" className="auth-alert-icon" />
@@ -279,8 +273,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
             <p className="auth-alert-desc">
               MetaMask is required to access your Web3 ballot. Please install the extension in your browser.
             </p>
-            <button 
-              className="auth-install-btn" 
+            <button
+              className="auth-install-btn"
               onClick={handleInstallMetaMask}
               type="button"
             >
@@ -289,8 +283,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
             </button>
           </div>
         ) : (
-          /* State 3: Connect with MetaMask Button */
-          <button 
+
+          <button
             className={`auth-continue-btn ${status === 'connecting' ? 'connecting' : ''}`}
             onClick={handleConnectMetaMask}
             disabled={status === 'connecting'}
@@ -303,10 +297,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
               </>
             ) : (
               <>
-                <img 
-                  src="/images/stacks/muskmask.webp" 
-                  alt="MetaMask" 
-                  className="auth-btn-icon" 
+                <img
+                  src="/images/stacks/muskmask.webp"
+                  alt="MetaMask"
+                  className="auth-btn-icon"
                 />
                 <span>Continue with MetaMask</span>
               </>
@@ -314,7 +308,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
           </button>
         )}
 
-        {/* Error Notification */}
         {errorMessage && (
           <p className="auth-error-message">{errorMessage}</p>
         )}
@@ -324,3 +317,4 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
 };
 
 export default AuthModal;
+

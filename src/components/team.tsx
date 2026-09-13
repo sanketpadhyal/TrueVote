@@ -52,20 +52,18 @@ export const TeamPage: React.FC = () => {
       <Navbar />
 
       <main className="team-page-main">
-        {/* Hero Header */}
+
         <section className="team-hero-container">
           <h1 className="team-main-title blur-animate delay-1">
             Pioneering the Future of <br />
             <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Verifiable Democracy</span>
           </h1>
 
-
           <p className="team-main-sub blur-animate delay-2">
             Engineers and researchers committed to advancing transparent, trustless, and censorship-resistant governance infrastructure.
           </p>
         </section>
 
-        {/* Builder Profile Showcase */}
         <section className="team-builder-section blur-animate delay-3">
           <div className="team-card-prominent">
             <div className="team-avatar-box">
@@ -82,13 +80,12 @@ export const TeamPage: React.FC = () => {
               Specializing in EVM smart contract state architecture, meta-transaction relayer engines, and decentralized consensus design. Dedicated to engineering cryptographic systems where integrity is mathematically enforced rather than administratively granted.
             </p>
 
-            {/* Social Links - Strictly NO hover movement or hover scale */}
             <div className="team-links">
-              <a 
-                href="https://github.com" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="team-link" 
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noreferrer"
+                className="team-link"
                 title="GitHub"
                 aria-label="GitHub Profile"
               >
@@ -114,14 +111,12 @@ export const TeamPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Guiding Principles Grid */}
         <section className="team-principles-section blur-animate delay-4">
           <div className="principles-header">
             <h3 className="principles-title">
               What Powers Our <span className="serif-italic-accent" style={{ color: '#1d6bf3' }}>Vision</span>
             </h3>
           </div>
-
 
           <div className="principles-grid">
             <div className="principle-card">
@@ -176,14 +171,13 @@ export const TeamPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Prototype CTA Banner */}
         <section className="team-cta-banner blur-animate delay-5">
           <div className="team-cta-box">
             <h3>Experience TrueVote in Action</h3>
             <p>Inspect the smart contract architecture, view the open-source MVP specifications, and test the zero-knowledge voting workflow.</p>
             <div className="team-cta-buttons">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="team-cta-btn-primary"
                 onClick={() => setIsHackathonModalOpen(true)}
               >
@@ -199,12 +193,13 @@ export const TeamPage: React.FC = () => {
 
       <Footer onOpenHackathon={() => setIsHackathonModalOpen(true)} />
 
-      <DialogueBox 
-        isOpen={isHackathonModalOpen} 
-        onClose={() => setIsHackathonModalOpen(false)} 
+      <DialogueBox
+        isOpen={isHackathonModalOpen}
+        onClose={() => setIsHackathonModalOpen(false)}
       />
     </div>
   );
 };
 
 export default TeamPage;
+

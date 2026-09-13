@@ -46,7 +46,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Serif Typography Classes */
+
 .serif-accent {
   font-family: var(--font-serif);
   font-weight: 600;
@@ -60,7 +60,7 @@ html, body {
   letter-spacing: 0.01em;
 }
 
-/* Blur-to-Normal Animation System (Silky smooth 60/120fps ease) */
+
 .blur-animate {
   opacity: 0;
   filter: blur(12px);
@@ -84,7 +84,7 @@ html, body {
 .delay-3 { transition-delay: 0.32s; }
 .delay-4 { transition-delay: 0.44s; }
 
-/* Navbar-Triggered Section Blur-to-Normal Entrance */
+
 @keyframes sectionNavBlurIn {
   0% {
     opacity: 0.2;
@@ -126,7 +126,7 @@ html, body {
   animation: sectionNavBlurIn 0.92s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
-/* Main Page Container */
+
 .landing-wrapper {
   min-height: 100vh;
   display: flex;
@@ -136,7 +136,7 @@ html, body {
   background-color: var(--bg-page);
 }
 
-/* Hero Section */
+
 .hero-container {
   width: 100%;
   max-width: 1200px;
@@ -148,7 +148,7 @@ html, body {
   position: relative;
 }
 
-/* Dedicated Blur-to-Normal Entrance for Hackathon Pill */
+
 @keyframes blurInHeroPill {
   0% {
     opacity: 0;
@@ -162,7 +162,7 @@ html, body {
   }
 }
 
-/* Top Hackathon Badge - Ultra-Premium Glassmorphic Pill */
+
 .trusted-pill {
   display: inline-flex;
   align-items: center;
@@ -192,7 +192,7 @@ html, body {
   background: rgba(239, 246, 255, 0.92);
   border-color: rgba(59, 130, 246, 0.55);
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18), inset 0 1px 1px rgba(255, 255, 255, 1);
-  /* Removed transform: translateY(-2px) scale(1.02) to stop the popup effect */
+  
 }
 
 .trusted-pill.clickable-pill:active {
@@ -220,7 +220,7 @@ html, body {
   letter-spacing: -0.015em;
 }
 
-/* Hero Headline */
+
 .main-title {
   font-size: 3.5rem;
   line-height: 1.1;
@@ -240,7 +240,7 @@ html, body {
   margin-bottom: 1.75rem;
 }
 
-/* CTA Buttons - NO HOVER JUMPS OR TRANSFORMS */
+
 .hero-action-group {
   display: flex;
   flex-direction: column;
@@ -266,7 +266,7 @@ html, body {
   justify-content: center;
   gap: 0.55rem;
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  /* Static: No popup/lift transforms */
+  
 }
 
 .btn-primary-blue svg {
@@ -277,7 +277,7 @@ html, body {
   background-color: #145ed4;
   border-color: #2b75eb;
   box-shadow: 0 0 0 2.5px rgba(26, 109, 246, 0.38);
-  /* Pure color change only - no popup effect */
+  
 }
 
 .btn-primary-blue:hover svg {
@@ -293,7 +293,7 @@ html, body {
   color: #64748b;
 }
 
-/* Hero Content Area Container (Keeps cards strictly inside hero text area) */
+
 .hero-content-area {
   position: relative;
   width: 100%;
@@ -304,7 +304,7 @@ html, body {
   margin-bottom: 2.2rem;
 }
 
-/* Floating 3D Tech Stack Cards - FIXED POSITION ONLY, NO MOVEMENT */
+
 .floating-icon-card {
   position: absolute;
   width: 82px;
@@ -324,10 +324,10 @@ html, body {
     inset 0 2px 4px rgba(255, 255, 255, 0.9);
   z-index: 10;
   user-select: none;
-  /* Fixed position: strictly NO floating animations, NO drift, NO movement */
+  
 }
 
-/* Blur-to-Normal Entrance for Floating Tech Stack Cards */
+
 .floating-icon-card.blur-animate {
   opacity: 0;
   filter: blur(12px);
@@ -347,7 +347,7 @@ html, body {
   filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.06));
 }
 
-/* Fixed Positions inside Hero Content Area with Blur-to-Normal Transforms */
+
 .float-top-left {
   top: 14px;
   left: 14px;
@@ -408,9 +408,7 @@ html, body {
   .float-bottom-right { right: 14px; }
 }
 
-/* ==========================================================================
-   3D PERSPECTIVE DASHBOARD SHOWCASE
-   ========================================================================== */
+
 .dashboard-perspective-wrapper {
   perspective: 1200px;
   perspective-origin: 50% 15%;
@@ -453,9 +451,7 @@ html, body {
   object-fit: cover;
 }
 
-/* ==========================================================================
-   BENEFITS SECTION - NO HOVER LIFTS OR SCALE
-   ========================================================================== */
+
 .benefits-section {
   width: 100%;
   max-width: 1080px;
@@ -519,7 +515,7 @@ html, body {
   box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.03);
   position: relative;
   overflow: hidden;
-  /* Static: NO translateY, NO shadow jumps */
+  
 }
 
 .benefit-icon-wrapper {
@@ -533,7 +529,7 @@ html, body {
   margin-bottom: 1.5rem;
   color: var(--brand-blue);
   font-size: 1.25rem;
-  /* Static: NO scale on hover */
+  
 }
 
 .benefit-card-title {
@@ -551,9 +547,7 @@ html, body {
   font-weight: 500;
 }
 
-/* ==========================================================================
-   HOW IT WORKS SECTION
-   ========================================================================== */
+
 .workflow-section {
   width: 100%;
   max-width: 1140px;
@@ -639,9 +633,7 @@ html, body {
   margin-top: 1.4rem;
 }
 
-/* ==========================================================================
-   SECURITY & ARCHITECTURE SECTION
-   ========================================================================== */
+
 .security-section {
   width: 100%;
   max-width: 1140px;
@@ -711,9 +703,7 @@ html, body {
   font-weight: 500;
 }
 
-/* ==========================================================================
-   FAQ SECTION
-   ========================================================================== */
+
 .faq-section {
   width: 100%;
   max-width: 860px;
@@ -795,9 +785,7 @@ html, body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================================================
-   TEAM SECTION
-   ========================================================================== */
+
 .team-section {
   width: 100%;
   max-width: 1140px;
@@ -900,12 +888,10 @@ html, body {
   justify-content: center;
   color: #64748b;
   text-decoration: none;
-  /* Static: NO hover animation or movement */
+  
 }
 
-/* ==========================================================================
-   FOOTER SECTION
-   ========================================================================== */
+
 .footer-section {
   width: 100%;
   background: #ffffff;
@@ -1045,7 +1031,7 @@ html, body {
   border-radius: 6px;
 }
 
-/* Toast Alert Message */
+
 .vote-toast {
   position: fixed;
   bottom: 2rem;
@@ -1069,9 +1055,7 @@ html, body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* ==========================================================================
-   MOBILE OPTIMIZATION
-   ========================================================================== */
+
 @media (max-width: 768px) {
   .hero-container {
     padding: 7rem 1.25rem 1.5rem 1.25rem;
@@ -1094,7 +1078,7 @@ html, body {
     padding: 0 0.5rem;
   }
 
-  /* Responsive Mobile Tech Stack Cards - Fixed Position, No Floating */
+  
   .floating-icon-card {
     display: flex;
     width: 52px;

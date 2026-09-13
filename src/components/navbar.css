@@ -1,4 +1,4 @@
-/* Standalone Navbar Component Styles */
+
 .navbar-header {
   position: fixed;
   top: 0;
@@ -51,7 +51,7 @@
   justify-content: space-between;
 }
 
-/* Brand & Logo */
+
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -78,7 +78,7 @@
   color: #1d6bf3;
 }
 
-/* Center Nav Menu */
+
 .navbar-menu {
   display: flex;
   align-items: center;
@@ -130,7 +130,7 @@
   background: rgba(241, 245, 249, 0.9);
 }
 
-/* Action CTA & Mobile Button */
+
 .navbar-actions {
   display: flex;
   align-items: center;
@@ -172,7 +172,7 @@
   color: #1d6bf3;
 }
 
-/* Extended Mobile Navigation Panel inside Navbar */
+
 .mobile-expand-panel {
   display: none;
 }
@@ -194,7 +194,7 @@
     display: flex;
   }
 
-  /* Extended Mobile Navigation Panel */
+  
   .mobile-expand-panel {
     display: grid;
     grid-template-rows: 0fr;
@@ -263,7 +263,7 @@
   }
 }
 
-/* Semi-transparent Backdrop when Mobile Navbar is Extended */
+
 .navbar-backdrop {
   position: fixed;
   inset: 0;

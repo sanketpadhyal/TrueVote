@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { FlipText } from '../universalbuttonshover';
 import './dialoguebox.css';
 
@@ -12,7 +12,6 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
   const [isClosing, setIsClosing] = useState(false);
   const isClosingRef = React.useRef(false);
 
-  // Sync internal state whenever isOpen changes
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
@@ -43,6 +42,9 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
     }, 400);
   };
 
+  const handleCloseRef = useRef(handleClose);
+  handleCloseRef.current = handleClose;
+
   useEffect(() => {
     if (!shouldRender) return;
 
@@ -51,7 +53,7 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleClose();
+        handleCloseRef.current();
       }
     };
 
@@ -61,13 +63,12 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldRender]);
 
   if (!shouldRender) return null;
 
   return (
-    <div 
+    <div
       className={`ios-dialogue-overlay ${isClosing ? 'closing' : 'opening'}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -79,16 +80,15 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
       aria-labelledby="dialogue-title"
     >
       <div className={`ios-dialogue-card ${isClosing ? 'closing' : 'opening'}`}>
-        {/* Decorative Grid Lines matching TrueVote theme */}
+
         <div className="hackathon-card-line line-tl" />
         <div className="hackathon-card-line line-mr" />
         <div className="hackathon-card-line line-bl" />
         <div className="hackathon-card-line line-br" />
 
-        {/* Circular Close Button */}
-        <button 
-          className="ios-close-btn" 
-          onClick={handleClose} 
+        <button
+          className="ios-close-btn"
+          onClick={handleClose}
           aria-label="Close modal"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -97,26 +97,22 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
           </svg>
         </button>
 
-        {/* Top Hackathon Banner Image */}
         <div className="ios-dialogue-image-box">
-          <img 
-            src="/images/illus.webp" 
-            alt="Hackathon Team Collaboration" 
-            className="ios-dialogue-image" 
+          <img
+            src="/images/illus.webp"
+            alt="Hackathon Team Collaboration"
+            className="ios-dialogue-image"
           />
         </div>
 
-        {/* Modal Title with Signature Website Serif Italic Accent */}
         <h3 className="ios-dialogue-title" id="dialogue-title">
           Hackathon Project <span className="serif-italic-accent" style={{ color: '#1d6bf3', fontSize: '1.08em' }}>Prototype</span>
         </h3>
 
-        {/* Notice Description with TrueVote Brand Styling */}
         <p className="ios-dialogue-text">
           Welcome to <strong>True<span style={{ color: '#1d6bf3' }}>Vote</span></strong>! This project is an experimental <strong>MVP (Minimum Viable Product)</strong> built specifically for hackathon judging and demonstration purposes.
         </p>
 
-        {/* Primary Action Button Matching Website Theme */}
         <button className="btn-primary-blue framer-flip-btn ios-action-btn" onClick={handleClose}>
           <FlipText>Understood, Explore TrueVote</FlipText>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -130,3 +126,4 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({ isOpen, onClose }) => 
 };
 
 export default DialogueBox;
+

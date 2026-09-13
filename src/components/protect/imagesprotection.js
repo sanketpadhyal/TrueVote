@@ -1,13 +1,7 @@
-/**
- * Image Protection Module
- * Prevents users from right-clicking to save images or dragging them
- * using event delegation for both current and future images.
- */
 
 export const protectImages = () => {
   console.log('[ImageProtection] Initializing image protection...');
 
-  // Prevent right-click (context menu) on images and any element that looks like an image
   document.addEventListener('contextmenu', (e) => {
     const target = e.target;
     if (
@@ -22,7 +16,6 @@ export const protectImages = () => {
     }
   }, true);
 
-  // Prevent dragging images
   document.addEventListener('dragstart', (e) => {
     if (
       e.target instanceof HTMLImageElement ||
@@ -33,16 +26,14 @@ export const protectImages = () => {
     }
   }, true);
 
-  // Block mousedown right-click for extra security
   document.addEventListener('mousedown', (e) => {
-    if (e.button === 2) { // Right click
+    if (e.button === 2) {
       if (e.target instanceof HTMLImageElement || e.target.closest('img')) {
         e.preventDefault();
       }
     }
   }, true);
 
-  // CSS safeguards
   const style = document.createElement('style');
   style.innerHTML = `
     img,
@@ -61,7 +52,6 @@ export const protectImages = () => {
       pointer-events: auto !important;
     }
 
-    /* Create a transparent overlay to block direct interaction with images */
     .protect-img-overlay {
       position: absolute;
       top: 0;
@@ -75,7 +65,7 @@ export const protectImages = () => {
   document.head.appendChild(style);
 };
 
-// Initialize immediately if imported as a side-effect
 if (typeof window !== 'undefined') {
   protectImages();
 }
+

@@ -63,8 +63,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenHackathon }) => {
         <div className="footer-inner">
           <div className="footer-top">
             <div className="footer-brand-col">
-              <div 
-                className="footer-brand-title" 
+              <div
+                className="footer-brand-title"
                 onClick={() => {
                   if (location.pathname === '/') {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -107,9 +107,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenHackathon }) => {
               <div className="footer-link-col">
                 <h5 className="footer-link-heading">About</h5>
                 <a href="/team" className="footer-link" onClick={(e) => handleLinkClick(e, 'team')}>About Team</a>
-                <span 
-                  className="footer-link-static" 
-                  onClick={handleOpenHackathon} 
+                <span
+                  className="footer-link-static"
+                  onClick={handleOpenHackathon}
                   style={{ cursor: 'pointer', color: 'var(--brand-blue)' }}
                 >
                   Hackathon Details
@@ -132,13 +132,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenHackathon }) => {
         </div>
       </footer>
 
-      {/* Internal Hackathon Dialogue Box if opened directly from footer */}
-      <DialogueBox 
-        isOpen={internalHackathonOpen} 
-        onClose={() => setInternalHackathonOpen(false)} 
+      <DialogueBox
+        isOpen={internalHackathonOpen}
+        onClose={() => setInternalHackathonOpen(false)}
       />
     </>
   );
 };
 
 export default Footer;
+

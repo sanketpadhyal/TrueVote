@@ -25,3 +25,4 @@ describe('VotingPage Component', () => {
     expect(castBtn).toBeDisabled();
   });
 });
+

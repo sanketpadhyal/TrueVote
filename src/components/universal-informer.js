@@ -1,31 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-/**
- * Universal Informer System for TrueVote
- *
- * Provides a sleek, web-themed toast notification system that animates
- * in and out smoothly from the top-right on desktop, and from top-center on mobile.
- *
- * Features:
- * - Types: success, error, warning, info
- * - Progress bar with pause-on-hover
- * - Spring entrance & smooth slide exit
- * - Full mobile responsiveness with safe-area support
- * - Universal JS dispatchers: `inform(message, type, options)`, `informSuccess(...)`, etc.
- * - Global window integration: `window.inform('...')`
- */
-
 const EVENT_NAME = 'truevote_informer_event';
 
-/**
- * Trigger an informer toast notification from anywhere in JavaScript or React.
- *
- * @param {string} message - Primary notification text
- * @param {'success'|'error'|'warning'|'info'} [type='info'] - Notification type
- * @param {Object} [options] - Additional options
- * @param {string} [options.title] - Optional bold title
- * @param {number} [options.duration=4500] - Duration in ms before auto-dismiss (0 for persistent)
- */
 export function inform(message, type = 'info', options = {}) {
   if (typeof window === 'undefined') return;
 
@@ -54,7 +30,6 @@ export const informWarning = (message, title = 'Notice', options = {}) =>
 export const informInfo = (message, title = 'Information', options = {}) =>
   inform(message, 'info', { title, ...options });
 
-// Mount to window for non-react or console triggers
 if (typeof window !== 'undefined') {
   window.inform = inform;
   window.informSuccess = informSuccess;
@@ -63,7 +38,6 @@ if (typeof window !== 'undefined') {
   window.informInfo = informInfo;
 }
 
-// Inline styles for complete self-containment and zero dependency issues
 const INFORMER_STYLES = `
 .tv-informer-container {
   position: fixed;
@@ -274,7 +248,6 @@ const INFORMER_STYLES = `
   }
 }
 
-/* Mobile Responsiveness & Safe Area Support */
 @media (max-width: 640px) {
   .tv-informer-container {
     top: max(12px, env(safe-area-inset-top));
@@ -359,9 +332,6 @@ function getToastIcon(type) {
   }
 }
 
-/**
- * Individual Informer Toast Item
- */
 const InformerToast = React.memo(({ toast, onDismiss }) => {
   const [isExiting, setIsExiting] = useState(false);
   const timerRef = useRef(null);
@@ -447,10 +417,6 @@ const InformerToast = React.memo(({ toast, onDismiss }) => {
   );
 });
 
-/**
- * UniversalInformer Root Container Component.
- * Mount this component once at the application root (e.g. App.tsx).
- */
 export default function UniversalInformer() {
   const [toasts, setToasts] = useState([]);
 
@@ -460,7 +426,7 @@ export default function UniversalInformer() {
       const newToast = e.detail;
 
       setToasts((prev) => {
-        // Limit to max 5 simultaneous toasts to avoid clutter
+
         const truncated = prev.length >= 5 ? prev.slice(prev.length - 4) : prev;
         return [...truncated, newToast];
       });
@@ -491,3 +457,4 @@ export default function UniversalInformer() {
     </>
   );
 }
+
