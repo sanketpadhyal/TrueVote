@@ -3,7 +3,7 @@ import { mergeEventVersions } from './services/pinata';
 describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
   test('returns null when versions array is empty or undefined', () => {
     expect(mergeEventVersions([])).toBeNull();
-    expect(mergeEventVersions(null as any)).toBeNull();
+    expect(mergeEventVersions(null)).toBeNull();
   });
 
   test('returns the original event when only one version exists', () => {
@@ -86,8 +86,8 @@ describe('Pinata IPFS Multi-Version Concurrency Merge', () => {
     expect(merged.totalVotesCast).toBe(2);
 
     // Both options should have 1 vote
-    const optApprove = merged.options.find((o: any) => o.id === 'opt-1');
-    const optReject = merged.options.find((o: any) => o.id === 'opt-2');
+    const optApprove = merged.options.find((o) => o.id === 'opt-1');
+    const optReject = merged.options.find((o) => o.id === 'opt-2');
     expect(optApprove.votesCount).toBe(1);
     expect(optReject.votesCount).toBe(1);
   });
