@@ -27,6 +27,7 @@ export const EventsTable: React.FC = () => {
   const [isInitialSyncing, setIsInitialSyncing] = useState<boolean>(!isTest && initialEvents.length === 0);
   const [selectedAnalyticsEventId, setSelectedAnalyticsEventId] = useState<string | null>(null);
   const [selectedPauseQuitEvent, setSelectedPauseQuitEvent] = useState<EventItem | null>(null);
+  const [activatingEventIds, setActivatingEventIds] = useState<Set<string>>(new Set());
 
   const [isSyncSpinning, setIsSyncSpinning] = useState<boolean>(false);
 
@@ -155,13 +156,18 @@ export const EventsTable: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateEventStatus = (id: string, updates: Partial<EventItem>) => {
+  const updateEventStatus = async (id: string, updates: Partial<EventItem>) => {
+    setActivatingEventIds((prev) => new Set(prev).add(id));
+
+    const currentEvent = events.find((ev) => ev.id === id);
+    const targetUpdatedEvent: EventItem | null = currentEvent
+      ? { ...currentEvent, ...updates }
+      : null;
+
     setEvents((prev) => {
-      let targetUpdatedEvent: EventItem | null = null;
       const updated = prev.map((ev) => {
         if (ev.id === id) {
-          targetUpdatedEvent = { ...ev, ...updates };
-          return targetUpdatedEvent;
+          return { ...ev, ...updates };
         }
         return ev;
       });
@@ -178,38 +184,50 @@ export const EventsTable: React.FC = () => {
         console.error(e);
       }
 
-      // Automatically sync updated activation status to Pinata IPFS
-      if (targetUpdatedEvent) {
-        uploadEventToPinata(targetUpdatedEvent)
-          .then((pinResult) => {
-            if (pinResult?.IpfsHash) {
-              setEvents((curr) => {
-                const withPin = curr.map((ev) =>
-                  ev.id === id
-                    ? {
-                        ...ev,
-                        ipfsHash: pinResult.IpfsHash,
-                        ipfsUrl: pinResult.gatewayUrl,
-                        ipfsFileId: pinResult.fileId,
-                      }
-                    : ev
-                );
-                localStorage.setItem('truevote_events', JSON.stringify(withPin));
-                saveEventsToBackup(withPin);
-                return withPin;
-              });
-            }
-          })
-          .catch((err) => {
-            console.warn('Pinata activation sync notice:', err);
-          });
-      }
-
       return updated;
     });
+
+    // Automatically sync updated activation status to Pinata IPFS
+    if (targetUpdatedEvent) {
+      try {
+        const pinResult = await uploadEventToPinata(targetUpdatedEvent);
+        if (pinResult?.IpfsHash) {
+          setEvents((curr) => {
+            const withPin = curr.map((ev) =>
+              ev.id === id
+                ? {
+                    ...ev,
+                    ipfsHash: pinResult.IpfsHash,
+                    ipfsUrl: pinResult.gatewayUrl,
+                    ipfsFileId: pinResult.fileId,
+                  }
+                : ev
+            );
+            localStorage.setItem('truevote_events', JSON.stringify(withPin));
+            saveEventsToBackup(withPin);
+            return withPin;
+          });
+        }
+      } catch (err) {
+        console.warn('Pinata activation sync notice:', err);
+      } finally {
+        setActivatingEventIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    } else {
+      setActivatingEventIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
   };
 
   const handleActivationClick = (event: EventItem) => {
+    if (activatingEventIds.has(event.id)) return;
     if (event.isActivated) {
       // If already active, trigger iOS popup to ask "Pause or Quit?"
       setSelectedPauseQuitEvent(event);
@@ -220,13 +238,13 @@ export const EventsTable: React.FC = () => {
   };
 
   const handlePauseEvent = (id: string) => {
-    updateEventStatus(id, { isActivated: false });
     setSelectedPauseQuitEvent(null);
+    updateEventStatus(id, { isActivated: false });
   };
 
   const handleResumeEvent = (id: string) => {
-    updateEventStatus(id, { isActivated: true });
     setSelectedPauseQuitEvent(null);
+    updateEventStatus(id, { isActivated: true });
   };
 
   const handleDeleteEvent = async (eventToDelete: EventItem) => {
@@ -439,36 +457,73 @@ export const EventsTable: React.FC = () => {
                         <div className="action-button-align">
                           <button
                             type="button"
-                            className={`btn-activate ${event.isActivated ? 'is-active' : ''}`}
+                            className={`btn-activate ${event.isActivated ? 'is-active' : ''} ${
+                              activatingEventIds.has(event.id) ? 'is-loading' : ''
+                            }`}
                             onClick={() => handleActivationClick(event)}
-                            aria-label={event.isActivated ? 'Deactivate event' : 'Activate event'}
+                            disabled={activatingEventIds.has(event.id)}
+                            aria-label={
+                              activatingEventIds.has(event.id)
+                                ? 'Updating status...'
+                                : event.isActivated
+                                ? 'Deactivate event'
+                                : 'Activate event'
+                            }
                             title={
-                              event.isActivated
+                              activatingEventIds.has(event.id)
+                                ? 'Updating status with decentralized storage...'
+                                : event.isActivated
                                 ? 'Active — click to pause or delete'
                                 : 'Click to activate voting'
                             }
                           >
                             <span>
-                              {event.isActivated
+                              {activatingEventIds.has(event.id)
+                                ? event.isActivated
+                                  ? 'pausing...'
+                                  : 'activating...'
+                                : event.isActivated
                                 ? 'active'
                                 : event.activationType === 'automatic'
                                 ? 'paused'
                                 : 'activate'}
                             </span>
-                            <svg
-                              className="power-icon"
-                              width="15"
-                              height="15"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
-                              <line x1="12" y1="2" x2="12" y2="12" />
-                            </svg>
+                            {activatingEventIds.has(event.id) ? (
+                              <span
+                                className="spinner-border-sm"
+                                style={{
+                                  width: 13,
+                                  height: 13,
+                                  borderWidth: 2,
+                                  borderStyle: 'solid',
+                                  borderColor: event.isActivated
+                                    ? 'rgba(255, 255, 255, 0.35)'
+                                    : 'rgba(0, 229, 163, 0.35)',
+                                  borderTopColor: event.isActivated
+                                    ? '#ffffff'
+                                    : 'var(--dash-mint)',
+                                  borderRadius: '50%',
+                                  display: 'inline-block',
+                                  animation: 'spin 0.75s linear infinite',
+                                  flexShrink: 0,
+                                }}
+                              />
+                            ) : (
+                              <svg
+                                className="power-icon"
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                                <line x1="12" y1="2" x2="12" y2="12" />
+                              </svg>
+                            )}
                           </button>
                         </div>
 

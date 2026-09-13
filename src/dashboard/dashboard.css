@@ -546,6 +546,19 @@
   stroke: #ffffff;
 }
 
+.btn-activate.is-loading,
+.btn-activate:disabled {
+  opacity: 0.82;
+  cursor: wait !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn-activate.is-loading .spinner-border-sm {
+  margin-left: 4px;
+}
+
 /* Action Cards */
 .dashboard-action-cards {
   display: flex;
