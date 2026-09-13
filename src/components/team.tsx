@@ -3,6 +3,7 @@ import Lenis from 'lenis';
 import Navbar from './navbar';
 import Footer from './footer';
 import DialogueBox from './box/dialoguebox';
+import avatarImg from './avatar.png';
 import './team.css';
 
 export const TeamPage: React.FC = () => {
@@ -69,7 +70,7 @@ export const TeamPage: React.FC = () => {
           <div className="team-card-prominent">
             <div className="team-avatar-box">
               <img
-                src="/dashboard/images/images (1).png"
+                src={avatarImg}
                 alt="Sanket Padhyal"
                 className="team-avatar-img"
               />
