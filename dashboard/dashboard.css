@@ -2695,46 +2695,76 @@ input:checked + .slider.round:before {
   margin-bottom: 6px;
 }
 
-/* Apple-Grade Total Votes Presets */
+/* Modern Total Votes Capacity Grid */
 .votes-presets-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   width: 100%;
   max-width: 380px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   animation: iosRowEntrance 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .votes-preset-chip {
-  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px;
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #e2e8f0;
   border-radius: 14px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #334155;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  position: relative;
+  user-select: none;
+  transform: none !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .votes-preset-chip:hover {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* Strictly NO hover movement, NO scale, NO jump */
+  transform: none !important;
 }
 
 .votes-preset-chip:active {
-  transform: scale(0.95);
+  transform: none !important;
 }
 
 .votes-preset-chip.active {
-  background: #2563eb !important;
-  color: #ffffff !important;
-  border-color: #2563eb;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  transform: none !important;
+}
+
+.votes-chip-num {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  transition: color 0.15s ease;
+}
+
+.votes-preset-chip.active .votes-chip-num {
+  color: #ffffff;
+}
+
+.votes-chip-sub {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin-top: 3px;
+  transition: color 0.15s ease;
+}
+
+.votes-preset-chip.active .votes-chip-sub {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .custom-votes-wrap {

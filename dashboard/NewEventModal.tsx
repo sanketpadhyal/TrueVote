@@ -563,7 +563,7 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                 Set the voter quorum capacity (minimum 50 votes) or allow unlimited participation.
               </p>
 
-              {/* iOS Glassmorphic Presets Grid */}
+              {/* Modern Total Votes Capacity Grid */}
               <div className="votes-presets-grid">
                 {[50, 100, 250, 500, 1000].map((num) => (
                   <button
@@ -572,7 +572,8 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                     className={`votes-preset-chip ${totalVotes === num ? 'active' : ''}`}
                     onClick={() => handleTotalVotesSelect(num)}
                   >
-                    {num} Votes
+                    <span className="votes-chip-num">{num}</span>
+                    <span className="votes-chip-sub">Votes</span>
                   </button>
                 ))}
                 <button
@@ -580,7 +581,8 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                   className={`votes-preset-chip unlimited-chip ${totalVotes === 'unlimited' ? 'active' : ''}`}
                   onClick={() => handleTotalVotesSelect('unlimited')}
                 >
-                  ∞ Unlimited
+                  <span className="votes-chip-num" style={{ fontSize: '22px', lineHeight: 1 }}>&infin;</span>
+                  <span className="votes-chip-sub">Unlimited</span>
                 </button>
               </div>
 
