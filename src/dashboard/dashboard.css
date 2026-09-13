@@ -2989,14 +2989,26 @@ input:checked + .slider.round:before {
   font-family: monospace;
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .spinner-border-sm {
-  width: 14px;
-  height: 14px;
-  border: 2px solid #ffffff;
-  border-top-color: transparent;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.65s linear infinite !important;
   display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* =========================================================
