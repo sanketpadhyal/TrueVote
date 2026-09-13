@@ -730,29 +730,20 @@ export const VotingPage: React.FC = () => {
             autoComplete="off"
           />
 
-          {/* Connected Voter Wallet Banner */}
-          <div className="voting-connected-wallet-card">
-            <div className="wallet-card-header">
-              <div className="wallet-chip">
-                <span className="wallet-dot-live"></span>
-                <span className="wallet-chip-label">Connected Voter Wallet</span>
-              </div>
-              <span className="wallet-badge-shield">
-                <span className="status-indicator-dot"></span>
+          {/* Sleek Compact Voter Identity & ZKP Privacy Bar */}
+          <div className="voter-identity-pill-bar">
+            <div className="voter-identity-left">
+              <span className="voter-live-dot" title="Ballot cryptographic identity active"></span>
+              <span className="voter-id-label">Ballot Key:</span>
+              <code className="voter-id-hash" title={voterWalletAddress}>
+                {voterWalletAddress ? `${voterWalletAddress.slice(0, 8)}...${voterWalletAddress.slice(-6)}` : '0x71C4...84B2'}
+              </code>
+            </div>
+            <div className="voter-identity-right">
+              <span className="voter-zk-tag">
+                <span className="zk-green-dot"></span>
                 Zero-Knowledge Privacy Active
               </span>
-            </div>
-            <div className="wallet-address-row">
-              <div className="wallet-hash-group">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="wallet-key-svg">
-                  <path d="M21 2l-2 2m-1.5 1.5L14 9M3 21l6.5-6.5" />
-                  <circle cx="7.5" cy="16.5" r="4.5" />
-                </svg>
-                <code className="wallet-hash-text" title={voterWalletAddress}>
-                  {voterWalletAddress ? `${voterWalletAddress.slice(0, 10)}...${voterWalletAddress.slice(-8)}` : '0x71C4...84B2'}
-                </code>
-              </div>
-              <span className="wallet-ready-badge">✓ Ballot Key Linked</span>
             </div>
           </div>
 
@@ -763,7 +754,6 @@ export const VotingPage: React.FC = () => {
               <span className={`voting-status-pill ${isVotingActive ? 'pill-active' : 'pill-closed'}`}>
                 {isVotingActive ? 'Polls Open' : 'Voting Inactive'}
               </span>
-              <span className="voting-privacy-pill">Cryptographic Shield</span>
             </div>
 
             <h1 className="voting-event-title">{event.name}</h1>

@@ -10,6 +10,8 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', Helvetica, Arial, sans-serif;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
 }
@@ -115,11 +117,14 @@
 .voting-main-container {
   position: relative;
   z-index: 5;
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 32px 20px 60px 20px;
+  justify-content: flex-start;
+  padding: 32px 16px 80px 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .voting-card {
@@ -130,7 +135,9 @@
   border-radius: 24px;
   box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03);
   padding: 32px 28px;
+  margin: 0 auto;
   animation: cardEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  box-sizing: border-box;
 }
 
 @keyframes cardEntrance {
@@ -145,39 +152,36 @@
 }
 
 /* =========================================================
-   Connected Voter Wallet Banner (Cryptographic Proof)
+   Sleek Compact Voter Identity & ZKP Privacy Bar
    ========================================================= */
-.voting-connected-wallet-card {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 13px 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-}
-
-.wallet-card-header {
+.voter-identity-pill-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
   flex-wrap: wrap;
+  gap: 8px 12px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 9px 15px;
+  margin-bottom: 22px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.voter-identity-left {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
 }
 
-.wallet-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.wallet-dot-live {
+.voter-live-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.55);
   animation: pulseGlow 1.8s infinite ease-in-out;
+  flex-shrink: 0;
 }
 
 @keyframes pulseGlow {
@@ -185,68 +189,51 @@
   50% { opacity: 0.45; transform: scale(0.85); }
 }
 
-.wallet-chip-label {
+.voter-id-label {
   font-size: 11.5px;
   font-weight: 700;
-  color: #475569;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
-.wallet-badge-shield {
+.voter-id-hash {
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+}
+
+.voter-identity-right {
+  display: inline-flex;
+  align-items: center;
+}
+
+.voter-zk-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: #ecfdf5;
   border: 1px solid #a7f3d0;
   color: #059669;
-  padding: 4px 10px;
+  padding: 3.5px 10px;
   border-radius: 9999px;
   font-size: 11.5px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
-.status-indicator-dot {
+.zk-green-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #059669;
-}
-
-.wallet-address-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.wallet-hash-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.wallet-key-svg {
-  color: #0284c7;
   flex-shrink: 0;
-}
-
-.wallet-hash-text {
-  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #0f172a;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.wallet-ready-badge {
-  font-size: 12px;
-  font-weight: 700;
-  color: #059669;
 }
 
 /* =========================================================
@@ -921,44 +908,40 @@
   }
 
   .voting-main-container {
-    padding: 14px 10px 36px 10px;
+    padding: 16px 12px 64px 12px;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .voting-card {
     padding: 20px 16px;
     border-radius: 18px;
-    margin: 4px auto 20px auto;
+    margin: 0 auto 20px auto;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
-  .voting-connected-wallet-card {
-    padding: 11px 12px;
-    border-radius: 14px;
-    margin-bottom: 18px;
+  .voter-identity-pill-bar {
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    gap: 8px;
+    justify-content: space-between;
   }
 
-  .wallet-card-header {
-    gap: 6px;
-  }
-
-  .wallet-chip-label {
+  .voter-id-label {
     font-size: 10.5px;
   }
 
-  .wallet-badge-shield {
+  .voter-id-hash {
+    font-size: 11.5px;
+    padding: 2px 6px;
+  }
+
+  .voter-zk-tag {
     font-size: 10.5px;
     padding: 3px 8px;
-  }
-
-  .wallet-address-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .wallet-hash-text {
-    font-size: 12px;
   }
 
   .voting-event-title {
@@ -977,8 +960,7 @@
   }
 
   .voting-event-num-pill,
-  .voting-status-pill,
-  .voting-privacy-pill {
+  .voting-status-pill {
     font-size: 11px;
     padding: 2.5px 8px;
   }
