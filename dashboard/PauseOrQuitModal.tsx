@@ -152,13 +152,14 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
               }}
             >
               <svg
-                width="17"
-                height="17"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 style={{ flexShrink: 0 }}
               >
-                <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                <rect x="5.5" y="4" width="4" height="16" rx="1.5" />
+                <rect x="14.5" y="4" width="4" height="16" rx="1.5" />
               </svg>
               <span>Pause Voting</span>
             </button>
@@ -176,19 +177,19 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
               }}
             >
               <svg
-                width="17"
-                height="17"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 style={{ flexShrink: 0 }}
               >
-                <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+                <path d="M6 4.5c0-.85.94-1.37 1.66-.92l11.5 7.5c.7.45.7 1.49 0 1.94l-11.5 7.5c-.72.45-1.66-.07-1.66-.92V4.5z" />
               </svg>
               <span>Activate Voting</span>
             </button>
           )}
 
-          {/* Delete This Vote Action Button with Cube Icon & Red Halo */}
+          {/* Delete This Vote Action Button */}
           <button
             type="button"
             className="btn-action-quit btn-action-delete"
@@ -196,13 +197,20 @@ export const PauseOrQuitModal: React.FC<PauseOrQuitModalProps> = ({
             disabled={isDeleting}
           >
             <svg
-              width="17"
-              height="17"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
-              fill="currentColor"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               style={{ flexShrink: 0 }}
             >
-              <path d="M19.8285 6.6117l-5.52-5.535a3.1352 3.1352 0 00-4.5 0l-5.535 5.535 7.755 3.87zm2.118 2.235l1.095 1.095a3.12 3.12 0 010 4.5L14.22 23.3502a2.6846 2.6846 0 01-.72.525V13.0767zm-19.893 0l-1.095 1.095a3.1198 3.1198 0 000 4.5L9.78 23.3502c.2091.214.4525.3914.72.525V13.0767z" />
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
             </svg>
             <span>{isDeleting ? 'Deleting...' : 'Delete This Vote'}</span>
           </button>
