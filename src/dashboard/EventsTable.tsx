@@ -33,84 +33,81 @@ export const EventsTable: React.FC = () => {
     if (isTest) return;
 
     try {
-      // Step 1: Check local backup first
-      const idbEvents = await loadEventsFromBackup();
-      let combined: EventItem[] = [];
+      const deletedKey = 'truevote_deleted_events';
+      const deletedSet = new Set<string>();
+      try {
+        const dList: string[] = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+        for (let k = 0; k < dList.length; k++) {
+          if (dList[k]) deletedSet.add(String(dList[k]).toLowerCase());
+        }
+      } catch (e) {}
 
-      if (idbEvents && idbEvents.length > 0) {
-        combined = idbEvents;
-        setEvents(combined);
-      }
-
-      // Step 2: Query Pinata IPFS
+      // Step 1: Query Pinata IPFS (primary cloud source of truth)
       const pinataEvents = await fetchEventsFromPinata();
 
-      if (pinataEvents && pinataEvents.length > 0) {
-        const map = new Map<string, EventItem>();
-        for (let i = 0; i < combined.length; i++) {
-          const ev = combined[i];
-          map.set(ev.id, ev);
-        }
-        for (let j = 0; j < pinataEvents.length; j++) {
-          const pEv = pinataEvents[j];
-          let foundKey: string | null = null;
-          map.forEach((v, k) => {
-            if (!foundKey && (v.id === pEv.id || (v.votingNumber && v.votingNumber === pEv.votingNumber))) {
-              foundKey = k;
-            }
-          });
-          if (foundKey) {
-            const existing = map.get(foundKey);
-            const mergedTotalVotes = Math.max(existing?.totalVotesCast || 0, pEv.totalVotesCast || 0);
-            const mergedRecentVotes = [
-              ...((pEv as any).recentVotes || []),
-              ...((existing as any)?.recentVotes || []),
-            ];
-            const voteMap = new Map<string, any>();
-            for (let vIdx = 0; vIdx < mergedRecentVotes.length; vIdx++) {
-              const rVote = mergedRecentVotes[vIdx];
-              if (rVote && rVote.id && !voteMap.has(rVote.id)) {
-                voteMap.set(rVote.id, rVote);
-              }
-            }
-            const dedupedRecentVotes: any[] = [];
-            voteMap.forEach((v) => dedupedRecentVotes.push(v));
+      // Filter out any known deleted events
+      const validPinataEvents = (pinataEvents || []).filter((pEv) => {
+        const idMatch = pEv.id && deletedSet.has(String(pEv.id).toLowerCase());
+        const numMatch = pEv.votingNumber && deletedSet.has(String(pEv.votingNumber).toLowerCase());
+        return !idMatch && !numMatch;
+      });
 
-            map.set(foundKey, {
-              ...existing,
-              ...pEv,
-              totalVotesCast: mergedTotalVotes,
-              recentVotes: dedupedRecentVotes,
-            });
-          } else {
-            map.set(pEv.id, pEv);
+      // Keep recently created local events that might still be propagating to Pinata (within last 45s)
+      const localEvents = getStoredEvents();
+      const now = Date.now();
+      const pendingUploads = localEvents.filter((ev) => {
+        const isDeleted =
+          (ev.id && deletedSet.has(String(ev.id).toLowerCase())) ||
+          (ev.votingNumber && deletedSet.has(String(ev.votingNumber).toLowerCase()));
+        if (isDeleted) return false;
+        if (ev.createdAt) {
+          const age = now - new Date(ev.createdAt).getTime();
+          return age < 45000;
+        }
+        return false;
+      });
+
+      const map = new Map<string, EventItem>();
+      for (let j = 0; j < validPinataEvents.length; j++) {
+        const pEv = validPinataEvents[j];
+        map.set(pEv.id, pEv);
+      }
+
+      for (let p = 0; p < pendingUploads.length; p++) {
+        const pEv = pendingUploads[p];
+        let exists = false;
+        map.forEach((v) => {
+          if (v.id === pEv.id || (v.votingNumber && v.votingNumber === pEv.votingNumber)) {
+            exists = true;
           }
-        }
-        const updatedList: EventItem[] = [];
-        map.forEach((item) => updatedList.push(item));
-        combined = updatedList;
-        setEvents(combined);
-      }
-
-      if (combined.length > 0) {
-        try {
-          localStorage.setItem('truevote_events', JSON.stringify(combined));
-          saveEventsToBackup(combined);
-
-          // Restore total votes used
-          const totalUsed = combined.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
-          localStorage.setItem('truevote_votes_used', String(totalUsed));
-
-          // Ensure activities (latest votes and announcements) are kept in sync
-          getStoredActivities();
-
-          window.dispatchEvent(new Event('truevote_events_updated'));
-        } catch (e) {
-          console.error(e);
+        });
+        if (!exists) {
+          map.set(pEv.id, pEv);
         }
       }
+
+      const combined: EventItem[] = [];
+      map.forEach((item) => combined.push(item));
+
+      setEvents(combined);
+      localStorage.setItem('truevote_events', JSON.stringify(combined));
+      saveEventsToBackup(combined);
+
+      // Restore total votes used
+      const totalUsed = combined.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
+      localStorage.setItem('truevote_votes_used', String(totalUsed));
+
+      // Ensure activities (latest votes and announcements) are kept in sync
+      getStoredActivities();
+
+      window.dispatchEvent(new Event('truevote_events_updated'));
     } catch (pinataErr) {
       console.warn('Pinata auto-sync notice:', pinataErr);
+      // Fallback to local backup only if Pinata network is unreachable
+      const idbEvents = await loadEventsFromBackup();
+      if (idbEvents && idbEvents.length > 0) {
+        setEvents(idbEvents);
+      }
     }
   };
 
@@ -241,16 +238,53 @@ export const EventsTable: React.FC = () => {
       console.warn('Pinata delete error:', err);
     }
 
-    // 2. Remove vote from local storage, backup storage, and update state
+    // 2. Mark event as deleted in tombstone storage so it is NEVER restored
+    try {
+      const deletedKey = 'truevote_deleted_events';
+      const deletedList: string[] = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+      if (eventToDelete.id && !deletedList.includes(eventToDelete.id)) {
+        deletedList.push(eventToDelete.id);
+      }
+      if (eventToDelete.votingNumber && !deletedList.includes(eventToDelete.votingNumber)) {
+        deletedList.push(eventToDelete.votingNumber);
+      }
+      localStorage.setItem(deletedKey, JSON.stringify(deletedList));
+    } catch (e) {}
+
+    // 3. Remove vote from local storage, backup storage, and update state
     setEvents((prev) => {
-      const updated = prev.filter((ev) => ev.id !== eventToDelete.id);
+      const updated = prev.filter(
+        (ev) =>
+          ev.id !== eventToDelete.id &&
+          (!eventToDelete.votingNumber || ev.votingNumber !== eventToDelete.votingNumber)
+      );
       try {
         localStorage.setItem('truevote_events', JSON.stringify(updated));
-        removeEventFromBackup(eventToDelete.id);
+        removeEventFromBackup(eventToDelete.id, eventToDelete.votingNumber);
+
+        // Update total votes used counter
+        const totalUsed = updated.reduce((sum, e) => sum + (e.totalVotesCast || 0), 0);
+        localStorage.setItem('truevote_votes_used', String(totalUsed));
+
+        // Purge activities related to this deleted event
+        const actsStr = localStorage.getItem('truevote_activities');
+        if (actsStr) {
+          try {
+            const acts: any[] = JSON.parse(actsStr);
+            const filteredActs = acts.filter(
+              (a) =>
+                a.votingNumber !== eventToDelete.votingNumber &&
+                !a.id?.includes(eventToDelete.id) &&
+                !(eventToDelete.votingNumber && a.id?.includes(eventToDelete.votingNumber))
+            );
+            localStorage.setItem('truevote_activities', JSON.stringify(filteredActs));
+          } catch (err) {}
+        }
+
         window.dispatchEvent(new Event('truevote_events_updated'));
         try {
           const bc = new BroadcastChannel('truevote_events_channel');
-          bc.postMessage({ type: 'EVENT_DELETED', eventId: eventToDelete.id });
+          bc.postMessage({ type: 'EVENT_DELETED', eventId: eventToDelete.id, votingNumber: eventToDelete.votingNumber });
           bc.close();
         } catch (e) {}
       } catch (e) {
@@ -259,7 +293,7 @@ export const EventsTable: React.FC = () => {
       return updated;
     });
 
-    // 3. Clear any cached vote status flags for this event
+    // 4. Clear any cached vote status flags for this event
     try {
       localStorage.removeItem(`truevote_voted_${eventToDelete.id}`);
       localStorage.removeItem(`truevote_voted_${eventToDelete.votingNumber}`);
@@ -267,7 +301,7 @@ export const EventsTable: React.FC = () => {
       // ignore
     }
 
-    // 4. Close active analytics modal if it was open for this event
+    // 5. Close active analytics modal if it was open for this event
     if (selectedAnalyticsEventId === eventToDelete.id) {
       setSelectedAnalyticsEventId(null);
     }

@@ -62,13 +62,31 @@ export async function loadEventsFromBackup(): Promise<any[]> {
   }
 }
 
-export async function removeEventFromBackup(id: string): Promise<void> {
+export async function removeEventFromBackup(id: string, votingNumber?: string): Promise<void> {
   try {
     const db = await openDB();
     if (!db) return;
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     store.delete(id);
+    if (votingNumber) {
+      store.delete(votingNumber);
+    }
+    const req = store.openCursor();
+    req.onsuccess = (e: any) => {
+      const cursor = e.target.result;
+      if (cursor) {
+        const val = cursor.value;
+        if (
+          val.id === id ||
+          (votingNumber && (val.votingNumber === votingNumber || val.id === votingNumber)) ||
+          (val.votingNumber && val.votingNumber === id)
+        ) {
+          cursor.delete();
+        }
+        cursor.continue();
+      }
+    };
   } catch (e) {
     console.warn('IndexedDB delete notice:', e);
   }

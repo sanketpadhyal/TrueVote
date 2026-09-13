@@ -146,8 +146,6 @@ export async function uploadEventToPinata(eventData: Record<string, any>): Promi
   }
 }
 
-const PINATA_UNPIN_URL = 'https://api.pinata.cloud/pinning/unpin';
-
 /**
  * Deletes / unpins an event from Pinata IPFS by its CID, V3 file ID, and/or votingNumber/id.
  */
@@ -167,14 +165,14 @@ export async function deleteEventFromPinata(
       });
       if (v3Del.ok) {
         console.log(`Successfully deleted Pinata V3 file ${fileId}`);
-        return { success: true };
       }
     } catch (e) {
       console.warn('Pinata V3 file delete notice:', e);
     }
   }
 
-  // 2. Query Pinata V3 files to locate matching file by CID or voting number / id
+  // 2. Query Pinata V3 files to locate and purge ALL matching files by CID or voting number / id
+  // (In case multiple versions were uploaded during vote casts or edits)
   try {
     const listRes = await fetch('https://api.pinata.cloud/v3/files/public?limit=100', {
       headers: { Authorization: `Bearer ${jwt}` },
@@ -183,10 +181,14 @@ export async function deleteEventFromPinata(
       const data = await listRes.json();
       const files: any[] = data?.data?.files || [];
       const cleanTarget = (searchNameOrId || '').toLowerCase().trim();
+      const idSuffix = cleanTarget.includes('-') ? cleanTarget.split('-').pop()! : cleanTarget;
 
       for (const file of files) {
         const matchesCid = ipfsHash && file.cid === ipfsHash;
-        const matchesName = cleanTarget && (file.name || '').toLowerCase().includes(cleanTarget);
+        const fileName = (file.name || '').toLowerCase();
+        const matchesName =
+          (cleanTarget && fileName.includes(cleanTarget)) ||
+          (idSuffix && idSuffix.length >= 3 && fileName.includes(idSuffix));
 
         if (matchesCid || matchesName) {
           console.log(`Deleting matching Pinata V3 file: ${file.name} (ID: ${file.id})`);
@@ -203,32 +205,6 @@ export async function deleteEventFromPinata(
     }
   } catch (err) {
     console.warn('Pinata V3 search-and-delete notice:', err);
-  }
-
-  // 3. Fallback unpin attempt for legacy V1
-  if (ipfsHash && !ipfsHash.startsWith('QmTrueVote')) {
-    const apiKey = process.env.REACT_APP_PINATA_API_KEY;
-    const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    if (apiKey && secretKey) {
-      headers['pinata_api_key'] = apiKey;
-      headers['pinata_secret_api_key'] = secretKey;
-    } else if (jwt) {
-      headers['Authorization'] = `Bearer ${jwt}`;
-    }
-
-    try {
-      await fetch(`${PINATA_UNPIN_URL}/${ipfsHash}`, {
-        method: 'DELETE',
-        headers,
-      });
-    } catch (err) {
-      // ignore
-    }
   }
 
   return { success: true };
@@ -275,6 +251,7 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
   const seenIds = new Set<string>();
 
   // 1. Try Pinata V3 Files API
+  let v3Success = false;
   try {
     const v3Res = await fetch('https://api.pinata.cloud/v3/files/public?limit=100', {
       headers: {
@@ -282,6 +259,7 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
       },
     });
     if (v3Res.ok) {
+      v3Success = true;
       const json = await v3Res.json();
       const files: any[] = json?.data?.files || [];
       // Sort newest files first
@@ -313,16 +291,13 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
     console.warn('Pinata V3 sync failed:', err);
   }
 
-  // 2. Try Pinata V1 PinList API fallback
-  if (events.length === 0) {
+  // 2. Only attempt Pinata legacy V1 PinList fallback if V3 failed completely AND API key + secret are available
+  if (!v3Success && events.length === 0 && apiKey && secretKey) {
     try {
-      const headers: Record<string, string> = {};
-      if (apiKey && secretKey) {
-        headers['pinata_api_key'] = apiKey;
-        headers['pinata_secret_api_key'] = secretKey;
-      } else if (jwt) {
-        headers['Authorization'] = `Bearer ${jwt}`;
-      }
+      const headers: Record<string, string> = {
+        pinata_api_key: apiKey,
+        pinata_secret_api_key: secretKey,
+      };
 
       const v1Res = await fetch('https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=100', {
         headers,

@@ -50,6 +50,15 @@ export const getStoredActivities = (): ActivityItem[] => {
     const allActivities: ActivityItem[] = [];
     const seenIds = new Set<string>();
 
+    const deletedKey = 'truevote_deleted_events';
+    const deletedSet = new Set<string>();
+    try {
+      const dList: string[] = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+      for (let k = 0; k < dList.length; k++) {
+        if (dList[k]) deletedSet.add(String(dList[k]).toLowerCase());
+      }
+    } catch (e) {}
+
     // 1. Read directly stored activities from localStorage
     const stored = localStorage.getItem('truevote_activities');
     if (stored) {
@@ -58,7 +67,10 @@ export const getStoredActivities = (): ActivityItem[] => {
         if (Array.isArray(parsed)) {
           for (let i = 0; i < parsed.length; i++) {
             const a = parsed[i];
-            if (a && a.id && !seenIds.has(a.id)) {
+            const isDel =
+              (a.votingNumber && deletedSet.has(String(a.votingNumber).toLowerCase())) ||
+              (a.id && deletedSet.has(String(a.id).toLowerCase()));
+            if (a && a.id && !seenIds.has(a.id) && !isDel) {
               seenIds.add(a.id);
               allActivities.push(a);
             }
@@ -75,6 +87,10 @@ export const getStoredActivities = (): ActivityItem[] => {
         if (Array.isArray(events)) {
           for (let i = 0; i < events.length; i++) {
             const ev = events[i];
+            const isEvDel =
+              (ev.id && deletedSet.has(String(ev.id).toLowerCase())) ||
+              (ev.votingNumber && deletedSet.has(String(ev.votingNumber).toLowerCase()));
+            if (isEvDel) continue;
 
             // A. Include embedded recentVotes
             if (Array.isArray(ev.recentVotes)) {
