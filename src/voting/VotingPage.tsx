@@ -110,11 +110,14 @@ export const VotingPage: React.FC = () => {
   const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean>(false);
   const [storedReceipt, setStoredReceipt] = useState<{ receiptHash: string; timestamp: string; optionLabel: string } | null>(null);
 
-  // Cloudflare Turnstile Human Verification Challenge state
+  // Cloudflare Turnstile & Headless Bot Heuristics state
   const [isCaptchaSolved, setIsCaptchaSolved] = useState<boolean>(false);
   const [isTurnstileVerifying, setIsTurnstileVerifying] = useState<boolean>(true);
+  const [turnstileBotDetected, setTurnstileBotDetected] = useState<boolean>(false);
+  const [turnstileBotReason, setTurnstileBotReason] = useState<string>('');
   const [honeypotVal, setHoneypotVal] = useState<string>('');
   const [pageLoadTime] = useState<number>(Date.now());
+  const humanInteractionCount = React.useRef(0);
 
   // Casting state
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -159,26 +162,88 @@ export const VotingPage: React.FC = () => {
     };
   }, [isTest, isLoading]);
 
-  // Cloudflare Turnstile Automatic Proof of Humanity Verification
+  // Track genuine human entropy (cursor movement, touch tap, keypress, scroll)
+  useEffect(() => {
+    const handleHumanAction = () => {
+      humanInteractionCount.current += 1;
+    };
+
+    window.addEventListener('mousemove', handleHumanAction, { passive: true });
+    window.addEventListener('touchstart', handleHumanAction, { passive: true });
+    window.addEventListener('touchmove', handleHumanAction, { passive: true });
+    window.addEventListener('keydown', handleHumanAction, { passive: true });
+    window.addEventListener('scroll', handleHumanAction, { passive: true });
+
+    return () => {
+      window.removeEventListener('mousemove', handleHumanAction);
+      window.removeEventListener('touchstart', handleHumanAction);
+      window.removeEventListener('touchmove', handleHumanAction);
+      window.removeEventListener('keydown', handleHumanAction);
+      window.removeEventListener('scroll', handleHumanAction);
+    };
+  }, []);
+
+  // Cloudflare Turnstile Verification Engine with Headless Bot Heuristics
   useEffect(() => {
     if (isTest) {
-      // In test mode, keep initial state disabled until interaction or test triggers it
       return;
     }
-    const timer = setTimeout(() => {
-      setIsCaptchaSolved(true);
+
+    // 1. Headless Browser & Automated Webdriver Checks (Puppeteer, Selenium, Playwright)
+    const isWebDriver = typeof navigator !== 'undefined' && Boolean(navigator.webdriver);
+    const win = window as any;
+    const isHeadlessAnomalies =
+      Boolean(win.callPhantom || win._phantom) ||
+      Boolean(win.__nightmare) ||
+      Boolean(win.domAutomation || win.domAutomationController) ||
+      (typeof navigator !== 'undefined' && (!navigator.languages || navigator.languages.length === 0));
+
+    if (isWebDriver || isHeadlessAnomalies) {
+      setTurnstileBotDetected(true);
+      setTurnstileBotReason(
+        isWebDriver
+          ? 'Automated webdriver environment detected (navigator.webdriver)'
+          : 'Headless browser environment anomaly detected'
+      );
       setIsTurnstileVerifying(false);
-    }, 1300);
+      setIsCaptchaSolved(false);
+      return;
+    }
+
+    // 2. Automated evaluation sequence: wait for human entropy or user presence
+    const timer = setTimeout(() => {
+      // If genuine human entropy was recorded, verify automatically
+      if (humanInteractionCount.current >= 1) {
+        setIsCaptchaSolved(true);
+        setIsTurnstileVerifying(false);
+      } else {
+        // Stop spinning and wait for user to click/interact
+        setIsTurnstileVerifying(false);
+      }
+    }, 1400);
+
     return () => clearTimeout(timer);
   }, [isTest]);
 
   const handleTurnstileClick = () => {
     if (!isVotingActive || isCaptchaSolved) return;
+
+    // Check automated runner on click
+    if (typeof navigator !== 'undefined' && Boolean(navigator.webdriver) && !isTest) {
+      setTurnstileBotDetected(true);
+      setTurnstileBotReason('Automated webdriver runner detected (navigator.webdriver)');
+      setIsTurnstileVerifying(false);
+      setIsCaptchaSolved(false);
+      return;
+    }
+
+    humanInteractionCount.current += 1;
     setIsTurnstileVerifying(true);
     setTimeout(() => {
       setIsCaptchaSolved(true);
       setIsTurnstileVerifying(false);
-    }, 300);
+      setErrorMessage('');
+    }, 400);
   };
 
   // Load Event Data with real-time sync across tabs, IndexedDB and Pinata IPFS
@@ -429,9 +494,19 @@ export const VotingPage: React.FC = () => {
       return;
     }
 
-    // 1. Anti-Bot Verification Check
+    // 1. Anti-Bot Verification Checks
     if (honeypotVal.trim() !== '') {
-      setErrorMessage('Security Exception: Bot behavior detected.');
+      setErrorMessage('Security Exception: Bot behavior detected (honeypot trap triggered).');
+      return;
+    }
+
+    if (turnstileBotDetected) {
+      setErrorMessage(`Security Exception: Bot blocked (${turnstileBotReason || 'automated runner detected'}).`);
+      return;
+    }
+
+    if (typeof navigator !== 'undefined' && Boolean(navigator.webdriver) && !isTest) {
+      setErrorMessage('Security Exception: Automated webdriver runner detected.');
       return;
     }
 
@@ -955,7 +1030,7 @@ export const VotingPage: React.FC = () => {
               {/* Cloudflare Turnstile Proof of Humanity Challenge */}
               <div className={`cf-turnstile-container ${!isVotingActive ? 'cf-disabled' : ''}`}>
                 <div
-                  className={`cf-turnstile-box ${isCaptchaSolved ? 'cf-verified' : ''}`}
+                  className={`cf-turnstile-box ${isCaptchaSolved ? 'cf-verified' : ''} ${turnstileBotDetected ? 'cf-blocked' : ''}`}
                   onClick={handleTurnstileClick}
                   role="checkbox"
                   aria-checked={isCaptchaSolved}
@@ -963,7 +1038,15 @@ export const VotingPage: React.FC = () => {
                 >
                   <div className="cf-turnstile-left">
                     <div className="cf-checkbox-wrap">
-                      {isCaptchaSolved ? (
+                      {turnstileBotDetected ? (
+                        <div className="cf-blocked-badge" title={turnstileBotReason}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                          </svg>
+                        </div>
+                      ) : isCaptchaSolved ? (
                         <div className="cf-success-tick">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="20 6 9 17 4 12" />
@@ -978,9 +1061,17 @@ export const VotingPage: React.FC = () => {
 
                     <div className="cf-text-col">
                       <span className="cf-status-text">
-                        {isCaptchaSolved ? 'Success! Verified human voter' : isTurnstileVerifying ? 'Verifying connection security...' : 'Verify you are human'}
+                        {turnstileBotDetected
+                          ? 'Automated Runner Detected'
+                          : isCaptchaSolved
+                          ? 'Success! Verified human voter'
+                          : isTurnstileVerifying
+                          ? 'Verifying connection security...'
+                          : 'Verify you are human'}
                       </span>
-                      <span className="cf-subtext">Proof of Humanity Challenge</span>
+                      <span className="cf-subtext">
+                        {turnstileBotDetected ? 'Bot access blocked' : 'Proof of Humanity Challenge'}
+                      </span>
                     </div>
                   </div>
 

@@ -520,6 +520,24 @@
   cursor: default;
 }
 
+.cf-turnstile-box.cf-blocked {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  cursor: not-allowed;
+}
+
+.cf-blocked-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #fee2e2;
+  border: 1.5px solid #fca5a5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tickPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .cf-turnstile-left {
   display: flex;
   align-items: center;
