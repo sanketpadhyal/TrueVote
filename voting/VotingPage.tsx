@@ -670,7 +670,7 @@ export const VotingPage: React.FC = () => {
         </header>
 
         <main className="voting-main-container">
-          <div className="voting-card" style={{ textAlign: 'center', padding: '50px 24px', maxWidth: '520px', margin: '60px auto' }}>
+          <div className="voting-card" style={{ textAlign: 'center', padding: '50px 24px', maxWidth: '520px', margin: '20px auto' }}>
             <div style={{ fontSize: '44px', marginBottom: '16px' }}>🗳️</div>
             <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '10px' }}>
               Ballot Event Not Found

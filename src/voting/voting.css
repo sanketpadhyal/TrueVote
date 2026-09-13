@@ -51,18 +51,21 @@
    (Only Logo on Left, Real-time Clock on Right)
    ========================================================= */
 .voting-navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 50;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px 48px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
   background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
 .voting-brand {
@@ -127,7 +130,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 32px 16px 40px 16px;
+  padding: 96px 16px 40px 16px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -913,7 +916,7 @@
   }
 
   .voting-main-container {
-    padding: 16px 12px 28px 12px;
+    padding: 72px 12px 28px 12px;
     width: 100%;
     box-sizing: border-box;
   }
