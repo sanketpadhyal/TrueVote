@@ -760,10 +760,6 @@ export const VotingPage: React.FC = () => {
               <span className={`voting-status-pill ${isVotingActive ? 'pill-active' : 'pill-closed'}`}>
                 {isVotingActive ? 'Polls Open' : 'Voting Inactive'}
               </span>
-              <span className="voting-zk-tag">
-                <span className="zk-green-dot"></span>
-                Zero-Knowledge Privacy Active
-              </span>
             </div>
 
             <h1 className="voting-event-title">{event.name}</h1>

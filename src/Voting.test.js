@@ -12,9 +12,9 @@ describe('VotingPage Component', () => {
     localStorage.clear();
   });
 
-  test('renders voting header, zero-knowledge privacy badge, and options', () => {
+  test('renders voting header, connected metamask wallet badge, and options', () => {
     renderWithRouter(<VotingPage />);
-    expect(screen.getByText(/Zero-Knowledge Privacy Active/i)).toBeInTheDocument();
+    expect(screen.getByText(/Connected MetaMask/i)).toBeInTheDocument();
     expect(screen.getByText(/Proof of Humanity Challenge/i)).toBeInTheDocument();
     expect(screen.getByText(/Cast Anonymous Vote/i)).toBeInTheDocument();
   });
