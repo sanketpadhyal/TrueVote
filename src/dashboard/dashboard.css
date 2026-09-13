@@ -3873,3 +3873,103 @@ input:checked + .slider.round:before {
 .btn-ipfs-sync .sync-icon.sync-icon-spinning {
   animation: syncSpin360 0.65s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ==========================================================================
+   PhonePe-Style Animated Success Badge (Modal Step 5 Voting Link Published)
+   ========================================================================== */
+.phonepe-success-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  margin: 4px auto 16px auto;
+}
+
+.phonepe-circle-ripple {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.28);
+  animation: phonepeRipple 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+.phonepe-circle-ripple:nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.phonepe-success-circle {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.45), 0 4px 8px -2px rgba(16, 185, 129, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: phonepePopIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  z-index: 2;
+}
+
+.phonepe-checkmark-svg {
+  width: 44px;
+  height: 44px;
+  display: block;
+  overflow: visible;
+}
+
+.phonepe-checkmark-check {
+  stroke: #ffffff;
+  stroke-width: 4.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 52;
+  stroke-dashoffset: 52;
+  animation: phonepeStrokeCheck 0.45s cubic-bezier(0.65, 0, 0.45, 1) 0.3s forwards;
+}
+
+@keyframes phonepePopIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.14);
+    opacity: 1;
+  }
+  85% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes phonepeRipple {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes phonepeStrokeCheck {
+  0% {
+    stroke-dashoffset: 52;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+

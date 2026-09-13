@@ -824,13 +824,18 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
           {/* STEP 5: Success & Generated Shareable Voting Link */}
           {step === 5 && createdEvent && (
             <div className="new-event-step-inner success-view">
-              <div className="new-event-illustration">
-                <svg width="115" height="85" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="80" cy="60" r="46" fill="#ECFDF5" stroke="#10B981" strokeWidth="2.5" />
-                  <path d="M58 60L73 75L104 44" stroke="#059669" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="125" cy="28" r="14" fill="#2563EB" />
-                  <path d="M120 28L123 31L130 24" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+              <div className="phonepe-success-wrap">
+                <div className="phonepe-circle-ripple" />
+                <div className="phonepe-circle-ripple" />
+                <div className="phonepe-success-circle">
+                  <svg className="phonepe-checkmark-svg" viewBox="0 0 52 52">
+                    <path
+                      className="phonepe-checkmark-check"
+                      fill="none"
+                      d="M14.1 27.2l7.1 7.2 16.7-16.8"
+                    />
+                  </svg>
+                </div>
               </div>
 
               <h2 className="new-event-title">Voting Event Published!</h2>
