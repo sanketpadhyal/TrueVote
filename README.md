@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/sanketpadhyal/TrueVote">
+  <a href="https://truevote.sanketpadhyal.in">
     <img src="public/images/logo.png" alt="TrueVote logo" width="96" />
   </a>
 </p>
@@ -11,23 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sanketpadhyal/TrueVote"><strong>Explore TrueVote Repository</strong></a>
-  &nbsp;&middot;&nbsp;
-  <a href="../../releases">All Releases</a>
-  &nbsp;&middot;&nbsp;
-  <a href="../../issues">Report a Problem</a>
-</p>
-
-<p align="center">
-  <a href="../../releases/latest">
-    <img src="https://img.shields.io/badge/TrueVote-v2.0.0-111111?style=for-the-badge" alt="TrueVote v2.0.0" />
-  </a>
-  <a href="../../releases/latest">
-    <img src="https://img.shields.io/badge/Build-Passing-00A86B?style=for-the-badge" alt="Build Status Passing" />
-  </a>
-  <img src="https://img.shields.io/badge/Web3-Decentralized-7C5CFC?style=for-the-badge" alt="Web3 Decentralized" />
-  <img src="https://img.shields.io/badge/Storage-Pinata_IPFS-F59E0B?style=for-the-badge" alt="Pinata IPFS" />
-  <img src="https://img.shields.io/badge/Security-ZKP_Nullifiers-0284C7?style=for-the-badge" alt="ZKP Nullifiers" />
+  <a href="https://truevote.sanketpadhyal.in"><strong>truevote.sanketpadhyal.in</strong></a>
 </p>
 
 > [!IMPORTANT]
@@ -36,9 +20,9 @@
 > [!IMPORTANT]
 > Live ballot audits and decentralized pinning are powered by IPFS and Pinata Dedicated Gateways. Once cast, cryptographic election records cannot be altered or retroactively manipulated.
 
-## What's New in TrueVote v2.0.0
+## Key Features & Highlights
 
-TrueVote v2.0.0 is a major production release introducing UPI/PhonePe-style transactional celebration sequences, strict revote locking across browser sessions, real headless bot heuristics with human entropy verification, dynamic frontrunner tracking pills, dual IndexedDB and Pinata IPFS synchronization, and a fully optimized O(N) zero-comment production architecture.
+TrueVote is a modern decentralized Web3 voting application built with UPI/PhonePe-style transactional celebration sequences, strict revote locking across browser sessions, real headless bot heuristics with human entropy verification, dynamic frontrunner tracking pills, dual IndexedDB and Pinata IPFS synchronization, and a fully optimized O(N) zero-comment production architecture.
 
 ### Major Highlights
 
@@ -333,6 +317,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Developer
 
 - Developer: Sanket Padhyal
+- Live Platform: https://truevote.sanketpadhyal.in
 - Website: https://www.sanketpadhyal.in
 - Support: sanketpadhyal3@gmail.com
 - GitHub: https://github.com/sanketpadhyal
