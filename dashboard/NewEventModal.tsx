@@ -475,16 +475,17 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
                 Select how many voting options or proposals will be presented on this ballot.
               </p>
 
-              {/* iOS Segmented Track for 2 to 5 */}
-              <div className="ios-segmented-track">
+              {/* Modern Choice Cards Grid */}
+              <div className="choice-count-grid">
                 {[2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
                     type="button"
-                    className={`ios-segment-btn ${optionsCount === n ? 'active' : ''}`}
+                    className={`choice-count-card ${optionsCount === n ? 'active' : ''}`}
                     onClick={() => handleOptionsCountSelect(n)}
                   >
-                    <span>{n}</span>
+                    <span className="choice-count-num">{n}</span>
+                    <span className="choice-count-sub">Choices</span>
                   </button>
                 ))}
               </div>
