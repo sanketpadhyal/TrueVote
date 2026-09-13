@@ -44,17 +44,6 @@ TrueVote is an open-source decentralized voting platform engineered to deliver a
 3. Decentralized Storage: Election manifests, candidate configurations, and vote tallies are pinned directly to IPFS via Pinata Dedicated Gateways, creating a permanent, audit-ready paper trail.
 4. Bot Resistance: Client-side heuristics and Cloudflare Turnstile protect public election links from automated submission scripts, headless Selenium/Puppeteer bots, and Sybil flooding.
 
-## App Preview
-
-<p align="center">
-  <img src="public/images/privacy_dashboard.webp" alt="TrueVote Analytics and Privacy Dashboard" width="48%" />
-  <img src="public/images/vote.webp" alt="TrueVote Ballot and Voting Interface" width="48%" />
-</p>
-
-<p align="center">
-  <img src="public/images/illus.webp" alt="TrueVote Decentralized Architecture Illustration" width="60%" />
-</p>
-
 ## What You Can Do
 
 ### Anonymous Voting
