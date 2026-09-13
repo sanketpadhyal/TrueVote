@@ -67,6 +67,24 @@ const DEFAULT_TEST_EVENT: EventItem = {
   timezone: 'IST (UTC+05:30)',
 };
 
+// Generate a deterministic, realistic Ethereum-formatted wallet address for the voter session
+export const getDeterministicVoterWallet = (voterSeed: string, eventId: string = ''): string => {
+  let hash1 = 5381;
+  let hash2 = 52711;
+  const input = `${voterSeed}:${eventId}:truevote_zk_wallet`;
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    hash1 = ((hash1 << 5) + hash1) ^ char;
+    hash2 = ((hash2 << 5) + hash2) ^ char;
+  }
+  const part1 = Math.abs(hash1).toString(16).padStart(8, '0');
+  const part2 = Math.abs(hash2).toString(16).padStart(8, '0');
+  const part3 = Math.abs(hash1 ^ hash2).toString(16).padStart(8, '0');
+  const part4 = Math.abs((hash1 * 31) ^ hash2).toString(16).padStart(8, '0');
+  const part5 = Math.abs((hash2 * 17) ^ hash1).toString(16).padStart(8, '0');
+  return `0x${(part1 + part2 + part3 + part4 + part5).substring(0, 40)}`;
+};
+
 export const VotingPage: React.FC = () => {
   const { eventId } = useParams<{ eventId?: string }>();
   const navigate = useNavigate();
@@ -81,6 +99,11 @@ export const VotingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(() => {
     if (isTest && !eventId) return false;
     return true;
+  });
+  const [loadingPhase, setLoadingPhase] = useState<number>(isTest ? 4 : 0);
+  const [voterWalletAddress] = useState<string>(() => {
+    const seed = getAnonymousVoterId();
+    return getDeterministicVoterWallet(seed, eventId || 'truevote');
   });
   const [notFound, setNotFound] = useState<boolean>(false);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
@@ -121,6 +144,21 @@ export const VotingPage: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isTest]);
+
+  // Phased step-by-step loading progression (slowly slowly connecting wallet and decrypting)
+  useEffect(() => {
+    if (isTest || !isLoading) return;
+
+    const t1 = setTimeout(() => setLoadingPhase(1), 500);
+    const t2 = setTimeout(() => setLoadingPhase(2), 1100);
+    const t3 = setTimeout(() => setLoadingPhase(3), 1700);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [isTest, isLoading]);
 
   // Initialize Captcha Challenge
   useEffect(() => {
@@ -543,52 +581,72 @@ export const VotingPage: React.FC = () => {
     }
   };
 
-  if (isLoading && !event) {
+  if (isLoading || !event) {
     return (
       <div className="voting-page-wrapper">
-        <div className="voting-glow-ambient voting-glow-top"></div>
-        <div className="voting-glow-ambient voting-glow-bottom"></div>
-
-        {/* Real-time Web3 Skeleton Ballot Card */}
-        <div className="voting-card" style={{ maxWidth: '580px', margin: '40px auto 60px auto' }}>
-          {/* Top Real-time Status Banner */}
-          <div className="ballot-sync-banner">
-            <span className="sync-pulse-dot" />
-            <span className="sync-status-text">Synchronizing & Decrypting Ballot from IPFS...</span>
+        <header className="voting-navbar">
+          <div className="voting-brand" onClick={() => navigate('/dashboard')} title="TrueVote Dashboard">
+            <img src="/images/logo.png" alt="TrueVote Logo" className="voting-brand-logo" />
+            <span className="voting-brand-title">
+              True<span className="brand-accent">Vote</span>
+            </span>
           </div>
 
-          <div className="skeleton-shimmer-dark" style={{ width: '130px', height: '24px', borderRadius: '20px', marginBottom: '16px' }} />
-          <div className="skeleton-shimmer-dark" style={{ width: '80%', height: '28px', marginBottom: '12px', borderRadius: '8px' }} />
-          <div className="skeleton-shimmer-dark" style={{ width: '95%', height: '14px', marginBottom: '8px', borderRadius: '6px' }} />
-          <div className="skeleton-shimmer-dark" style={{ width: '60%', height: '14px', marginBottom: '24px', borderRadius: '6px' }} />
-
-          {/* Skeleton Quorum Box */}
-          <div className="skeleton-quorum-box">
-            <div className="skeleton-shimmer-dark" style={{ width: '40%', height: '14px', borderRadius: '6px' }} />
-            <div className="skeleton-shimmer-dark" style={{ width: '100%', height: '8px', borderRadius: '4px', marginTop: '10px' }} />
+          <div className="voting-meta-badges">
+            <div className="ist-clock-badge">
+              <span>🇮🇳 {currentTimeIst || 'IST'}</span>
+            </div>
           </div>
+        </header>
 
-          {/* Skeleton Choice Options */}
-          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[1, 2, 3].map((optIdx) => (
-              <div key={optIdx} className="skeleton-option-card">
-                <div className="skeleton-shimmer-dark" style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0 }} />
-                <div className="skeleton-shimmer-dark" style={{ width: `${50 + optIdx * 15}%`, height: '16px', borderRadius: '6px' }} />
+        <main className="voting-main-container">
+          <div className="voting-card voting-loading-card">
+            <div className="voting-webm-wrap">
+              <video
+                src={`${process.env.PUBLIC_URL || ''}/images/tinywow_grabill54-virtual-4546_91750253.webm`}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="voting-loading-webm"
+              />
+            </div>
+
+            <h2 className="voting-loading-title">Connecting Decentralized Ballot</h2>
+            <p className="voting-loading-subtitle">
+              Establishing zero-knowledge anonymous voting session...
+            </p>
+
+            {/* Stepped connection sequence */}
+            <div className="loading-steps-track">
+              <div className={`loading-step-item ${loadingPhase >= 0 ? 'step-done' : ''} ${loadingPhase === 0 ? 'step-current' : ''}`}>
+                <span className="step-num">{loadingPhase > 0 ? '✓' : '1'}</span>
+                <span className="step-text">Initializing ZK Enclave</span>
               </div>
-            ))}
-          </div>
+              <div className={`loading-step-item ${loadingPhase >= 1 ? 'step-done' : ''} ${loadingPhase === 1 ? 'step-current' : ''}`}>
+                <span className="step-num">{loadingPhase > 1 ? '✓' : '2'}</span>
+                <span className="step-text">Connecting Voter Ballot Wallet</span>
+              </div>
+              <div className={`loading-step-item ${loadingPhase >= 2 ? 'step-done' : ''} ${loadingPhase === 2 ? 'step-current' : ''}`}>
+                <span className="step-num">{loadingPhase > 2 ? '✓' : '3'}</span>
+                <span className="step-text">
+                  {voterWalletAddress ? `Linked: ${voterWalletAddress.slice(0, 6)}...${voterWalletAddress.slice(-4)}` : 'Generating Ballot Key'}
+                </span>
+              </div>
+              <div className={`loading-step-item ${loadingPhase >= 3 ? 'step-done' : ''} ${loadingPhase === 3 ? 'step-current' : ''}`}>
+                <span className="step-num">{loadingPhase >= 4 ? '✓' : '4'}</span>
+                <span className="step-text">Decrypting IPFS Ballot Schema</span>
+              </div>
+            </div>
 
-          {/* Skeleton Security Challenge Box */}
-          <div className="skeleton-security-box" style={{ marginTop: '24px' }}>
-            <div className="skeleton-shimmer-dark" style={{ width: '50%', height: '14px', borderRadius: '6px' }} />
-            <div className="skeleton-shimmer-dark" style={{ width: '85%', height: '12px', marginTop: '8px', borderRadius: '4px' }} />
+            <div className="loading-progress-bar-wrap">
+              <div
+                className="loading-progress-fill"
+                style={{ width: `${Math.min(100, (loadingPhase + 1) * 25)}%` }}
+              />
+            </div>
           </div>
-
-          {/* Skeleton Submit Button */}
-          <div style={{ marginTop: '28px' }}>
-            <div className="skeleton-shimmer-dark" style={{ width: '100%', height: '48px', borderRadius: '9999px' }} />
-          </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -596,34 +654,39 @@ export const VotingPage: React.FC = () => {
   if (notFound && !event) {
     return (
       <div className="voting-page-wrapper">
-        <div className="voting-glow-ambient voting-glow-top"></div>
-        <div className="voting-glow-ambient voting-glow-bottom"></div>
-        <div className="voting-card" style={{ textAlign: 'center', padding: '60px 24px', maxWidth: '520px', margin: '80px auto' }}>
-          <div style={{ fontSize: '44px', marginBottom: '16px' }}>🗳️</div>
-          <h2 style={{ fontSize: '22px', fontWeight: 600, color: '#fff', marginBottom: '10px' }}>
-            Ballot Event Not Found
-          </h2>
-          <p style={{ color: '#94a3b8', fontSize: '14px', maxWidth: '420px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
-            No election ballot matching <span style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{eventId}</span> could be located on the IPFS network or local persistence.
-          </p>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="btn-cast-ballot"
-            style={{ maxWidth: '220px', margin: '0 auto' }}
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+        <header className="voting-navbar">
+          <div className="voting-brand" onClick={() => navigate('/dashboard')} title="TrueVote Dashboard">
+            <img src="/images/logo.png" alt="TrueVote Logo" className="voting-brand-logo" />
+            <span className="voting-brand-title">
+              True<span className="brand-accent">Vote</span>
+            </span>
+          </div>
 
-  if (!event) {
-    return (
-      <div className="voting-page-wrapper">
-        <div className="voting-card">
-          <p style={{ color: '#fff' }}>Loading voting session...</p>
-        </div>
+          <div className="voting-meta-badges">
+            <div className="ist-clock-badge">
+              <span>🇮🇳 {currentTimeIst || 'IST'}</span>
+            </div>
+          </div>
+        </header>
+
+        <main className="voting-main-container">
+          <div className="voting-card" style={{ textAlign: 'center', padding: '50px 24px', maxWidth: '520px', margin: '60px auto' }}>
+            <div style={{ fontSize: '44px', marginBottom: '16px' }}>🗳️</div>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '10px' }}>
+              Ballot Event Not Found
+            </h2>
+            <p style={{ color: '#64748b', fontSize: '14px', maxWidth: '420px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
+              No election ballot matching <span style={{ color: '#0284c7', fontFamily: 'monospace', fontWeight: 700 }}>{eventId}</span> could be located on the IPFS network or local persistence.
+            </p>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="btn-cast-pill"
+              style={{ maxWidth: '220px', margin: '0 auto' }}
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
@@ -633,13 +696,13 @@ export const VotingPage: React.FC = () => {
 
   return (
     <div className="voting-page-wrapper">
-      {/* Background Decorative Lighting */}
+      {/* Background Subtle Gradient Glows */}
       <div className="voting-glow-ambient voting-glow-top"></div>
       <div className="voting-glow-ambient voting-glow-bottom"></div>
 
-      {/* Top Security Banner */}
+      {/* Top Navbar: only logo and real-time clock */}
       <header className="voting-navbar">
-        <div className="voting-brand" onClick={() => navigate('/dashboard')}>
+        <div className="voting-brand" onClick={() => navigate('/dashboard')} title="TrueVote Dashboard">
           <img src="/images/logo.png" alt="TrueVote Logo" className="voting-brand-logo" />
           <span className="voting-brand-title">
             True<span className="brand-accent">Vote</span>
@@ -647,11 +710,6 @@ export const VotingPage: React.FC = () => {
         </div>
 
         <div className="voting-meta-badges">
-          <div className="security-status-badge">
-            <span className="status-indicator-dot"></span>
-            <span>Zero-Knowledge Privacy Active</span>
-          </div>
-
           <div className="ist-clock-badge">
             <span>🇮🇳 {currentTimeIst || 'IST'}</span>
           </div>
@@ -671,6 +729,32 @@ export const VotingPage: React.FC = () => {
             tabIndex={-1}
             autoComplete="off"
           />
+
+          {/* Connected Voter Wallet Banner */}
+          <div className="voting-connected-wallet-card">
+            <div className="wallet-card-header">
+              <div className="wallet-chip">
+                <span className="wallet-dot-live"></span>
+                <span className="wallet-chip-label">Connected Voter Wallet</span>
+              </div>
+              <span className="wallet-badge-shield">
+                <span className="status-indicator-dot"></span>
+                Zero-Knowledge Privacy Active
+              </span>
+            </div>
+            <div className="wallet-address-row">
+              <div className="wallet-hash-group">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="wallet-key-svg">
+                  <path d="M21 2l-2 2m-1.5 1.5L14 9M3 21l6.5-6.5" />
+                  <circle cx="7.5" cy="16.5" r="4.5" />
+                </svg>
+                <code className="wallet-hash-text" title={voterWalletAddress}>
+                  {voterWalletAddress ? `${voterWalletAddress.slice(0, 10)}...${voterWalletAddress.slice(-8)}` : '0x71C4...84B2'}
+                </code>
+              </div>
+              <span className="wallet-ready-badge">✓ Ballot Key Linked</span>
+            </div>
+          </div>
 
           {/* Event Header */}
           <div className="voting-card-header">
