@@ -851,9 +851,202 @@
   padding: 24px 0;
 }
 
-.shield-icon-badge,
-.success-icon-wrap {
-  margin-bottom: 16px;
+.already-voted-panel {
+  animation: phonepe-fade-up 0.4s ease-out forwards;
+}
+
+.shield-icon-badge {
+  margin-bottom: 18px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.25);
+  animation: shield-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes shield-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px -4px rgba(59, 130, 246, 0.25);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px -2px rgba(59, 130, 246, 0.4);
+  }
+}
+
+/* PhonePe / UPI Style Payment Success Animation */
+.phonepe-success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 0 28px 0;
+  position: relative;
+  overflow: visible;
+}
+
+.phonepe-animation-wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px auto 26px auto;
+}
+
+/* Concentric Expanding Ripples */
+.phonepe-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 84px;
+  height: 84px;
+  margin-top: -42px;
+  margin-left: -42px;
+  border-radius: 50%;
+  border: 2px solid rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.08);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.phonepe-ripple.r1 {
+  animation: phonepe-pulse 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.phonepe-ripple.r2 {
+  animation: phonepe-pulse 2s 0.45s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.phonepe-ripple.r3 {
+  animation: phonepe-pulse 2s 0.9s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+@keyframes phonepe-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Central Green Circle Badge */
+.phonepe-circle-badge {
+  position: relative;
+  z-index: 2;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px -4px rgba(16, 185, 129, 0.55),
+              0 0 0 6px rgba(16, 185, 129, 0.15);
+  animation: phonepe-badge-pop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes phonepe-badge-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Animated Checkmark Drawing */
+.phonepe-check-svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
+.phonepe-check-path {
+  stroke-dasharray: 45;
+  stroke-dashoffset: 45;
+  animation: phonepe-draw-check 0.45s 0.32s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+@keyframes phonepe-draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Confetti Sparkles */
+.phonepe-sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.phonepe-sparkle.sp-1 { top: 6px; left: 50%; background: #34d399; animation: sparkle-1 0.75s 0.25s ease-out forwards; }
+.phonepe-sparkle.sp-2 { top: 22px; right: 10px; background: #6ee7b7; animation: sparkle-2 0.75s 0.25s ease-out forwards; }
+.phonepe-sparkle.sp-3 { bottom: 22px; right: 8px; background: #10b981; animation: sparkle-3 0.75s 0.25s ease-out forwards; }
+.phonepe-sparkle.sp-4 { bottom: 6px; left: 50%; background: #059669; animation: sparkle-4 0.75s 0.25s ease-out forwards; }
+.phonepe-sparkle.sp-5 { bottom: 22px; left: 8px; background: #34d399; animation: sparkle-5 0.75s 0.25s ease-out forwards; }
+.phonepe-sparkle.sp-6 { top: 22px; left: 10px; background: #a7f3d0; animation: sparkle-6 0.75s 0.25s ease-out forwards; }
+
+@keyframes sparkle-1 { 0% { transform: translateY(0) scale(0); opacity: 1; } 100% { transform: translateY(-28px) scale(1.4); opacity: 0; } }
+@keyframes sparkle-2 { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 100% { transform: translate(24px, -18px) scale(1.4); opacity: 0; } }
+@keyframes sparkle-3 { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 100% { transform: translate(24px, 18px) scale(1.4); opacity: 0; } }
+@keyframes sparkle-4 { 0% { transform: translateY(0) scale(0); opacity: 1; } 100% { transform: translateY(28px) scale(1.4); opacity: 0; } }
+@keyframes sparkle-5 { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 100% { transform: translate(-24px, 18px) scale(1.4); opacity: 0; } }
+@keyframes sparkle-6 { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 100% { transform: translate(-24px, -18px) scale(1.4); opacity: 0; } }
+
+/* Staggered Content Entrances */
+.phonepe-fade-1 {
+  opacity: 0;
+  animation: phonepe-fade-up 0.45s 0.32s ease-out forwards;
+}
+
+.phonepe-fade-2 {
+  opacity: 0;
+  animation: phonepe-fade-up 0.45s 0.44s ease-out forwards;
+}
+
+.phonepe-fade-3 {
+  opacity: 0;
+  animation: phonepe-fade-up 0.45s 0.56s ease-out forwards;
+}
+
+.phonepe-fade-4 {
+  opacity: 0;
+  animation: phonepe-fade-up 0.45s 0.68s ease-out forwards;
+}
+
+@keyframes phonepe-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .panel-status-title {

@@ -38,6 +38,156 @@ const getAnonymousVoterId = (): string => {
   return voterId;
 };
 
+// Robust Anti-Double Voting Guard check across local storage, session storage, and wallet
+export const checkHasAlreadyVoted = (idOrNum: string): { voted: boolean; receipt: any } => {
+  if (typeof window === 'undefined' || !idOrNum) return { voted: false, receipt: null };
+  const cleanId = idOrNum.trim().toLowerCase();
+  const voterId = getAnonymousVoterId();
+  const walletAddr = (localStorage.getItem('truevote_wallet_connected_addr') || '').toLowerCase();
+
+  // 1. Centralized registry check
+  try {
+    const regStr = localStorage.getItem('truevote_voted_events_registry');
+    if (regStr) {
+      const reg = JSON.parse(regStr);
+      if (reg[cleanId]) return { voted: true, receipt: reg[cleanId] };
+      for (const k of Object.keys(reg)) {
+        if (k.toLowerCase() === cleanId) {
+          return { voted: true, receipt: reg[k] };
+        }
+      }
+    }
+  } catch (e) {}
+
+  // 2. Direct nullifier keys
+  const candidateKeys = [
+    `truevote_voted_nullifier_${cleanId}_${voterId}`,
+    `truevote_voted_nullifier_${idOrNum}_${voterId}`,
+  ];
+  if (walletAddr) {
+    candidateKeys.push(
+      `truevote_voted_nullifier_${cleanId}_${walletAddr}`,
+      `truevote_voted_nullifier_${idOrNum}_${walletAddr}`,
+      `truevote_wallet_voted_${cleanId}_${walletAddr}`,
+      `truevote_wallet_voted_${idOrNum}_${walletAddr}`
+    );
+  }
+
+  for (const key of candidateKeys) {
+    const item = localStorage.getItem(key);
+    if (item) {
+      try {
+        return { voted: true, receipt: JSON.parse(item) };
+      } catch (e) {
+        return { voted: true, receipt: null };
+      }
+    }
+  }
+
+  // 3. sessionStorage fallback
+  try {
+    const sess = sessionStorage.getItem(`truevote_voted_${cleanId}`);
+    if (sess) {
+      try {
+        return { voted: true, receipt: JSON.parse(sess) };
+      } catch (e) {
+        return { voted: true, receipt: null };
+      }
+    }
+  } catch (e) {}
+
+  return { voted: false, receipt: null };
+};
+
+// Permanently record committed nullifier receipt to forbid any subsequent voting
+export const recordVotedNullifier = (
+  evId: string,
+  votingNum: string | undefined,
+  receipt: { receiptHash: string; timestamp: string; optionLabel?: string; eventId?: string; votingNumber?: string }
+) => {
+  if (typeof window === 'undefined') return;
+  const voterId = getAnonymousVoterId();
+  const walletAddr = (localStorage.getItem('truevote_wallet_connected_addr') || '').toLowerCase();
+
+  // Save in central registry
+  try {
+    const regStr = localStorage.getItem('truevote_voted_events_registry');
+    const reg = regStr ? JSON.parse(regStr) : {};
+    if (evId) reg[evId.toLowerCase()] = receipt;
+    if (votingNum) reg[votingNum.toLowerCase()] = receipt;
+    localStorage.setItem('truevote_voted_events_registry', JSON.stringify(reg));
+  } catch (e) {}
+
+  const keysToSet: string[] = [];
+  if (evId) {
+    keysToSet.push(
+      `truevote_voted_nullifier_${evId}_${voterId}`,
+      `truevote_voted_nullifier_${evId.toLowerCase()}_${voterId}`
+    );
+    if (walletAddr) {
+      keysToSet.push(
+        `truevote_voted_nullifier_${evId}_${walletAddr}`,
+        `truevote_voted_nullifier_${evId.toLowerCase()}_${walletAddr}`,
+        `truevote_wallet_voted_${evId.toLowerCase()}_${walletAddr}`
+      );
+    }
+    try { sessionStorage.setItem(`truevote_voted_${evId.toLowerCase()}`, JSON.stringify(receipt)); } catch (e) {}
+  }
+  if (votingNum) {
+    keysToSet.push(
+      `truevote_voted_nullifier_${votingNum}_${voterId}`,
+      `truevote_voted_nullifier_${votingNum.toLowerCase()}_${voterId}`
+    );
+    if (walletAddr) {
+      keysToSet.push(
+        `truevote_voted_nullifier_${votingNum}_${walletAddr}`,
+        `truevote_voted_nullifier_${votingNum.toLowerCase()}_${walletAddr}`,
+        `truevote_wallet_voted_${votingNum.toLowerCase()}_${walletAddr}`
+      );
+    }
+    try { sessionStorage.setItem(`truevote_voted_${votingNum.toLowerCase()}`, JSON.stringify(receipt)); } catch (e) {}
+  }
+
+  keysToSet.forEach((k) => {
+    try { localStorage.setItem(k, JSON.stringify(receipt)); } catch (e) {}
+  });
+};
+
+// Play cheerful PhonePe / UPI style confirmation chime using Web Audio API
+const playSuccessChime = () => {
+  if (typeof window === 'undefined') return;
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(1046.5, now); // C6
+    gain1.gain.setValueAtTime(0.14, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1567.98, now + 0.11); // G6
+    gain2.gain.setValueAtTime(0.14, now + 0.11);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.11);
+    osc2.stop(now + 0.52);
+  } catch (e) {
+    // AudioContext safely ignored if restricted
+  }
+};
+
 // Convert Date to Indian Standard Time (IST UTC+05:30)
 const getIstCurrentTime = (): Date => {
   const now = new Date();
@@ -258,6 +408,15 @@ export const VotingPage: React.FC = () => {
     const loadEventData = async () => {
       let foundEvent: EventItem | null = null;
 
+      // 0. Immediate Fast-Path Anti-Double-Voting Guard
+      if (targetId) {
+        const initialStatus = checkHasAlreadyVoted(targetId);
+        if (initialStatus.voted) {
+          setHasAlreadyVoted(true);
+          if (initialStatus.receipt) setStoredReceipt(initialStatus.receipt);
+        }
+      }
+
       // 1. Check localStorage first
       const storedEventsStr = localStorage.getItem('truevote_events');
       if (storedEventsStr) {
@@ -304,8 +463,15 @@ export const VotingPage: React.FC = () => {
         }
       }
 
-      // If found locally, immediately show it so there's zero UI latency
+      // If found locally, immediately guard against double-voting before rendering
       if (foundEvent && isMounted) {
+        const checkLocal =
+          checkHasAlreadyVoted(foundEvent.id) ||
+          (foundEvent.votingNumber ? checkHasAlreadyVoted(foundEvent.votingNumber) : { voted: false, receipt: null });
+        if (checkLocal.voted) {
+          setHasAlreadyVoted(true);
+          if (checkLocal.receipt) setStoredReceipt(checkLocal.receipt);
+        }
         setEvent(foundEvent);
         setIsLoading(false);
         setNotFound(false);
@@ -328,6 +494,13 @@ export const VotingPage: React.FC = () => {
           }
           if (isMounted && pinataEvent) {
             foundEvent = pinataEvent;
+            const checkPinata =
+              checkHasAlreadyVoted(pinataEvent.id) ||
+              (pinataEvent.votingNumber ? checkHasAlreadyVoted(pinataEvent.votingNumber) : { voted: false, receipt: null });
+            if (checkPinata.voted) {
+              setHasAlreadyVoted(true);
+              if (checkPinata.receipt) setStoredReceipt(checkPinata.receipt);
+            }
             setEvent(pinataEvent);
             setIsLoading(false);
             setNotFound(false);
@@ -354,6 +527,13 @@ export const VotingPage: React.FC = () => {
           const pinataEvents = await fetchEventsFromPinata();
           if (isMounted && Array.isArray(pinataEvents) && pinataEvents.length > 0) {
             foundEvent = pinataEvents[0];
+            const checkPinata =
+              checkHasAlreadyVoted(pinataEvents[0].id) ||
+              (pinataEvents[0].votingNumber ? checkHasAlreadyVoted(pinataEvents[0].votingNumber) : { voted: false, receipt: null });
+            if (checkPinata.voted) {
+              setHasAlreadyVoted(true);
+              if (checkPinata.receipt) setStoredReceipt(checkPinata.receipt);
+            }
             setEvent(pinataEvents[0]);
             setIsLoading(false);
             setNotFound(false);
@@ -396,6 +576,13 @@ export const VotingPage: React.FC = () => {
             createdAt: new Date().toISOString(),
             timezone: 'IST (UTC+05:30)',
           };
+          const checkDemo =
+            checkHasAlreadyVoted(demoEvent.id) ||
+            (demoEvent.votingNumber ? checkHasAlreadyVoted(demoEvent.votingNumber) : { voted: false, receipt: null });
+          if (checkDemo.voted) {
+            setHasAlreadyVoted(true);
+            if (checkDemo.receipt) setStoredReceipt(checkDemo.receipt);
+          }
           setEvent(demoEvent);
           setIsLoading(false);
           setNotFound(false);
@@ -403,18 +590,15 @@ export const VotingPage: React.FC = () => {
         }
       }
 
-      // Check if voter already voted for this event (No Twice Voting Guard)
+      // Check if voter already voted for this event (Comprehensive Multi-Key Guard)
       if (foundEvent) {
-        const voterId = getAnonymousVoterId();
-        const nullifierKey = `truevote_voted_nullifier_${foundEvent.id}_${voterId}`;
-        const previousReceipt = localStorage.getItem(nullifierKey);
-        if (previousReceipt) {
-          try {
-            setStoredReceipt(JSON.parse(previousReceipt));
-            setHasAlreadyVoted(true);
-          } catch (e) {
-            setHasAlreadyVoted(true);
-          }
+        const checkFinal =
+          checkHasAlreadyVoted(foundEvent.id) ||
+          (foundEvent.votingNumber ? checkHasAlreadyVoted(foundEvent.votingNumber) : { voted: false, receipt: null }) ||
+          (targetId ? checkHasAlreadyVoted(targetId) : { voted: false, receipt: null });
+        if (checkFinal.voted) {
+          setHasAlreadyVoted(true);
+          if (checkFinal.receipt) setStoredReceipt(checkFinal.receipt);
         }
       }
     };
@@ -529,10 +713,13 @@ export const VotingPage: React.FC = () => {
     if (!event) return;
 
     // 2. Double-voting check
-    const voterId = getAnonymousVoterId();
-    const nullifierKey = `truevote_voted_nullifier_${event.id}_${voterId}`;
-    if (localStorage.getItem(nullifierKey)) {
+    const voteCheck =
+      checkHasAlreadyVoted(event.id) ||
+      (event.votingNumber ? checkHasAlreadyVoted(event.votingNumber) : { voted: false, receipt: null }) ||
+      (eventId ? checkHasAlreadyVoted(eventId) : { voted: false, receipt: null });
+    if (voteCheck.voted || hasAlreadyVoted) {
       setHasAlreadyVoted(true);
+      if (voteCheck.receipt) setStoredReceipt(voteCheck.receipt);
       setErrorMessage('Anti-Double Voting Protection: You have already cast an anonymous ballot for this event.');
       return;
     }
@@ -541,6 +728,7 @@ export const VotingPage: React.FC = () => {
 
     try {
       // 3. Generate Cryptographic Nullifier & Anonymous Receipt
+      const voterId = getAnonymousVoterId();
       const nullifierHash = await sha256(`truevote:nullifier:${event.id}:${voterId}:${Date.now()}`);
       const receiptHash = `0x${nullifierHash.substring(0, 32)}`;
       const timestamp = new Date().toISOString();
@@ -650,13 +838,18 @@ export const VotingPage: React.FC = () => {
         timestamp,
         optionLabel,
         eventId: event.id,
+        votingNumber: event.votingNumber,
       };
-      localStorage.setItem(nullifierKey, JSON.stringify(receiptData));
+      recordVotedNullifier(event.id, event.votingNumber, receiptData);
 
       setEvent(updatedEvent);
       setLatestReceipt({ receiptHash, timestamp });
+      setStoredReceipt(receiptData);
       setVoteSuccess(true);
       setHasAlreadyVoted(true);
+
+      // Play PhonePe / UPI confirmation chime
+      playSuccessChime();
     } catch (err) {
       console.error('Error casting vote:', err);
       setErrorMessage('Cryptographic error occurred while signing ballot. Please retry.');
@@ -939,7 +1132,7 @@ export const VotingPage: React.FC = () => {
           {hasAlreadyVoted && !voteSuccess && (
             <div className="already-voted-panel">
               <div className="shield-icon-badge">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   <path d="m9 12 2 2 4-4" />
                 </svg>
@@ -950,50 +1143,74 @@ export const VotingPage: React.FC = () => {
                 Your cryptographic voter nullifier has already been committed for this referendum. In compliance with TrueVote’s anti-double voting protocol, each authorized entity can only cast exactly one ballot.
               </p>
 
-              {storedReceipt && (
-                <div className="receipt-box">
+              <div className="receipt-box">
+                {storedReceipt?.receiptHash && (
                   <div className="receipt-item">
                     <span className="receipt-key">Nullifier Receipt:</span>
                     <code className="receipt-hash">{storedReceipt.receiptHash}</code>
                   </div>
+                )}
+                {storedReceipt?.timestamp && (
                   <div className="receipt-item">
                     <span className="receipt-key">Timestamp:</span>
                     <span className="receipt-val">{new Date(storedReceipt.timestamp).toLocaleString('en-IN')} IST</span>
                   </div>
-                  <div className="receipt-item">
-                    <span className="receipt-key">Cryptographic Status:</span>
-                    <span className="receipt-val status-sealed">Sealed & Verifiable</span>
-                  </div>
+                )}
+                <div className="receipt-item">
+                  <span className="receipt-key">Double-Voting Guard:</span>
+                  <span className="receipt-val status-sealed">Nullifier Committed</span>
                 </div>
-              )}
+                <div className="receipt-item">
+                  <span className="receipt-key">Cryptographic Status:</span>
+                  <span className="receipt-val status-sealed">Sealed & Verifiable</span>
+                </div>
+              </div>
 
               <button
                 type="button"
                 className="btn-blue-pill"
                 onClick={() => navigate('/dashboard')}
-                style={{ marginTop: '20px' }}
+                style={{ marginTop: '22px' }}
               >
-                Return to Dashboard
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                  <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                  <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+                <span>Return to Dashboard</span>
               </button>
             </div>
           )}
 
-          {/* SUCCESSFUL BALLOT CONFIRMATION */}
+          {/* SUCCESSFUL BALLOT CONFIRMATION (PhonePe / UPI Style Animation) */}
           {voteSuccess && latestReceipt && (
-            <div className="vote-success-panel">
-              <div className="success-icon-wrap">
-                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="m9 12 2 2 4-4"></path>
-                </svg>
+            <div className="vote-success-panel phonepe-success-container">
+              <div className="phonepe-animation-wrapper">
+                <div className="phonepe-ripple r1"></div>
+                <div className="phonepe-ripple r2"></div>
+                <div className="phonepe-ripple r3"></div>
+
+                <div className="phonepe-circle-badge">
+                  <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" className="phonepe-check-svg">
+                    <path className="phonepe-check-path" d="m6 12.5 4 4.2 8-8.4" />
+                  </svg>
+                </div>
+
+                <span className="phonepe-sparkle sp-1"></span>
+                <span className="phonepe-sparkle sp-2"></span>
+                <span className="phonepe-sparkle sp-3"></span>
+                <span className="phonepe-sparkle sp-4"></span>
+                <span className="phonepe-sparkle sp-5"></span>
+                <span className="phonepe-sparkle sp-6"></span>
               </div>
 
-              <h2 className="panel-status-title">Ballot Anonymously Cast & Sealed!</h2>
-              <p className="panel-status-desc">
+              <h2 className="panel-status-title phonepe-fade-1">Ballot Anonymously Cast & Sealed!</h2>
+              <p className="panel-status-desc phonepe-fade-2">
                 Your vote was recorded with zero-knowledge anonymity. Your voter identity is disconnected from your selection to guarantee total voter privacy.
               </p>
 
-              <div className="receipt-box">
+              <div className="receipt-box phonepe-fade-3">
                 <div className="receipt-item">
                   <span className="receipt-key">ZKP Receipt Hash:</span>
                   <code className="receipt-hash">{latestReceipt.receiptHash}</code>
@@ -1008,7 +1225,7 @@ export const VotingPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="success-buttons-row">
+              <div className="success-buttons-row phonepe-fade-4">
                 <button
                   type="button"
                   className="btn-blue-pill"
