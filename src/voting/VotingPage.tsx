@@ -696,9 +696,11 @@ export const VotingPage: React.FC = () => {
 
   return (
     <div className="voting-page-wrapper">
-      {/* Background Subtle Gradient Glows */}
-      <div className="voting-glow-ambient voting-glow-top"></div>
-      <div className="voting-glow-ambient voting-glow-bottom"></div>
+      {/* Background Subtle Gradient Glows - Contained to prevent scroll overflow */}
+      <div className="voting-ambient-background" aria-hidden="true">
+        <div className="voting-glow-ambient voting-glow-top"></div>
+        <div className="voting-glow-ambient voting-glow-bottom"></div>
+      </div>
 
       {/* Top Navbar: only logo and real-time clock */}
       <header className="voting-navbar">

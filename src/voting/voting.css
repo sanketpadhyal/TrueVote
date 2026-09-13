@@ -10,19 +10,24 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', Helvetica, Arial, sans-serif;
   position: relative;
   overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
 }
 
-/* Background Ambient Lighting (Pastel Mesh) */
+/* Background Ambient Lighting (Contained so it never creates phantom scrollbars) */
+.voting-ambient-background {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .voting-glow-ambient {
   position: absolute;
   border-radius: 50%;
   filter: blur(120px);
   pointer-events: none;
-  z-index: 0;
 }
 
 .voting-glow-top {
@@ -117,12 +122,12 @@
 .voting-main-container {
   position: relative;
   z-index: 5;
-  flex: 1 0 auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 32px 16px 80px 16px;
+  padding: 32px 16px 40px 16px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -908,7 +913,7 @@
   }
 
   .voting-main-container {
-    padding: 16px 12px 64px 12px;
+    padding: 16px 12px 28px 12px;
     width: 100%;
     box-sizing: border-box;
   }
