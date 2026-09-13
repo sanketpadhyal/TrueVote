@@ -49,6 +49,8 @@ export const getStoredActivities = (): ActivityItem[] => {
   try {
     const allActivities: ActivityItem[] = [];
     const seenIds = new Set<string>();
+    const seenAdminEvents = new Set<string>();
+    const seenBallots = new Set<string>();
 
     const deletedKey = 'truevote_deleted_events';
     const deletedSet = new Set<string>();
@@ -59,6 +61,36 @@ export const getStoredActivities = (): ActivityItem[] => {
       }
     } catch (e) {}
 
+    const isDeleted = (item: any) => {
+      const vNum = item.votingNumber ? String(item.votingNumber).toLowerCase() : '';
+      const id = item.id ? String(item.id).toLowerCase() : '';
+      return (vNum && deletedSet.has(vNum)) || (id && deletedSet.has(id));
+    };
+
+    const registerAdmin = (act: ActivityItem): boolean => {
+      if (act.type !== 'announcement' && !act.userName?.startsWith('Admin')) {
+        return true;
+      }
+      const vKey = act.votingNumber ? String(act.votingNumber).toLowerCase() : '';
+      if (!vKey) return true;
+      if (seenAdminEvents.has(vKey)) {
+        return false;
+      }
+      seenAdminEvents.add(vKey);
+      return true;
+    };
+
+    const registerBallot = (act: any): boolean => {
+      if (act.type === 'ballot' || act.userName?.startsWith('Anonymous Voter')) {
+        const bKey = String(act.receiptHash || act.id || `${act.userName}_${act.votingNumber}`).toLowerCase();
+        if (seenBallots.has(bKey)) {
+          return false;
+        }
+        seenBallots.add(bKey);
+      }
+      return true;
+    };
+
     // 1. Read directly stored activities from localStorage
     const stored = localStorage.getItem('truevote_activities');
     if (stored) {
@@ -67,13 +99,12 @@ export const getStoredActivities = (): ActivityItem[] => {
         if (Array.isArray(parsed)) {
           for (let i = 0; i < parsed.length; i++) {
             const a = parsed[i];
-            const isDel =
-              (a.votingNumber && deletedSet.has(String(a.votingNumber).toLowerCase())) ||
-              (a.id && deletedSet.has(String(a.id).toLowerCase()));
-            if (a && a.id && !seenIds.has(a.id) && !isDel) {
-              seenIds.add(a.id);
-              allActivities.push(a);
-            }
+            if (!a || isDeleted(a)) continue;
+            if (a.id && seenIds.has(a.id)) continue;
+            if (!registerAdmin(a)) continue;
+            if (!registerBallot(a)) continue;
+            if (a.id) seenIds.add(a.id);
+            allActivities.push(a);
           }
         }
       } catch (e) {}
@@ -87,19 +118,18 @@ export const getStoredActivities = (): ActivityItem[] => {
         if (Array.isArray(events)) {
           for (let i = 0; i < events.length; i++) {
             const ev = events[i];
-            const isEvDel =
-              (ev.id && deletedSet.has(String(ev.id).toLowerCase())) ||
-              (ev.votingNumber && deletedSet.has(String(ev.votingNumber).toLowerCase()));
-            if (isEvDel) continue;
+            if (!ev || isDeleted(ev)) continue;
 
             // A. Include embedded recentVotes
             if (Array.isArray(ev.recentVotes)) {
               for (let j = 0; j < ev.recentVotes.length; j++) {
                 const rv = ev.recentVotes[j];
-                if (rv && rv.id && !seenIds.has(rv.id)) {
-                  seenIds.add(rv.id);
-                  allActivities.push(rv);
-                }
+                if (!rv || isDeleted(rv)) continue;
+                if (rv.id && seenIds.has(rv.id)) continue;
+                if (!registerBallot(rv)) continue;
+                if (!registerAdmin(rv)) continue;
+                if (rv.id) seenIds.add(rv.id);
+                allActivities.push(rv);
               }
             }
 
@@ -107,7 +137,10 @@ export const getStoredActivities = (): ActivityItem[] => {
             const castCount = Number(ev.totalVotesCast) || 0;
             let existingBallots = 0;
             for (let k = 0; k < allActivities.length; k++) {
-              if (allActivities[k].type === 'ballot' && allActivities[k].votingNumber === ev.votingNumber) {
+              if (
+                allActivities[k].type === 'ballot' &&
+                String(allActivities[k].votingNumber).toLowerCase() === String(ev.votingNumber).toLowerCase()
+              ) {
                 existingBallots++;
               }
             }
@@ -120,25 +153,30 @@ export const getStoredActivities = (): ActivityItem[] => {
                   seenIds.add(syntheticId);
                   const shortHash = (ev.id + d)
                     .split('')
-                    .reduce((acc, c) => acc + c.charCodeAt(0), 0)
+                    .reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0)
                     .toString(16)
                     .padStart(4, '0')
                     .slice(-4);
-                  allActivities.push({
+                  const synBallot = {
                     id: syntheticId,
                     userName: `Anonymous Voter (#${shortHash})`,
                     votingNumber: ev.votingNumber,
                     date: 'Just now',
                     timestamp: Date.now() - d * 120000,
-                    type: 'ballot',
-                  });
+                    type: 'ballot' as const,
+                  };
+                  if (registerBallot(synBallot)) {
+                    allActivities.push(synBallot);
+                  }
                 }
               }
             }
 
-            // C. Admin creation item
-            const adminId = `act-admin-${ev.id}`;
-            if (!seenIds.has(adminId)) {
+            // C. Admin creation item (strictly one per election)
+            const vKey = ev.votingNumber ? String(ev.votingNumber).toLowerCase() : '';
+            if (vKey && !seenAdminEvents.has(vKey)) {
+              seenAdminEvents.add(vKey);
+              const adminId = `act-admin-${ev.id}`;
               seenIds.add(adminId);
               const walletStr = ev.creatorWallet || '0xf026';
               const shortWallet =

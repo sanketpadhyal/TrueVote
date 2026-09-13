@@ -442,6 +442,9 @@ export const VotingPage: React.FC = () => {
         date: 'Just now',
         timestamp: now,
         type: 'ballot' as const,
+        receiptHash,
+        selectedOptionId,
+        optionLabel,
       };
 
       const existingRecent = (event as any).recentVotes || [];

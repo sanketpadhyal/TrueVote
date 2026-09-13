@@ -243,15 +243,104 @@ async function fetchFromIpfsGateway(cid: string): Promise<any | null> {
   return null;
 }
 
+/**
+ * Reconciles and merges multiple versions of the same election event from IPFS.
+ * Resolves concurrency race conditions when multiple voters vote simultaneously from different devices.
+ */
+export function mergeEventVersions(versions: any[]): any {
+  if (!versions || versions.length === 0) return null;
+  if (versions.length === 1) return versions[0];
+
+  // Sort versions newest first by pinnedAt or createdAt
+  versions.sort((a, b) => {
+    const timeA = new Date(a.pinnedAt || a.createdAt || 0).getTime();
+    const timeB = new Date(b.pinnedAt || b.createdAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  const primary = versions[0];
+
+  // 1. Merge and deduplicate all recentVotes / ballot receipts across all versions
+  const allVotesMap = new Map<string, any>();
+  for (let i = 0; i < versions.length; i++) {
+    const v = versions[i];
+    if (Array.isArray(v.recentVotes)) {
+      for (let j = 0; j < v.recentVotes.length; j++) {
+        const vote = v.recentVotes[j];
+        if (!vote) continue;
+        const key = String(
+          vote.receiptHash || vote.id || `${vote.userName}_${vote.votingNumber}`
+        ).toLowerCase();
+        if (!allVotesMap.has(key)) {
+          allVotesMap.set(key, vote);
+        }
+      }
+    }
+  }
+
+  const mergedVotes: any[] = [];
+  allVotesMap.forEach((v) => mergedVotes.push(v));
+  mergedVotes.sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+
+  // 2. Reconcile options votesCount across all versions & merged ballots
+  const mergedOptions = (primary.options || []).map((opt: any) => {
+    let maxVersionCount = 0;
+    for (let vIdx = 0; vIdx < versions.length; vIdx++) {
+      const v = versions[vIdx];
+      const vOpt = (v.options || []).find(
+        (o: any) =>
+          String(o.id).toLowerCase() === String(opt.id).toLowerCase() ||
+          String(o.label).toLowerCase() === String(opt.label).toLowerCase()
+      );
+      if (vOpt && typeof vOpt.votesCount === 'number') {
+        maxVersionCount = Math.max(maxVersionCount, vOpt.votesCount);
+      }
+    }
+
+    // Count ballots explicitly cast for this option in the merged ballot receipts
+    let ballotsCount = 0;
+    const optId = String(opt.id || '').toLowerCase();
+    const optLabel = String(opt.label || '').toLowerCase();
+
+    for (let k = 0; k < mergedVotes.length; k++) {
+      const vote = mergedVotes[k];
+      const voteOptId = vote.selectedOptionId ? String(vote.selectedOptionId).toLowerCase() : '';
+      const voteOptLabel = vote.optionLabel ? String(vote.optionLabel).toLowerCase() : '';
+      if (
+        (voteOptId && (voteOptId === optId || voteOptId === optLabel)) ||
+        (voteOptLabel && (voteOptLabel === optId || voteOptLabel === optLabel))
+      ) {
+        ballotsCount++;
+      }
+    }
+
+    return {
+      ...opt,
+      votesCount: Math.max(maxVersionCount, ballotsCount),
+    };
+  });
+
+  // 4. Compute totalVotesCast across all options and ballots
+  const sumOptions = mergedOptions.reduce((acc: number, o: any) => acc + (Number(o.votesCount) || 0), 0);
+  let maxReportedTotal = 0;
+  for (let vIdx = 0; vIdx < versions.length; vIdx++) {
+    maxReportedTotal = Math.max(maxReportedTotal, Number(versions[vIdx].totalVotesCast) || 0);
+  }
+  const totalCast = Math.max(mergedVotes.length, sumOptions, maxReportedTotal);
+
+  return {
+    ...primary,
+    options: mergedOptions,
+    totalVotesCast: totalCast,
+    recentVotes: mergedVotes,
+  };
+}
+
 export async function fetchEventsFromPinata(): Promise<any[]> {
   const jwt = process.env.REACT_APP_PINATA_JWT || DEFAULT_JWT;
-  const apiKey = process.env.REACT_APP_PINATA_API_KEY;
-  const secretKey = process.env.REACT_APP_PINATA_SECRET_KEY;
   const events: any[] = [];
-  const seenIds = new Set<string>();
 
   // 1. Try Pinata V3 Files API
-  let v3Success = false;
   try {
     const v3Res = await fetch('https://api.pinata.cloud/v3/files/public?limit=100', {
       headers: {
@@ -259,78 +348,48 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
       },
     });
     if (v3Res.ok) {
-      v3Success = true;
       const json = await v3Res.json();
       const files: any[] = json?.data?.files || [];
       // Sort newest files first
       files.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      // Group all matching IPFS files by votingNumber or event id
+      const eventGroups = new Map<string, any[]>();
 
       for (const file of files) {
         if (file.name && file.name.startsWith('TrueVote-') && file.cid) {
           try {
             const eventData = await fetchFromIpfsGateway(file.cid);
             if (eventData && (eventData.id || eventData.votingNumber)) {
-              const id = String(eventData.id || eventData.votingNumber);
-              if (!seenIds.has(id)) {
-                seenIds.add(id);
-                events.push({
-                  ...eventData,
-                  ipfsFileId: file.id,
-                  ipfsHash: file.cid,
-                  ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
-                });
+              const groupKey = String(eventData.votingNumber || eventData.id).toLowerCase();
+              const eventWithMeta = {
+                ...eventData,
+                ipfsFileId: file.id,
+                ipfsHash: file.cid,
+                ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
+                pinnedAt: file.created_at,
+              };
+              if (!eventGroups.has(groupKey)) {
+                eventGroups.set(groupKey, []);
               }
+              eventGroups.get(groupKey)!.push(eventWithMeta);
             }
           } catch (e) {
             console.warn('Error fetching IPFS file content:', e);
           }
         }
       }
+
+      // Merge all concurrent versions within each election group
+      eventGroups.forEach((versions) => {
+        const merged = mergeEventVersions(versions);
+        if (merged) {
+          events.push(merged);
+        }
+      });
     }
   } catch (err) {
     console.warn('Pinata V3 sync failed:', err);
-  }
-
-  // 2. Only attempt Pinata legacy V1 PinList fallback if V3 failed completely AND API key + secret are available
-  if (!v3Success && events.length === 0 && apiKey && secretKey) {
-    try {
-      const headers: Record<string, string> = {
-        pinata_api_key: apiKey,
-        pinata_secret_api_key: secretKey,
-      };
-
-      const v1Res = await fetch('https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=100', {
-        headers,
-      });
-      if (v1Res.ok) {
-        const json = await v1Res.json();
-        const rows = json?.rows || [];
-        for (const row of rows) {
-          const name = row?.metadata?.name || '';
-          const cid = row?.ipfs_pin_hash;
-          if (name.startsWith('TrueVote-') && cid) {
-            try {
-              const eventData = await fetchFromIpfsGateway(cid);
-              if (eventData && (eventData.id || eventData.votingNumber)) {
-                const id = String(eventData.id || eventData.votingNumber);
-                if (!seenIds.has(id)) {
-                  seenIds.add(id);
-                  events.push({
-                    ...eventData,
-                    ipfsHash: cid,
-                    ipfsUrl: `${PINATA_GATEWAY}${cid}`,
-                  });
-                }
-              }
-            } catch (e) {
-              console.warn('Error fetching V1 pinned IPFS content:', e);
-            }
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('Pinata V1 pinList sync failed:', err);
-    }
   }
 
   return events;
@@ -338,6 +397,7 @@ export async function fetchEventsFromPinata(): Promise<any[]> {
 
 /**
  * Dedicated fast fetch for a specific event by its id or voting number from Pinata IPFS.
+ * Merges concurrent versions from multiple voting devices so no votes are lost.
  */
 export async function fetchEventByIdFromPinata(targetId: string): Promise<any | null> {
   if (!targetId) return null;
@@ -359,17 +419,18 @@ export async function fetchEventByIdFromPinata(targetId: string): Promise<any | 
       // Sort newest first
       files.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-      // If file name has a hint of the targetId or voting number suffix (e.g. 7882), check those first
+      // Prioritize files whose names match target
       const sortedFiles = [...files].sort((a, b) => {
         const aName = (a.name || '').toLowerCase();
         const bName = (b.name || '').toLowerCase();
-        const aHas = aName.includes(cleanTarget) || (idSuffix && aName.includes(idSuffix));
-        const bHas = bName.includes(cleanTarget) || (idSuffix && bName.includes(idSuffix));
+        const aHas = aName.includes(cleanTarget) || (idSuffix && idSuffix.length >= 3 && aName.includes(idSuffix));
+        const bHas = bName.includes(cleanTarget) || (idSuffix && idSuffix.length >= 3 && bName.includes(idSuffix));
         if (aHas && !bHas) return -1;
         if (!aHas && bHas) return 1;
         return 0;
       });
 
+      const matchingVersions: any[] = [];
       for (const file of sortedFiles) {
         if (file.cid) {
           try {
@@ -381,21 +442,26 @@ export async function fetchEventByIdFromPinata(targetId: string): Promise<any | 
               if (
                 evId === cleanTarget ||
                 evNum === cleanTarget ||
-                (idSuffix && evNum.includes(idSuffix)) ||
-                (idSuffix && evId.includes(idSuffix))
+                (idSuffix && idSuffix.length >= 3 && evNum.includes(idSuffix)) ||
+                (idSuffix && idSuffix.length >= 3 && evId.includes(idSuffix))
               ) {
-                return {
+                matchingVersions.push({
                   ...eventData,
                   ipfsFileId: file.id,
                   ipfsHash: file.cid,
                   ipfsUrl: `${PINATA_GATEWAY}${file.cid}`,
-                };
+                  pinnedAt: file.created_at,
+                });
               }
             }
           } catch (e) {
             // continue
           }
         }
+      }
+
+      if (matchingVersions.length > 0) {
+        return mergeEventVersions(matchingVersions);
       }
     }
   } catch (err) {
