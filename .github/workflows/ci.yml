@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Tests & Build
+  test-and-build:
+    name: Run Tests, Coverage & Build (${{ matrix.node-version }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -28,15 +28,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Test Suite
-        run: npm test -- --watchAll=false --passWithNoTests
+      - name: Run Test Suite & Generate Coverage
+        run: npm test -- --watchAll=false --passWithNoTests --coverage
         env:
           CI: true
 
-      - name: Build Application
+      - name: Upload Test Coverage Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage-report-${{ matrix.node-version }}
+          path: coverage/
+          retention-days: 14
+
+      - name: Build Application (Production)
         run: npm run build
         env:
           CI: true
+          GENERATE_SOURCEMAP: false
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
