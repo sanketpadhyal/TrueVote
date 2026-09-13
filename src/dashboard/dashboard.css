@@ -2467,29 +2467,28 @@ input:checked + .slider.round:before {
   border: 1.5px solid #e2e8f0;
   border-radius: 14px;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   position: relative;
   user-select: none;
+  transform: none !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .choice-count-card:hover {
-  background: #ffffff;
-  border-color: #93c5fd;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+  /* Strictly NO hover movement, NO transform, NO hover jump */
+  transform: none !important;
 }
 
 .choice-count-card:active {
-  transform: scale(0.96);
+  transform: none !important;
 }
 
 .choice-count-card.active {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
   border-color: #2563eb !important;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+  transform: none !important;
 }
 
 .choice-count-num {
