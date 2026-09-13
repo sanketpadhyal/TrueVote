@@ -419,21 +419,41 @@ async function generateWalletSignature(manifest: string, walletAddress: string):
         {/* Modal Header: Step Indicator & Smooth Error Accordion */}
         <div className="new-event-modal-header">
           {step <= 4 && (
-            <div className="new-event-steps-indicator">
-              {[1, 2, 3, 4].map((s) => (
-                <div
-                  key={s}
-                  className={`step-dot ${step === s ? 'step-active' : step > s ? 'step-done' : ''}`}
-                  onClick={() => {
-                    if (s < step) {
-                      setErrorMsg('');
-                      setStep(s);
-                    }
-                  }}
-                >
-                  <span className="step-num">{s}</span>
-                </div>
-              ))}
+            <div className="new-event-stepper-wrap">
+              <div className="new-event-steps-indicator">
+                {[1, 2, 3, 4].map((s, idx) => (
+                  <React.Fragment key={s}>
+                    {idx > 0 && (
+                      <div
+                        className={`step-connector ${step > idx ? 'connector-done' : ''}`}
+                      />
+                    )}
+                    <button
+                      type="button"
+                      className={`step-dot ${step === s ? 'step-active' : step > s ? 'step-done' : ''}`}
+                      onClick={() => {
+                        if (s < step) {
+                          setErrorMsg('');
+                          setStep(s);
+                        }
+                      }}
+                      disabled={s > step}
+                      aria-label={`Step ${s}`}
+                    >
+                      {step > s ? (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        <span className="step-num">{s}</span>
+                      )}
+                    </button>
+                  </React.Fragment>
+                ))}
+              </div>
+              <div className="stepper-sublabel">
+                Step {step} of 4 &bull; {step === 1 ? 'Choices' : step === 2 ? 'Quorum' : step === 3 ? 'Schedule' : 'Review'}
+              </div>
             </div>
           )}
 
