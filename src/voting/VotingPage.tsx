@@ -4,6 +4,7 @@ import { EventItem, BallotOption } from '../dashboard/types';
 import { fetchEventByIdFromPinata, fetchEventsFromPinata, uploadEventToPinata } from '../services/pinata';
 import { loadEventsFromBackup, saveEventsToBackup } from '../services/storage';
 import { detectSafeEnvironment } from '../security/detectenv';
+import { checkRateLimit, recordSuccessfulVote } from '../security/ratelimit';
 import './voting.css';
 
 async function sha256(message: string): Promise<string> {
@@ -707,6 +708,12 @@ export const VotingPage: React.FC = () => {
 
     if (!event) return;
 
+    const rateStatus = await checkRateLimit(event.id);
+    if (!rateStatus.allowed) {
+      setErrorMessage(rateStatus.reason || 'Rate limit exceeded. Please wait before submitting again.');
+      return;
+    }
+
     const voteCheck =
       checkHasAlreadyVoted(event.id) ||
       (event.votingNumber ? checkHasAlreadyVoted(event.votingNumber) : { voted: false, receipt: null }) ||
@@ -826,6 +833,7 @@ export const VotingPage: React.FC = () => {
         votingNumber: event.votingNumber,
       };
       recordVotedNullifier(event.id, event.votingNumber, receiptData);
+      recordSuccessfulVote(event.id).catch(() => {});
 
       setEvent(updatedEvent);
       setLatestReceipt({ receiptHash, timestamp });
