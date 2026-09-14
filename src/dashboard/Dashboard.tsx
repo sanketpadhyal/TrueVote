@@ -51,8 +51,10 @@ export const Dashboard: React.FC = () => {
 
   const handleConfirmLogout = () => {
     localStorage.removeItem('truevote_connected_wallet');
+    localStorage.removeItem('truevote_wallet_connected_addr');
     sessionStorage.clear();
     setIsLogoutModalOpen(false);
+    window.dispatchEvent(new Event('truevote_wallet_disconnected'));
     window.location.href = '/';
   };
 

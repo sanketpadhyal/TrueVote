@@ -40,11 +40,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onConnect
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('truevote_connected_wallet');
-    if (saved) {
-      setAccount(saved);
-      setStatus('connected');
-    }
+    const handleSync = () => {
+      const saved = localStorage.getItem('truevote_connected_wallet');
+      if (saved) {
+        setAccount(saved);
+        setStatus('connected');
+      } else {
+        setAccount(null);
+        setStatus('idle');
+      }
+    };
+    handleSync();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('truevote_wallet_disconnected', handleSync);
+    window.addEventListener('truevote_wallet_changed', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('truevote_wallet_disconnected', handleSync);
+      window.removeEventListener('truevote_wallet_changed', handleSync);
+    };
   }, []);
 
   useEffect(() => {
