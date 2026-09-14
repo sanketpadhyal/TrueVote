@@ -56,7 +56,8 @@ TrueVote runs entirely in the browser and requires zero server configuration, ma
 - When a vote is cast, the nullifier receipt is permanently recorded in browser storage and IndexedDB.
 - If the voter returns to the voting page, TrueVote detects the nullifier and replaces candidate selection with an immutable "Ballot Already Cast" confirmation state.
 
-### 3. Real Anti-Bot Heuristics & Cloudflare Turnstile
+### 3. Real Anti-Bot Heuristics, Incognito Detection & Cloudflare Turnstile
+- Incognito & Private Mode Detection: Automatically detects private browsing across Chromium, Safari, Firefox, and Edge via memory/storage heuristics. If detected, voting is blocked to prevent Sybil attacks and session isolation tampering.
 - Cloudflare Turnstile Widget: Embedded proof-of-humanity challenge verifies legitimate traffic.
 - Automated Test Runner Detection: Checks `navigator.webdriver` to immediately block headless browser drivers (Selenium, Puppeteer, Playwright).
 - Human Entropy Verification: Requires genuine cursor movement (`mousemove`) or mobile touch taps (`touchstart`) before the challenge unlocks, blocking programmatic click scripts.
@@ -226,6 +227,7 @@ The production bundle will be generated in the `build/` folder.
 | Walletless Voting Mode | Fully Operational |
 | Client-Side SHA-256 Nullifiers | Fully Operational |
 | Revote Prevention & Session Locking | Fully Operational |
+| Incognito & Unsafe Browser Guard | Fully Operational |
 | Cloudflare Turnstile Anti-Bot | Fully Operational |
 | Headless Webdriver Bot Detection | Fully Operational |
 | Human Cursor/Touch Entropy Checks | Fully Operational |
