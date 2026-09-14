@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { EventItem, BallotOption } from '../dashboard/types';
 import { fetchEventByIdFromPinata, fetchEventsFromPinata, uploadEventToPinata } from '../services/pinata';
 import { loadEventsFromBackup, saveEventsToBackup } from '../services/storage';
+import { detectSafeEnvironment } from '../security/detectenv';
 import './voting.css';
 
 async function sha256(message: string): Promise<string> {
@@ -261,7 +262,24 @@ export const VotingPage: React.FC = () => {
   const [latestReceipt, setLatestReceipt] = useState<{ receiptHash: string; timestamp: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  const [isIncognitoBlocked, setIsIncognitoBlocked] = useState<boolean>(false);
+  const [incognitoReason, setIncognitoReason] = useState<string>('');
+
   const [currentTimeIst, setCurrentTimeIst] = useState<string>('');
+
+  useEffect(() => {
+    let isMounted = true;
+    detectSafeEnvironment().then((res) => {
+      if (!isMounted) return;
+      if (!res.isSafe && res.isIncognito) {
+        setIsIncognitoBlocked(true);
+        setIncognitoReason(res.reason || 'Private/Incognito browsing mode detected');
+      }
+    }).catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const updateClock = () => {
@@ -640,6 +658,21 @@ export const VotingPage: React.FC = () => {
       );
       return;
     }
+
+    if (isIncognitoBlocked) {
+      setErrorMessage("not safe browser u cant vote here");
+      return;
+    }
+
+    try {
+      const envCheck = await detectSafeEnvironment();
+      if (!envCheck.isSafe && envCheck.isIncognito) {
+        setIsIncognitoBlocked(true);
+        setIncognitoReason(envCheck.reason || 'Private/Incognito browsing mode detected');
+        setErrorMessage("not safe browser u cant vote here");
+        return;
+      }
+    } catch (ignore) {}
 
     if (honeypotVal.trim() !== '') {
       setErrorMessage('Security Exception: Bot behavior detected (honeypot trap triggered).');
@@ -1185,7 +1218,50 @@ export const VotingPage: React.FC = () => {
             </div>
           )}
 
-          {!hasAlreadyVoted && !voteSuccess && (
+          {isIncognitoBlocked && !voteSuccess && !hasAlreadyVoted && (
+            <div className="incognito-blocked-panel" data-testid="incognito-blocked-panel">
+              <div className="incognito-illus-wrapper">
+                <img
+                  src={`${process.env.PUBLIC_URL || ''}/images/istockphoto-1018127028-612x612.jpg`}
+                  alt="not safe browser u cant vote here"
+                  className="incognito-blocked-illus"
+                />
+              </div>
+
+              <h2 className="panel-status-title incognito-blocked-title">
+                not safe browser u cant vote here
+              </h2>
+              <p className="panel-status-desc incognito-blocked-desc">
+                Incognito / Private browsing mode detected. For election security, double-voting prevention, and cryptographic integrity, voting is strictly disabled in incognito or unsafe browser environments.
+              </p>
+
+              <div className="incognito-warning-card">
+                <div className="incognito-warning-row">
+                  <span className="incognito-warning-label">Security Flag:</span>
+                  <span className="incognito-warning-val">{incognitoReason || 'Incognito / Private Browsing Detected'}</span>
+                </div>
+                <div className="incognito-warning-row">
+                  <span className="incognito-warning-label">Status:</span>
+                  <span className="incognito-warning-val status-blocked">Voting Blocked</span>
+                </div>
+                <div className="incognito-warning-row">
+                  <span className="incognito-warning-label">Required Action:</span>
+                  <span className="incognito-warning-val">Please switch to a regular browser window to participate.</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn-blue-pill"
+                onClick={() => navigate('/dashboard')}
+                style={{ marginTop: '22px' }}
+              >
+                <span>Return to Dashboard</span>
+              </button>
+            </div>
+          )}
+
+          {!hasAlreadyVoted && !voteSuccess && !isIncognitoBlocked && (
             <div className="ballot-form-section">
               {errorMessage && (
                 <div className="voting-error-box">
