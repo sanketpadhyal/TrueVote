@@ -1,14 +1,9 @@
-/**
- * TrueVote Browser Environment & Incognito Detection Engine
- * Detects private browsing / incognito windows across Chromium, Safari, Firefox, and Edge.
- */
-
 export async function detectIncognito() {
   if (typeof window === 'undefined') {
     return { isPrivate: false, browserName: 'Server' };
   }
 
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     let browserName = 'Unknown';
     let settled = false;
 
@@ -18,7 +13,6 @@ export async function detectIncognito() {
       resolve({ isPrivate: Boolean(isPrivate), browserName: name });
     }
 
-    // Timeout safety fallback (max 1200ms)
     setTimeout(() => {
       finish(false);
     }, 1200);
@@ -42,29 +36,25 @@ export async function detectIncognito() {
 
     function identifyChromium() {
       if (navigator.brave !== undefined) return 'Brave';
-      if (/Edg\//.test(ua)) return 'Edge';
-      if (/OPR\//.test(ua)) return 'Opera';
-      if (/Chrome\//.test(ua)) return 'Chrome';
+      if (ua.includes('Edg/')) return 'Edge';
+      if (ua.includes('OPR/')) return 'Opera';
+      if (ua.includes('Chrome/')) return 'Chrome';
       return 'Chromium';
     }
 
-    // 1. Safari Private Browsing Test
-    if (isSafari || (/Safari/.test(ua) && !/Chrome/.test(ua))) {
+    if (isSafari || (ua.includes('Safari') && !ua.includes('Chrome'))) {
       browserName = 'Safari';
       try {
         if (navigator.storage && typeof navigator.storage.getDirectory === 'function') {
-          try {
-            await navigator.storage.getDirectory();
-            finish(false);
-            return;
-          } catch (e) {
-            const msg = (e && e.message) ? String(e.message) : String(e);
-            finish(msg.includes('unknown transient reason') || msg.includes('Security'));
-            return;
-          }
+          navigator.storage.getDirectory()
+            .then(() => finish(false))
+            .catch((e) => {
+              const msg = (e && e.message) ? String(e.message) : String(e);
+              finish(msg.includes('unknown transient reason') || msg.includes('Security'));
+            });
+          return;
         }
 
-        // Secondary Safari test via IndexedDB blob support
         const testDbName = '__safari_priv_' + Math.random().toString(36).substring(2);
         const req = window.indexedDB.open(testDbName, 1);
         req.onupgradeneeded = (ev) => {
@@ -97,20 +87,17 @@ export async function detectIncognito() {
       }
     }
 
-    // 2. Firefox Private Browsing Test
-    if (isFirefox || /Firefox\//.test(ua)) {
+    if (isFirefox || ua.includes('Firefox')) {
       browserName = 'Firefox';
       try {
         if (navigator.storage && typeof navigator.storage.getDirectory === 'function') {
-          try {
-            await navigator.storage.getDirectory();
-            finish(false);
-            return;
-          } catch (e) {
-            const msg = (e && e.message) ? String(e.message) : String(e);
-            finish(msg.includes('Security error') || msg.includes('Security'));
-            return;
-          }
+          navigator.storage.getDirectory()
+            .then(() => finish(false))
+            .catch((e) => {
+              const msg = (e && e.message) ? String(e.message) : String(e);
+              finish(msg.includes('Security error') || msg.includes('Security'));
+            });
+          return;
         }
 
         const req = window.indexedDB.open('__ff_private_test');
@@ -136,26 +123,29 @@ export async function detectIncognito() {
       }
     }
 
-    // 3. Chrome / Chromium / Edge / Brave / Opera
-    if (isChrome || /Chrome|Chromium|CriOS/.test(ua)) {
+    if (isChrome || ua.includes('Chrome') || ua.includes('Chromium') || ua.includes('CriOS')) {
       browserName = identifyChromium();
 
-      // Check A: Storage Quota Heuristic (Chrome Incognito limits quota strictly)
       if (navigator.storage && navigator.storage.estimate) {
-        try {
-          const estimate = await navigator.storage.estimate();
+        navigator.storage.estimate().then((estimate) => {
           if (estimate && typeof estimate.quota === 'number') {
-            // In Chrome incognito, quota is capped to a fraction of RAM (typically <= 4GB or <= 120MB)
-            // On desktop/mobile with normal disk, quota is typically >= 10GB - 500GB.
             if (estimate.quota < 120000000) {
               finish(true);
               return;
             }
           }
-        } catch (ignore) {}
+          runChromiumTiming();
+        }).catch(() => {
+          runChromiumTiming();
+        });
+        return;
       }
 
-      // Check B: LevelDB Durability timing test for Chromium
+      runChromiumTiming();
+      return;
+    }
+
+    function runChromiumTiming() {
       try {
         if (window.indexedDB) {
           const dbName = '__cr_priv_' + Math.random().toString(36).substring(2);
@@ -212,7 +202,6 @@ export async function detectIncognito() {
                 db.close();
                 try { window.indexedDB.deleteDatabase(dbName); } catch (ignore) {}
                 const medianRatio = ratios[Math.floor(ratios.length / 2)];
-                // Median ratio < 1.3 indicates in-memory LevelDB (Incognito)
                 finish(medianRatio < 1.3);
               } catch (err) {
                 db.close();
@@ -220,7 +209,6 @@ export async function detectIncognito() {
                 finish(false);
               }
             })();
-            return;
           };
           return;
         }
@@ -228,23 +216,18 @@ export async function detectIncognito() {
         finish(false);
         return;
       }
+      finish(false);
     }
 
-    // Default fallback
     finish(false);
   });
 }
 
-/**
- * Checks overall browser environment safety for voting.
- * Returns { isSafe: boolean, isIncognito: boolean, isAutomated: boolean, reason: string }
- */
 export async function detectSafeEnvironment() {
   if (typeof window === 'undefined') {
     return { isSafe: true, isIncognito: false, isAutomated: false, reason: '' };
   }
 
-  // 1. Check for automated webdriver runners (Selenium, Puppeteer, Playwright)
   if (navigator.webdriver) {
     return {
       isSafe: false,
@@ -254,7 +237,6 @@ export async function detectSafeEnvironment() {
     };
   }
 
-  // 2. Check for Incognito / Private Browsing mode
   try {
     const incognitoResult = await detectIncognito();
     if (incognitoResult.isPrivate) {
@@ -266,11 +248,8 @@ export async function detectSafeEnvironment() {
         browserName: incognitoResult.browserName,
       };
     }
-  } catch (err) {
-    // If detection fails, don't falsely block regular users
-  }
+  } catch (err) {}
 
-  // 3. Check for available local storage and IndexedDB
   try {
     const testKey = '__tv_env_test__';
     window.localStorage.setItem(testKey, '1');

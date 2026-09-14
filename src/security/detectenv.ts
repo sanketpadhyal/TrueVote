@@ -49,14 +49,13 @@ export async function detectIncognito(): Promise<IncognitoDetectionResult> {
 
     function identifyChromium(): string {
       if ((navigator as any).brave !== undefined) return 'Brave';
-      if (/Edg\//.test(ua)) return 'Edge';
-      if (/OPR\//.test(ua)) return 'Opera';
-      if (/Chrome\//.test(ua)) return 'Chrome';
+      if (ua.includes('Edg/')) return 'Edge';
+      if (ua.includes('OPR/')) return 'Opera';
+      if (ua.includes('Chrome/')) return 'Chrome';
       return 'Chromium';
     }
 
-    // 1. Safari Private Browsing Test
-    if (isSafari || (/Safari/.test(ua) && !/Chrome/.test(ua))) {
+    if (isSafari || (ua.includes('Safari') && !ua.includes('Chrome'))) {
       browserName = 'Safari';
       try {
         if (navigator.storage && typeof (navigator.storage as any).getDirectory === 'function') {
@@ -101,8 +100,7 @@ export async function detectIncognito(): Promise<IncognitoDetectionResult> {
       }
     }
 
-    // 2. Firefox Private Browsing Test
-    if (isFirefox || /Firefox\//.test(ua)) {
+    if (isFirefox || ua.includes('Firefox')) {
       browserName = 'Firefox';
       try {
         if (navigator.storage && typeof (navigator.storage as any).getDirectory === 'function') {
@@ -138,8 +136,7 @@ export async function detectIncognito(): Promise<IncognitoDetectionResult> {
       }
     }
 
-    // 3. Chrome / Chromium / Edge / Brave / Opera
-    if (isChrome || /Chrome|Chromium|CriOS/.test(ua)) {
+    if (isChrome || ua.includes('Chrome') || ua.includes('Chromium') || ua.includes('CriOS')) {
       browserName = identifyChromium();
 
       if (navigator.storage && navigator.storage.estimate) {
@@ -264,9 +261,7 @@ export async function detectSafeEnvironment(): Promise<EnvironmentCheckResult> {
         browserName: incognitoResult.browserName,
       };
     }
-  } catch (err) {
-    // Graceful fallback
-  }
+  } catch (err) {}
 
   try {
     const testKey = '__tv_env_test__';
