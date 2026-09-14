@@ -7,7 +7,7 @@
 <h1 align="center">TrueVote</h1>
 
 <p align="center">
-  A decentralized, privacy-preserving Web3 voting platform with zero-knowledge nullifiers, Cloudflare Turnstile bot resistance, and IPFS persistence.
+  An open-source, privacy-focused Web3 voting web application with cryptographic voter nullifiers, Cloudflare Turnstile anti-bot verification, and decentralized IPFS storage.
 </p>
 
 <p align="center">
@@ -15,149 +15,105 @@
 </p>
 
 <p align="center">
-  Open-Source Web3 Hackathon Project &middot; Free for anyone to use, deploy, and customize.
+  Open-Source Web3 Hackathon Project &middot; Free for anyone to use, self-host, and customize.
 </p>
 
 > [!IMPORTANT]
-> TrueVote provides client-side zero-knowledge proof (ZKP) nullifier verification and browser-level anti-bot entropy heuristics. Votes are cryptographically bound to voter credentials without exposing their identity on the blockchain or decentralized storage.
+> TrueVote is an open-source Web3 hackathon project. Anyone can freely use this platform, run elections, clone the repository, or customize it for their own DAOs, universities, clubs, or community votes. No backend server setup is needed.
 
 > [!IMPORTANT]
-> Live ballot audits and decentralized pinning are powered by IPFS and Pinata Dedicated Gateways. Once cast, cryptographic election records cannot be altered or retroactively manipulated.
-
-## Key Features & Highlights
-
-TrueVote is a modern decentralized Web3 voting application built with cryptographic voter nullifiers, strict revote locking across browser sessions, real headless bot heuristics with human entropy verification, dynamic frontrunner tracking pills, dual IndexedDB and Pinata IPFS synchronization, and an optimized O(N) production architecture.
-
-### Major Highlights
-
-- Cryptographic Voter Nullifiers: Client-side deterministic SHA-256 nullifiers enforce the one-person-one-vote rule without exposing voter identities or wallet addresses.
-- Strict Revote Locking & One-Vote Enforcement: Dynamic cryptographic nullifier verification prevents double voting. Once a ballot is sealed, IndexedDB and browser storage persist the voter lock, replacing ballot selection with an immutable confirmation state upon return.
-- Real Headless Bot Heuristics & Human Entropy: Native Cloudflare Turnstile integration augmented with client-side automated test runner detection (`navigator.webdriver`) and human entropy tracking (requiring genuine cursor movement or touch tap gestures prior to challenge resolution).
-- Real-Time Leading Candidate Pill: High-performance O(N) tally calculation with a dynamic "Leading" pill badge highlighting the frontrunner across active voting ballots and administrative analytics tables.
-- Dual IndexedDB & Pinata IPFS Synchronization: Client-side persistence using IndexedDB (`truevote_persistence_db`) paired with automated JSON pinning to Pinata IPFS V3 dedicated gateways for decentralized record immutability.
-- Cleaned Production Architecture: Strict O(N) data processing algorithms, optimized re-render trees, zero development comments, and sanitized production builds.
-
----
+> Privacy First: Voter identities and wallet addresses are never linked to candidate choices. Every cast vote produces a deterministic cryptographic nullifier hash that prevents double voting while keeping the voter's ballot confidential.
 
 ## About TrueVote
 
-TrueVote is an open-source Web3 hackathon project engineered to deliver anonymous, verifiable, and tamper-proof electronic voting. Anyone can freely use, fork, deploy, or customize TrueVote for DAOs, student councils, community elections, or corporate polls.
+TrueVote is an open-source Web3 hackathon project created to make electronic voting transparent, anonymous, and tamper-resistant without requiring heavy infrastructure or platform accounts.
 
-Traditional electronic voting systems rely on centralized databases vulnerable to insider manipulation, single points of failure, and voter de-anonymization. TrueVote eliminates these vulnerabilities through a hybrid cryptographic architecture:
+Most conventional voting systems store votes in a central database where administrators can alter records, view who voted for whom, or suffer from database downtime. TrueVote solves this right in the browser using three core building blocks:
 
-1. Anonymous Participation: Voters can participate using Web3 wallets (MetaMask) or zero-credential walletless mode without creating platform accounts.
-2. Cryptographic Voter Nullifiers: Client-side deterministic hashes ensure one-person-one-vote enforcement without recording personal identities or wallet addresses alongside ballot choices.
-3. Decentralized Storage: Election manifests, candidate configurations, and vote tallies are pinned directly to IPFS via Pinata Dedicated Gateways, creating a permanent, audit-ready paper trail.
-4. Bot Resistance: Client-side heuristics and Cloudflare Turnstile protect public election links from automated submission scripts, headless Selenium/Puppeteer bots, and Sybil flooding.
-5. Open Source & Zero Server Overhead: Designed so anyone can run independent elections directly from the browser with no dedicated backend server required.
+1. Cryptographic Voter Nullifiers: Instead of storing voter identities alongside ballot selections, TrueVote derives a deterministic SHA-256 nullifier for each voter. This guarantees one vote per person while keeping candidate selections private.
+2. Anti-Bot & Proof of Humanity: Public voting links are protected by Cloudflare Turnstile, browser automation detection (`navigator.webdriver`), and human entropy tracking (requiring genuine mouse or touch movements before voting).
+3. Decentralized IPFS Storage: When an election is created or a vote is submitted, the record is backed up in browser IndexedDB and pinned to IPFS through Pinata Dedicated Gateways, creating a decentralized and auditable trail.
 
-## Open Source & Community Use
+## Who Can Use TrueVote?
 
-TrueVote is an open-source hackathon project built for public use. Anyone is free to use, self-host, fork, or build upon this codebase:
+TrueVote runs entirely in the browser and requires zero server configuration, making it accessible to anyone:
 
-- DAOs & Decentralized Communities: Conduct transparent governance votes and community sentiment polling.
-- Student Councils & Campus Elections: Run anonymous school or university elections with verifiable outcomes.
-- Hackathons & Events: Collect live participant and audience votes without collecting personal data.
-- Organizations & Clubs: Host leadership elections, board polling, and straw votes.
+- DAOs & Web3 Communities: Run community sentiment polls, grant selections, and governance referendums.
+- Student Councils & Universities: Host anonymous campus elections where students vote securely with zero data harvesting.
+- Hackathons & Conferences: Allow attendees and judges to vote on project presentations in real time.
+- Clubs & Organizations: Run leadership elections, committee votes, and straw polls.
+- Developers & Students: Study how client-side Web3 authentication, IPFS pinning, and anti-bot verification work together in a modern React app.
 
-## What You Can Do
+## Core Features
 
-### Anonymous Voting
+### 1. Anonymous Voting (Wallet & Walletless)
+- Voters can participate using MetaMask (EIP-1193 Web3 provider) or directly in walletless mode.
+- No personal sign-up, email, or passwords required.
+- Ballot choices are decoupled from voter identity to protect confidentiality.
 
-- Cast confidential ballots on active elections without registering personal details.
-- Generate client-side cryptographic voter nullifiers to prevent duplicate submissions.
-- Receive a deterministic transaction hash and cryptographic verification receipt upon submission.
-- View immediate on-screen cryptographic confirmation and ballot audit details upon submission.
+### 2. Double-Voting Prevention (Cryptographic Nullifiers)
+- Each voter session generates a unique deterministic SHA-256 nullifier hash (`truevote:nullifier:<eventId>:<voterId>:<timestamp>`).
+- When a vote is cast, the nullifier receipt is permanently recorded in browser storage and IndexedDB.
+- If the voter returns to the voting page, TrueVote detects the nullifier and replaces candidate selection with an immutable "Ballot Already Cast" confirmation state.
 
-### Web3 & Walletless Modes
+### 3. Real Anti-Bot Heuristics & Cloudflare Turnstile
+- Cloudflare Turnstile Widget: Embedded proof-of-humanity challenge verifies legitimate traffic.
+- Automated Test Runner Detection: Checks `navigator.webdriver` to immediately block headless browser drivers (Selenium, Puppeteer, Playwright).
+- Human Entropy Verification: Requires genuine cursor movement (`mousemove`) or mobile touch taps (`touchstart`) before the challenge unlocks, blocking programmatic click scripts.
 
-- Connect via MetaMask or standard Web3 browser providers (EIP-1193).
-- Utilize walletless mode where voter nullifiers are derived from secure browser entropy and session salt.
-- Switch between decentralized networks without losing local election state.
+### 4. Decentralized IPFS Archival via Pinata
+- When an organizer creates an election, its manifest (title, description, candidate options, end time) is pinned to IPFS using Pinata's REST API (V3 endpoints with legacy fallback).
+- When votes are submitted, tallies are updated and re-pinned with high availability on Pinata Dedicated Gateways.
+- Every election includes an IPFS Content Identifier (CID) for independent verification.
 
-### Anti-Bot & Proof of Humanity
+### 5. Offline Resiliency with IndexedDB
+- Uses a local IndexedDB database (`truevote_persistence_db`) to store all election events, candidate tallies, and voter nullifiers.
+- Data persists across browser refreshes, restarts, and temporary offline periods.
 
-- Automatic challenge verification powered by Cloudflare Turnstile.
-- Headless runner detection intercepting automated test drivers (`navigator.webdriver`).
-- Human entropy tracking requiring authentic mouse gestures (`mousemove`) or mobile touch taps (`touchstart`).
-- Automatic bot blocking with contextual security exceptions.
+### 6. Real-Time Cross-Tab Synchronization
+- Uses the HTML5 `BroadcastChannel` API (`truevote_events_channel`).
+- When a vote is cast or an election status is toggled (paused/resumed) in one tab, all open organizer dashboards in other tabs update instantly without refreshing.
 
-### Election Administration & Analytics
+### 7. Live Leader Pill & Analytics Modal
+- An optimized O(N) tally calculator continuously tracks the frontrunning option and displays a live "Leading" pill badge on active ballots and dashboard tables.
+- The Realtime Analytics modal displays turnout percentages, vote share distribution bars, and candidate counts.
 
-- Create custom elections with flexible candidate lists, descriptions, and duration limits.
-- Monitor live turnout rates, percentage breakdowns, and total vote tallies.
-- Track real-time election frontrunners through automated leader badges.
-- Pause, resume, or close elections with instant cross-tab propagation via BroadcastChannel.
-- Pin election data directly to Pinata IPFS with dedicated gateway retrieval URLs.
+## How TrueVote Works
 
-## Voter & Election Lifecycle
+1. Create Election: The organizer opens the Dashboard (`/dashboard`) and clicks "Create Event". They define the title, description, category, expiration time, and candidates. TrueVote generates a unique 6-digit voting code, saves the event locally in IndexedDB, and pins it to Pinata IPFS.
+2. Share Link or Code: The organizer shares the election link (`/vote/:id`) or the 6-digit voting code with participants.
+3. Anti-Bot Verification: When the voter opens the ballot, TrueVote verifies human presence through mouse/touch entropy checks and Cloudflare Turnstile.
+4. Cast Ballot: The voter selects a candidate and confirms.
+5. Generate Nullifier & Seal: TrueVote computes the SHA-256 nullifier hash, increments the candidate's tally, updates the IPFS pin, and locks that voter session in IndexedDB and localStorage.
+6. Real-Time Dashboard Sync: The organizer's dashboard receives an instant message via `BroadcastChannel`, updating live results and leader badges with zero latency.
 
-1. Election Creation: The organizer creates an election on the Organizer Dashboard, defining candidate options, end times, and voting parameters. The event is saved to IndexedDB and pinned to IPFS.
-2. Link Distribution: The organizer shares the election link or 6-digit voting code with eligible voters.
-3. Bot & Entropy Verification: The voter opens the voting page. TrueVote runs headless runner checks and listens for genuine human cursor or touch interactions before resolving Cloudflare Turnstile.
-4. Candidate Selection: The voter reviews candidates, real-time leading candidate badges, and select their preferred choice.
-5. Nullifier Generation & Submission: TrueVote computes the client-side voter nullifier, verifies eligibility, increments the candidate tally, and pins the updated record to IPFS.
-6. Ballot Confirmation & Revote Lock: The ballot is cryptographically confirmed and sealed. The voter lock is persisted in IndexedDB and browser storage to block subsequent submissions.
+## Main Pages & Views
 
-## Main App Areas
-
-| Area | Purpose |
-| --- | --- |
-| Landing (`/`) | Product overview, cryptographic guarantees, feature highlights, and navigation entry |
-| Dashboard (`/dashboard`) | Election management, event tables, KPI statistics, pause/quit actions, and IPFS status |
-| New Event Modal | Step-by-step form to launch new elections with candidate configurations and IPFS pinning |
-| Voting Page (`/vote/:id`) | Voter interface featuring candidate selection, leader pill, Turnstile challenge, and submission |
-| Ballot Confirmation Screen | Real-time confirmation displaying transaction hash, voter nullifier, and IPFS audit status |
-| Realtime Analytics Modal | Modal displaying vote share percentages, leading candidate badges, and total voter turnout |
-
-## Cryptographic & Security Architecture
-
-### Zero-Knowledge Voter Nullifiers
-
-To enforce the one-person-one-vote rule without compromising anonymity, TrueVote utilizes deterministic client-side nullifier hashing:
-
-- A unique nullifier is derived using SHA-256 over the election identifier, voter salt, and entropy signature.
-- The nullifier is recorded in the election manifest to verify ballot uniqueness.
-- The voter's underlying identity or wallet address is never linked to the selected candidate index, ensuring privacy.
-
-### Headless Bot Detection & Human Entropy
-
-TrueVote implements client-side behavioral heuristics to ensure genuine human participation:
-
-- `navigator.webdriver` Verification: Immediately flags automated test runners (e.g., Selenium, Puppeteer, Playwright).
-- Human Entropy Tracking: Listens for authentic pointer movements (`mousemove`) or touch inputs (`touchstart`) with non-zero coordinate variance before enabling Turnstile completion.
-- Re-challenge Threshold: Repeated automated attempts result in locked ballot states and security alert banners.
-
-### Decentralized Storage & Ledger Replication
-
-- IPFS Content Addressing: Election manifests and ballot records are uploaded as JSON documents via Pinata IPFS V3 endpoints.
-- Pinata Dedicated Gateway: Content retrieval runs through high-availability Pinata gateways with fallback failover.
-- IndexedDB Backup: Browser sessions synchronize election data into a local IndexedDB store (`truevote_persistence_db`) for offline resiliency.
-- Cross-Tab BroadcastChannel: Multi-window dashboard sessions maintain state synchronization in real time via `BroadcastChannel('truevote_events_channel')`.
-
-## Supported Networks & Storage
-
-| Layer | Provider / Standard | Status |
+| Page / Component | Route | Description |
 | --- | --- | --- |
-| Web3 Provider | MetaMask (EIP-1193 / `window.ethereum`) | Supported |
-| Decentralized Storage | Pinata IPFS (V3 REST API & Dedicated Gateway) | Supported |
-| Local Backup | IndexedDB (`truevote_persistence_db`) | Supported |
-| Tab Synchronization | HTML5 BroadcastChannel API | Supported |
-| Anti-Bot Service | Cloudflare Turnstile & Heuristic Entropy Engine | Supported |
+| Landing Page | `/` | Overview of TrueVote, quick 6-digit code voter entry, platform features, and FAQ |
+| Organizer Dashboard | `/dashboard` | Election management table, KPI statistics cards, status filters, and IPFS status |
+| New Event Modal | Modal in `/dashboard` | Form to configure candidates, dates, categories, and pin new elections to IPFS |
+| Voting Page | `/vote/:id` | Voter ballot with candidate selection, live leader pill, and Turnstile challenge |
+| Ballot Confirmation | In `/vote/:id` | Post-vote confirmation displaying nullifier hash, transaction receipt, and IPFS status |
+| Realtime Analytics Modal | Modal in `/dashboard` | Detailed vote share percentages, rank badges, and total voter turnout |
 
 ## Technical Stack
 
-| Area | Technology | Version |
+| Category | Technology | Purpose |
 | --- | --- | --- |
-| UI Framework | React | `19.3.0` |
-| Web Routing | React Router DOM | `7.18.3` |
-| Language | TypeScript | `4.9.5` |
-| Build Tool | Create React App / React Scripts | `5.0.1` |
-| Smooth Scrolling | Lenis | `1.3.26` |
-| Decentralized Storage | Pinata IPFS REST API | V3 / Legacy Fallback |
-| Local Database | IndexedDB | Standard Level 2 |
-| Unit & Integration Testing | Jest & React Testing Library | `16.3.3` |
-| DOM Assertions | Jest-DOM | `6.9.1` |
+| UI Framework | React `19.3.0` | Component-based user interface |
+| Programming Language | TypeScript `4.9.5` | Type-safe application logic |
+| Routing | React Router DOM `7.18.3` | Client-side page navigation |
+| Build Tool | Create React App / React Scripts `5.0.1` | Application bundler and build pipeline |
+| Smooth Scrolling | Lenis `1.3.26` | Momentum smooth scroll behavior |
+| Decentralized Storage | Pinata IPFS API | Permanent, decentralized file pinning (V3 & Legacy) |
+| Local Database | IndexedDB (`truevote_persistence_db`) | Offline storage for elections and voter locks |
+| Inter-Tab Sync | HTML5 BroadcastChannel API | Zero-latency real-time state sync across browser tabs |
+| Anti-Bot Engine | Cloudflare Turnstile + Webdriver Heuristics | Proof-of-humanity challenge and bot blocking |
+| Hashing & Cryptography | Web Crypto API (`crypto.subtle.digest`) | Deterministic SHA-256 voter nullifier generation |
+| Web3 Connectivity | EIP-1193 (`window.ethereum`) | Optional MetaMask wallet integration |
+| Testing Suite | Jest & React Testing Library | Unit and component integration testing |
 
 ## Project Structure
 
@@ -165,168 +121,132 @@ TrueVote implements client-side behavioral heuristics to ensure genuine human pa
 .
 |-- public/
 |   |-- images/
-|   |   |-- logo.png                        Primary TrueVote branding mark
-|   |   |-- privacy_dashboard.webp          Dashboard overview graphic
-|   |   |-- vote.webp                       Voting ballot preview image
-|   |   |-- illus.webp                      Cryptographic architecture illustration
+|   |   |-- logo.png                        TrueVote official logo
+|   |   |-- favicon.ico                     Website favicon
 |   |   `-- stacks/                         Technology badges (Pinata, IPFS, Cloudflare, etc.)
-|   |-- favicon.ico                         Application favicon
-|   |-- index.html                          HTML document template
-|   `-- manifest.json                       Web app manifest configuration
+|   |-- index.html                          HTML root document
+|   `-- manifest.json                       Web application manifest
 |-- src/
-|   |-- __mocks__/
-|   |   `-- lenis.js                        Smooth scroll mock for Jest environment
 |   |-- components/
-|   |   |-- auth/                           Wallet connection and authentication modals
-|   |   |-- box/                            Generic dialog and confirmation components
-|   |   |-- navbar.tsx                      Global navigation bar with wallet status
-|   |   |-- footer.tsx                      Application footer and resource links
-|   |   |-- faq.tsx                         Frequently Asked Questions accordion
-|   |   `-- scrolltotop.tsx                 Route change scroll restoration helper
+|   |   |-- auth/                           Wallet connection modal
+|   |   |-- box/                            Generic confirmation dialogs
+|   |   |-- navbar.tsx                      Header navigation with wallet connection status
+|   |   |-- footer.tsx                      Platform footer and links
+|   |   |-- faq.tsx                         Frequently asked questions accordion
+|   |   `-- scrolltotop.tsx                 Scroll-to-top route watcher
 |   |-- dashboard/
 |   |   |-- Dashboard.tsx                   Main organizer dashboard coordinator
-|   |   |-- EventsTable.tsx                 Paginated, searchable election management table
-|   |   |-- NewEventModal.tsx               Election creator workflow modal
-|   |   |-- RealtimeAnalyticsModal.tsx      Live vote share and turnout breakdown
+|   |   |-- EventsTable.tsx                 Searchable election table with live status
+|   |   |-- NewEventModal.tsx               Multi-step election creation modal
+|   |   |-- RealtimeAnalyticsModal.tsx      Live vote share percentages and turnout analytics
 |   |   |-- HeroBanner.tsx                  Organizer summary and quick action banner
-|   |   |-- StatsPanel.tsx                  Aggregated KPI metrics cards
+|   |   |-- StatsPanel.tsx                  Aggregated statistics cards
 |   |   |-- ActionCards.tsx                 Election status quick filter cards
 |   |   |-- Sidebar.tsx                     Dashboard navigation sidebar
-|   |   `-- types.ts                        TypeScript interfaces for elections and ballots
+|   |   `-- types.ts                        TypeScript interfaces for elections and votes
 |   |-- pages/
-|   |   |-- home.tsx                        Public marketing and platform overview page
-|   |   `-- dashboard.tsx                   Dashboard route wrapper
+|   |   |-- home.tsx                        Home landing page with voting code lookup
+|   |   `-- dashboard.tsx                   Dashboard page wrapper
 |   |-- services/
-|   |   |-- pinata.ts                       Pinata IPFS V3 pinning and gateway client
-|   |   `-- storage.ts                      IndexedDB database and local backup handlers
-|   |-- styles/
-|   |   `-- animations.css                  UI keyframe animations and transitions
+|   |   |-- pinata.ts                       Pinata IPFS pinning and gateway service
+|   |   `-- storage.ts                      IndexedDB backup and recovery engine
 |   |-- voting/
-|   |   |-- VotingPage.tsx                  Voter ballot interface with Turnstile challenge
-|   |   `-- voting.css                      Ballot styling and confirmation receipt layout
-|   |-- App.tsx                             Root router configuration and provider tree
-|   |-- index.tsx                           React application bootstrap
-|   `-- setupTests.js                       Jest global test setup and DOM polyfills
-|-- package.json                            Project dependencies and build scripts
-|-- tsconfig.json                           TypeScript compiler options
+|   |   |-- VotingPage.tsx                  Ballot voting page with Turnstile and nullifier lock
+|   |   `-- voting.css                      Voting page layout and receipt styles
+|   |-- App.tsx                             Root route definitions and layout
+|   |-- index.tsx                           React DOM render entry point
+|   `-- setupTests.js                       Jest global test setup and mocks
+|-- package.json                            Project configuration and dependencies
+|-- tsconfig.json                           TypeScript compiler configuration
 `-- README.md                               Project documentation
 ```
 
-## Configuration Notes & Environment Variables
+## Configuration & Environment Variables
 
-Create a `.env` file in the project root to configure custom Pinata IPFS credentials or Cloudflare Turnstile keys:
+To configure custom Pinata IPFS or Cloudflare Turnstile credentials, create a `.env` file in the root directory:
 
 ```bash
-# Pinata IPFS Configuration
+# Pinata IPFS Credentials
 REACT_APP_PINATA_JWT=your_pinata_jwt_token_here
 REACT_APP_PINATA_GATEWAY_URL=https://your-custom-gateway.mypinata.cloud/ipfs/
 REACT_APP_PINATA_API_KEY=your_optional_pinata_api_key
 REACT_APP_PINATA_SECRET_KEY=your_optional_pinata_secret_key
 
-# Cloudflare Turnstile Configuration
+# Cloudflare Turnstile Site Key
 REACT_APP_TURNSTILE_SITE_KEY=your_cloudflare_turnstile_site_key
 
 # Build Optimization
 GENERATE_SOURCEMAP=false
 ```
 
-- When `REACT_APP_PINATA_JWT` is omitted, TrueVote defaults to the configured production Pinata gateway.
-- Client-side bot defense operates in deterministic heuristic mode if a custom Turnstile site key is not supplied.
-
-## Current Status
-
-| Feature | Status |
-| --- | --- |
-| Web3 Wallet Connection | Fully Operational |
-| Anonymous Voter Nullifiers | Fully Operational |
-| Cloudflare Turnstile Integration | Fully Operational |
-| Headless Bot & Entropy Detection | Fully Operational |
-| Pinata IPFS V3 Pinning | Fully Operational |
-| IndexedDB Client Backup | Fully Operational |
-| Cryptographic Ballot Confirmation | Fully Operational |
-| Persistent Revote Locking | Fully Operational |
-| Real-Time Leader Pill Calculation | Fully Operational |
-| Live Analytics & Audit Modal | Fully Operational |
+Note: If no custom environment variables are provided, TrueVote automatically runs with default production gateway fallbacks and client-side heuristic verification.
 
 ## Local Development Setup
 
-Follow these steps to set up and run TrueVote on your local workstation.
+Follow these steps to run TrueVote locally on your machine:
 
 ### 1. Prerequisites
-
-Ensure you have the following installed:
-
-- Node.js `18.0.0` or newer (Node `20.x` or `22.x` recommended).
+- Node.js `18.0.0` or newer (Node `20.x` recommended).
 - npm `9.0.0` or newer.
-- A modern web browser with MetaMask installed (optional for walletless testing).
+- A modern web browser (Google Chrome, Firefox, Brave, or Safari).
 
 ### 2. Clone the Repository
-
 ```bash
 git clone https://github.com/sanketpadhyal/TrueVote.git
 cd TrueVote/truevote
 ```
 
 ### 3. Install Dependencies
-
 ```bash
 npm install
 ```
 
-### 4. Configure Environment (Optional)
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` to provide your custom Pinata IPFS or Cloudflare credentials if desired.
-
-### 5. Start the Development Server
-
+### 4. Start the Local Development Server
 ```bash
 npm start
 ```
+The app will open automatically at `http://localhost:3000`.
 
-The application will start on `http://localhost:3000`.
-
-### 6. Run the Test Suite
-
+### 5. Run the Test Suite
 ```bash
 npm test -- --watchAll=false
 ```
 
-### 7. Build for Production
-
+### 6. Build for Production
 ```bash
 npm run build
 ```
+The production bundle will be generated in the `build/` folder.
 
-Production build artifacts will be generated in the `build/` directory with source maps omitted for deployment optimization.
+## Current Project Status
 
-## Release Checklist
+| Capability | Implementation Status |
+| --- | --- |
+| MetaMask Wallet Connection | Fully Operational |
+| Walletless Voting Mode | Fully Operational |
+| Client-Side SHA-256 Nullifiers | Fully Operational |
+| Revote Prevention & Session Locking | Fully Operational |
+| Cloudflare Turnstile Anti-Bot | Fully Operational |
+| Headless Webdriver Bot Detection | Fully Operational |
+| Human Cursor/Touch Entropy Checks | Fully Operational |
+| Pinata IPFS Manifest Pinning | Fully Operational |
+| IndexedDB Offline Storage | Fully Operational |
+| BroadcastChannel Cross-Tab Sync | Fully Operational |
+| Real-Time Leader Pill Calculation | Fully Operational |
+| Turnout & Vote Analytics Modal | Fully Operational |
 
-Before tagging and deploying a new release:
+## License
 
-- Confirm all test suites pass with zero failures (`npm test -- --watchAll=false`).
-- Verify production build succeeds without warnings (`npm run build`).
-- Confirm IndexedDB initialization and backup persistence in clean browser profiles.
-- Test IPFS upload and gateway retrieval using active Pinata credentials.
-- Verify Turnstile challenge resolution and headless bot blocking on automated browsers.
-- Confirm cryptographic ballot confirmation and subsequent revote locking.
-- Update release version numbers in `package.json` and documentation.
+This project is open source and available under the [MIT License](LICENSE). Anyone is free to use, modify, distribute, or incorporate this software into their own projects.
 
-## License & Open Source Terms
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Developer
+## Developer & Contact
 
 - Developer: Sanket Padhyal
-- Live Platform: https://truevote.sanketpadhyal.in
-- Website: https://www.sanketpadhyal.in
+- Live Application: https://truevote.sanketpadhyal.in
+- Portfolio: https://www.sanketpadhyal.in
 - Support: sanketpadhyal3@gmail.com
 - GitHub: https://github.com/sanketpadhyal
 
 ## Disclaimer
 
-TrueVote provides cryptographic zero-knowledge nullifiers and decentralized data persistence as open-source client software. Users, organizers, and institutions are responsible for ensuring that their election parameters, legal voting requirements, and deployment practices comply with relevant local election laws, privacy standards, and regulatory frameworks.
+TrueVote is developed as an open-source decentralized Web3 software project. Organizers and voters are responsible for ensuring that their elections and usage comply with applicable local rules, organizational policies, and legal frameworks.
